@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* Custom theme variables and base styles if needed */
+:root {
+  --color-brand-primary: #3b82f6;
+  --color-brand-secondary: #ec4899;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+}
