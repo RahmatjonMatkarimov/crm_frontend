@@ -14,31 +14,49 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    async register(username, password, name, role) {
+    // Yangi foydalanuvchi yaratish (rasm bilan)
+    async createUser(userData) {
       this.loading = true
       this.error = null
+
       try {
+        const formData = new FormData()
+
+        if (userData.username) formData.append('username', userData.username)
+        if (userData.password) formData.append('password', userData.password)
+        if (userData.name) formData.append('name', userData.name)
+        if (userData.surname) formData.append('surname', userData.surname)
+        if (userData.father_name) formData.append('father_name', userData.father_name)
+        if (userData.role) formData.append('role', userData.role)
+        if (userData.phone) formData.append('phone', userData.phone)
+        if (userData.phone2) formData.append('phone2', userData.phone2)
+        if (userData.birthDate) formData.append('birthDate', userData.birthDate)
+        if (userData.userCode) formData.append('userCode', userData.userCode)
+        if (userData.uniqueCode) formData.append('uniqueCode', userData.uniqueCode)
+
+        // Rasm yuklash
+        if (userData.img && userData.img instanceof File) {
+          formData.append('img', userData.img)
+        }
+
         const response = await fetch('http://localhost:4000/api/auth/register', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.token}`,
           },
-          body: JSON.stringify({ username, password, name, role }),
+          body: formData,
         })
 
         const data = await response.json()
+
         if (!response.ok) {
-          throw new Error(data.message || 'Ro\'yxatdan o\'tishda xatolik yuz berdi')
+          throw new Error(data.message || 'Foydalanuvchi yaratishda xatolik yuz berdi')
         }
 
-        this.token = data.access_token
-        this.user = data.user
-        localStorage.setItem('token', data.access_token)
-        localStorage.setItem('user', JSON.stringify(data.user))
-        return true
+        return { success: true, user: data.user }
       } catch (err) {
         this.error = err.message
-        return false
+        return { success: false, error: err.message }
       } finally {
         this.loading = false
       }
@@ -50,50 +68,88 @@ export const useAuthStore = defineStore('auth', {
       try {
         const response = await fetch('http://localhost:4000/api/auth/login', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password }),
         })
-
         const data = await response.json()
-        if (!response.ok) {
-          throw new Error(data.message || 'Tizimga kirishda xatolik yuz berdi')
-        }
+
+        if (!response.ok) throw new Error(data.message || 'Kirishda xatolik')
 
         this.token = data.access_token
         this.user = data.user
         localStorage.setItem('token', data.access_token)
         localStorage.setItem('user', JSON.stringify(data.user))
-        return true
+        return { success: true }
       } catch (err) {
         this.error = err.message
-        return false
+        return { success: false }
       } finally {
         this.loading = false
       }
     },
 
-    async createUser(username, password, name, role) {
+    async updateUser(userId, formData) {
       this.loading = true
       this.error = null
       try {
-        const response = await fetch('http://localhost:4000/api/auth/register', {
-          method: 'POST',
+        const response = await fetch(`http://localhost:4000/api/users/${userId}`, {
+          method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${this.token}`,
           },
-          body: JSON.stringify({ username, password, name, role }),
+          body: formData,
         })
         const data = await response.json()
         if (!response.ok) {
-          throw new Error(data.message || 'Foydalanuvchi yaratishda xatolik yuz berdi')
+          throw new Error(data.message || 'Foydalanuvchini yangilashda xatolik')
         }
         return { success: true, user: data.user }
       } catch (err) {
         this.error = err.message
-        return { success: false }
+        return { success: false, error: err.message }
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async archiveUser(userId) {
+      const response = await fetch(`http://localhost:4000/api/users/${userId}/archive`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${this.token}` },
+      })
+      const data = await response.json()
+      if (!response.ok) return { success: false, error: data.message }
+      return { success: true }
+    },
+
+    async restoreUser(userId) {
+      const response = await fetch(`http://localhost:4000/api/users/${userId}/restore`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${this.token}` },
+      })
+      const data = await response.json()
+      if (!response.ok) return { success: false, error: data.message }
+      return { success: true }
+    },
+
+    async deleteUser(userId) {
+      this.loading = true
+      this.error = null
+      try {
+        const response = await fetch(`http://localhost:4000/api/users/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${this.token}`,
+          },
+        })
+        const data = await response.json()
+        if (!response.ok) {
+          throw new Error(data.message || 'Foydalanuvchini o\'chirishda xatolik')
+        }
+        return { success: true }
+      } catch (err) {
+        this.error = err.message
+        return { success: false, error: err.message }
       } finally {
         this.loading = false
       }

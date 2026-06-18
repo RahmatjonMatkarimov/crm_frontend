@@ -2,11 +2,49 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
+import Home from '../views/home.vue'
+import Profile from '@/views/profile.vue'
+import Users from '@/views/users.vue'
+import Customers from '@/views/customers.vue'
+import Archive from '@/views/archive.vue'
 
 const routes = [
   {
     path: '/',
-    redirect: '/dashboard',
+    component: Home,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: Dashboard,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/profile',
+        name: 'profile',
+        component: Profile,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/users',
+        name: 'users',
+        component: Users,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/customers',
+        name: 'customers',
+        component: Customers,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/archive',
+        name: 'archive',
+        component: Archive,
+        meta: { requiresAuth: true },
+      },
+    ]
   },
   {
     path: '/login',
@@ -14,17 +52,7 @@ const routes = [
     component: Login,
     meta: { guestOnly: true },
   },
-  // /register is disabled — users are only created by Admin/Rahbar inside the Dashboard
-  {
-    path: '/register',
-    redirect: '/login',
-  },
-  {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: Dashboard,
-    meta: { requiresAuth: true },
-  },
+
 ]
 
 const router = createRouter({

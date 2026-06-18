@@ -1,15 +1,47 @@
 @import "tailwindcss";
 
-/* Custom theme variables and base styles if needed */
+@custom-variant dark (&:is(.dark *));
+
 :root {
-  --color-brand-primary: #3b82f6;
-  --color-brand-secondary: #ec4899;
+  --brand-50: #eef2ff;
+  --brand-100: #e0e7ff;
+  --brand-500: #1a2e7a;
+  --brand-600: #0a1850;
+  --brand-700: #071240;
+}
+
+html {
+  background-color: #eef1fb;
+}
+
+.dark html,
+html.dark {
+  background-color: #0f172a;
 }
 
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: #eef1fb;
+  color: #0a1850;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+.dark body {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+/* Smooth theme transitions */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+/* Override transitions on elements that need faster/no transitions */
+button, a, svg, input, select, textarea {
+  transition-duration: 100ms;
 }
