@@ -1,9 +1,11 @@
+import axios from 'axios'
 import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('token') || null,
     user: JSON.parse(localStorage.getItem('user')) || null,
+    permission: null,
     error: null,
     loading: false,
   }),
@@ -14,6 +16,21 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
+
+    async fetchPermission() {
+      try {
+        this.loading = true
+        const id = this.user.id
+        const { data } = await axios.get(`http://localhost:4000/permissions/${id}`)
+        this.permission = { ...data }
+      } catch (err) {
+        this.error = 'Maʼlumotni yuklashda xatolik'
+        console.error(err)
+      } finally {
+        this.loading = false
+      }
+    },
+
     // Yangi foydalanuvchi yaratish (rasm bilan)
     async createUser(userData) {
       this.loading = true
@@ -72,13 +89,13 @@ export const useAuthStore = defineStore('auth', {
           body: JSON.stringify({ username, password }),
         })
         const data = await response.json()
-
         if (!response.ok) throw new Error(data.message || 'Kirishda xatolik')
-
-        this.token = data.access_token
-        this.user = data.user
-        localStorage.setItem('token', data.access_token)
-        localStorage.setItem('user', JSON.stringify(data.user))
+          
+          this.token = data.access_token
+          this.user = data.user
+          localStorage.setItem('token', data.access_token)
+          localStorage.setItem('user', JSON.stringify(data.user))
+          await this.fetchPermission()
         return { success: true }
       } catch (err) {
         this.error = err.message

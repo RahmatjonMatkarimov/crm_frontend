@@ -1,8 +1,14 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
-// Initialize theme store on app start so dark class is applied immediately
+import { useAuthStore } from './stores/auth';
+
 useThemeStore()
+const authStore = useAuthStore()
+
+if (authStore.isAuthenticated) {
+    authStore.fetchPermission()
+}
 </script>
 
 <template>

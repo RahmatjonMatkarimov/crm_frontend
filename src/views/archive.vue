@@ -136,6 +136,17 @@ const switchTab = (tab) => { activeTab.value = tab; search.value = ''; dateFrom.
 const clearFilters = () => { search.value = ''; dateFrom.value = ''; dateTo.value = '' }
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('uz-UZ') : '—'
 const roleLabel = (r) => ({ ADMIN: 'Administrator', RAHBAR: 'Rahbar', YURIST: 'Yurist', KASSIR: 'Kassir' }[r] || r)
+
+const paymentTypeLabels = {
+  NAQD: 'Naqd pul',
+  KARTA: 'Plastik karta',
+  PUL_OTKAZISH: 'Pul o\'tkazish'
+}
+
+const formatMoney = (amount) => {
+  if (!amount) return '—'
+  return new Intl.NumberFormat('uz-UZ', { maximumFractionDigits: 0 }).format(amount) + ' so\'m'
+}
 </script>
 
 <template>
@@ -271,6 +282,7 @@ const roleLabel = (r) => ({ ADMIN: 'Administrator', RAHBAR: 'Rahbar', YURIST: 'Y
                             <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Mijoz</th>
                             <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Telefon</th>
                             <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Mas'ul yurist</th>
+                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">To'lov</th>
                             <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-wider">Arxiv sanasi</th>
                             <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Kim arxivlagan</th>
                             <th class="px-4 py-3.5 text-center text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Amallar</th>
@@ -299,6 +311,34 @@ const roleLabel = (r) => ({ ADMIN: 'Administrator', RAHBAR: 'Rahbar', YURIST: 'Y
                             <td class="px-4 py-3.5 text-sm text-slate-500 dark:text-slate-400">
                                 {{ c.assignedTo ? `${c.assignedTo.surname} ${c.assignedTo.name}` : '—' }}
                             </td>
+                            <td class="px-4 py-3.5 text-sm">
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Shartnoma:</span>
+                                        <span class="font-semibold text-slate-800 dark:text-slate-200">{{ formatMoney(c.price) }}</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-1.5 mt-1">
+                                        <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">To'landi:</span>
+                                        <span class="font-medium text-emerald-600 dark:text-emerald-400">
+                                            {{ formatMoney(c.payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0) }}
+                                        </span>
+                                        <span v-if="c.payments && c.payments.length > 0" class="text-[10px] text-slate-400 dark:text-slate-500">
+                                            ({{ paymentTypeLabels[c.payments[0].type] || c.payments[0].type }})
+                                        </span>
+                                    </div>
+                                    
+                                    <div v-if="(c.price || 0) - (c.payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0) > 0" class="flex items-center gap-1.5 mt-1">
+                                        <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Qarz:</span>
+                                        <span class="font-bold text-red-600 dark:text-red-400">
+                                            {{ formatMoney((c.price || 0) - (c.payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0)) }}
+                                        </span>
+                                    </div>
+                                    <div v-else-if="c.price > 0" class="flex items-center gap-1.5 mt-1">
+                                        <span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 text-[10px] font-semibold">To'liq to'langan</span>
+                                    </div>
+                                </div>
+                            </td>
                             <td class="px-4 py-3.5 text-sm font-medium text-amber-600 dark:text-amber-400">{{ formatDate(c.archivedAt) }}</td>
                             <td class="px-4 py-3.5 text-sm text-slate-500 dark:text-slate-400">{{ userName(c.archivedBy) }}</td>
                             <td class="px-4 py-3.5">
@@ -319,7 +359,7 @@ const roleLabel = (r) => ({ ADMIN: 'Administrator', RAHBAR: 'Rahbar', YURIST: 'Y
                             </td>
                         </tr>
                         <tr v-if="filteredCustomers.length === 0">
-                            <td colspan="7" class="px-6 py-16 text-center">
+                            <td colspan="8" class="px-6 py-16 text-center">
                                 <div class="flex flex-col items-center gap-2 text-slate-400 dark:text-slate-600">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />

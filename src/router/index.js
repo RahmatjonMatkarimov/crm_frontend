@@ -44,6 +44,11 @@ const routes = [
         component: Archive,
         meta: { requiresAuth: true },
       },
+      {
+        path: '/permissions/:id',
+        name: 'PermissionsEdit',
+        component: () => import('@/views/permissions.vue')
+      }
     ]
   },
   {

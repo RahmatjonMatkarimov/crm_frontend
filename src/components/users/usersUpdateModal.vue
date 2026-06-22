@@ -38,6 +38,7 @@ const newUserUsername = ref('')
 const newUserPassword = ref('')
 const newUserPhone = ref('')
 const newUserPhone2 = ref('')
+const newUserTelegram = ref('')
 const newUserBirthDate = ref('')
 const newUserUserCode = ref('')
 const newUserUniqueCode = ref('')
@@ -112,6 +113,7 @@ const fillForm = () => {
     newUserUsername.value = user.username || ''
     newUserPhone.value = user.phone || ''
     newUserPhone2.value = user.phone2 || ''
+    newUserTelegram.value = user.telegram || ''
     newUserBirthDate.value = user.birthDate ? user.birthDate.split('T')[0] : ''
     newUserUserCode.value = user.userCode || ''
     newUserUniqueCode.value = user.uniqueCode || ''
@@ -129,6 +131,7 @@ const resetForm = () => {
     newUserPassword.value = ''
     newUserPhone.value = ''
     newUserPhone2.value = ''
+    newUserTelegram.value = ''
     newUserBirthDate.value = ''
     newUserUserCode.value = ''
     newUserUniqueCode.value = ''
@@ -147,7 +150,7 @@ const saveUser = async () => {
 
     if (!newUserName.value || !newUserSurname.value || !newUserFatherName.value ||
         !newUserUsername.value || !newUserBirthDate.value || !newUserUserCode.value ||
-        !newUserUniqueCode.value) {
+        !newUserUniqueCode.value || !newUserTelegram.value) {
         userCreateError.value = 'Barcha majburiy maydonlarni to\'ldiring'
         return
     }
@@ -164,6 +167,7 @@ const saveUser = async () => {
     formData.append('username', newUserUsername.value)
     formData.append('phone', newUserPhone.value)
     formData.append('phone2', newUserPhone2.value || '')
+    formData.append('telegram', newUserTelegram.value || '')
     formData.append('birthDate', newUserBirthDate.value)
     formData.append('userCode', newUserUserCode.value)
     formData.append('uniqueCode', newUserUniqueCode.value)
@@ -356,7 +360,17 @@ watch(
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tug‘ilgan
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Telegram <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-sm font-medium">@</span>
+                                    <input v-model="newUserTelegram" type="text" placeholder="username yoki +998XXXXXXXXX"
+                                        class="w-full pl-7 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tug’ilgan
                                     sana</label>
                                 <input v-model="newUserBirthDate" type="date"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />

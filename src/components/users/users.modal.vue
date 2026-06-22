@@ -32,6 +32,7 @@ const newUserUsername = ref('')
 const newUserPassword = ref('')
 const newUserPhone = ref('')
 const newUserPhone2 = ref('')
+const newUserTelegram = ref('')
 const newUserBirthDate = ref('')
 const newUserUserCode = ref('')
 const newUserUniqueCode = ref('')
@@ -117,6 +118,7 @@ const resetForm = () => {
     newUserPassword.value = ''
     newUserPhone.value = ''
     newUserPhone2.value = ''
+    newUserTelegram.value = ''
     newUserBirthDate.value = ''
     newUserUserCode.value = ''
     newUserUniqueCode.value = ''
@@ -130,7 +132,7 @@ const addUser = async () => {
     userCreateError.value = ''
     userCreateSuccess.value = ''
 
-    if (!newUserUsername.value || !newUserPassword.value || !newUserPhone.value || !newUserSurname.value || !newUserFatherName.value || !newUserBirthDate.value || !newUserUserCode.value || !newUserUniqueCode.value || !newUserRole.value || !newUserName.value) {
+    if (!newUserUsername.value || !newUserPassword.value || !newUserPhone.value || !newUserSurname.value || !newUserFatherName.value || !newUserBirthDate.value || !newUserUserCode.value || !newUserUniqueCode.value || !newUserRole.value || !newUserName.value || !newUserTelegram.value) {
         userCreateError.value = 'barcha maydonlarni kiritilishi shart, faqat rasm va qo\'shimcha telefon raqami ixtiyoriy'
         return
     }
@@ -151,6 +153,7 @@ const addUser = async () => {
         father_name: newUserFatherName.value,
         phone: newUserPhone.value,
         phone2: newUserPhone2.value,
+        telegram: newUserTelegram.value,
         birthDate: newUserBirthDate.value,
         userCode: newUserUserCode.value,
         uniqueCode: +newUserUniqueCode.value ? Number(newUserUniqueCode.value) : undefined,
@@ -345,6 +348,17 @@ const closeModal = () => {
                                 <input v-model="newUserPhone2" @input="handlePhoneInput2" type="tel"
                                     placeholder="+998 XX XXX XX XX"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                            </div>
+
+                            <!-- Telegram -->
+                            <div class="space-y-1">
+                                <label
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Telegram <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-sm font-medium">@</span>
+                                    <input v-model="newUserTelegram" type="text" placeholder="username yoki +998XXXXXXXXX"
+                                        class="w-full pl-7 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                </div>
                             </div>
 
                             <!-- Birth date -->
