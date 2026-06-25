@@ -47,6 +47,11 @@ const error = ref('')
 const success = ref('')
 const users = ref([])
 
+const handleInputPrice = (e) => {
+  const rawValue = e.target.value.replace(/\D/g, '')
+  paymentAmount.value = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+}
+
 const formatNumberWithDots = (number) => {
   if (!number || isNaN(number)) return "0";
   return Number(number).toLocaleString("uz-UZ", { minimumFractionDigits: 0 }).replace(/,/g, ".");
@@ -694,8 +699,26 @@ const handleInput = () => {
 
 const save = async () => {
   error.value = ''
-  if (!name.value || !surname.value || !phone.value) {
-    error.value = 'Ism, familiya va telefon majburiy'
+  if (
+    !name.value ||
+    !surname.value ||
+    !father_name.value ||
+    !phone.value ||
+    !selectedRegion.value ||
+    !selectedDistrict.value ||
+    !source.value ||
+    !assignedToId.value ||
+    !paymentAmount.value ||
+    !paymentType.value ||
+    !price.value ||
+    !telegram.value) {
+    error.value = 'Barcha maydonlar to\'liq kiritilishi kerak'
+    return
+  }
+
+
+  if (price.value !== Number(String(paymentAmount.value).replace(/\./g, ''))) {
+    error.value = 'To\'liq to\'lov amalga oshirilishi kerak'
     return
   }
 
@@ -734,7 +757,7 @@ const save = async () => {
     source: source.value || null,
     telegram: telegram.value || null,
     appealType: appealType.value || "",
-    paymentAmount: paymentAmount.value !== '' ? Number(paymentAmount.value) : null,
+    paymentAmount: paymentAmount.value ? Number(String(paymentAmount.value).replace(/\./g, '')) : null,
     paymentType: paymentType.value || null,
     price: price.value !== '' ? Number(price.value) : 0,
   }
@@ -850,7 +873,8 @@ const handlePhone2isTelegram = () => {
             <!-- Ism -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Ism') }}
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                $t('Ism') }}
                 <span class="text-red-500">*</span></label>
               <input v-model="name" type="text" :placeholder="$t('Ismni kiriting')"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
@@ -859,7 +883,8 @@ const handlePhone2isTelegram = () => {
             <!-- Familiya -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Familiya') }}
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t('Familiya') }}
                 <span class="text-red-500">*</span></label>
               <input v-model="surname" type="text" :placeholder="$t('Familiyani kiriting')"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
@@ -868,7 +893,8 @@ const handlePhone2isTelegram = () => {
             <!-- Otasining ismi -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Otasining ismi') }} <span class="text-red-500">*</span></label>
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t('Otasining ismi') }} <span class="text-red-500">*</span></label>
               <input v-model="father_name" type="text" :placeholder="$t('Otasining ismi')"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
             </div>
@@ -876,7 +902,8 @@ const handlePhone2isTelegram = () => {
             <!-- Telefon -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Telefon') }}
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t('Telefon') }}
                 <span class="text-red-500">*</span></label>
               <input v-model="phone" @input="handlePhone($event, 1)" type="tel" placeholder="+998 XX XXX XX XX"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
@@ -902,7 +929,8 @@ const handlePhone2isTelegram = () => {
             <!-- Telegram -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Telegram') }}
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t('Telegram') }}
                 <span class="text-red-500">*</span></label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -921,7 +949,8 @@ const handlePhone2isTelegram = () => {
             <!-- Viloyat -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Viloyat') }}
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t('Viloyat') }}
                 <span class="text-red-500">*</span></label>
               <select v-model="selectedRegion"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20 cursor-pointer appearance-none">
@@ -933,7 +962,8 @@ const handlePhone2isTelegram = () => {
             <!-- Tuman -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Tuman / Shahar') }} <span class="text-red-500">*</span></label>
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t('Tuman / Shahar') }} <span class="text-red-500">*</span></label>
               <select v-model="selectedDistrict" :disabled="!selectedRegion"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20 cursor-pointer appearance-none">
                 <option value="">{{ $t('— Tuman tanlang —') }}</option>
@@ -951,7 +981,8 @@ const handlePhone2isTelegram = () => {
             <!-- Manba -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Qayerdan eshitib kelgan') }} <span class="text-red-500">*</span></label>
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t('Qayerdan eshitib kelgan') }} <span class="text-red-500">*</span></label>
               <select v-model="source"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20 cursor-pointer appearance-none">
                 <option value="">{{ $t('— Tanlanmagan —') }}</option>
@@ -962,7 +993,8 @@ const handlePhone2isTelegram = () => {
             <!-- Mas'ul yurist -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t("Mas'ul yurist") }} <span class="text-red-500">*</span></label>
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t("Mas'ul yurist") }} <span class="text-red-500">*</span></label>
               <select v-model="assignedToId"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20 cursor-pointer appearance-none">
                 <option value="">{{ $t('— Belgilanmagan —') }}</option>
@@ -978,14 +1010,16 @@ const handlePhone2isTelegram = () => {
                 {{ props.editing?.id ? $t("Qarzni to'lash summasi (so'mda)") : $t("To'lov summasi (so'mda)") }}
                 <span class="text-red-500">*</span>
               </label>
-              <input v-model="paymentAmount" type="number" :placeholder="$t('Masalan: 500000')"
+              <input v-model="paymentAmount" @input="handleInputPrice" type="string"
+                :placeholder="$t('Masalan: 500000')"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
             </div>
 
             <!-- To'lov turi -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t("To'lov turi") }} <span class="text-red-500">*</span></label>
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t("To'lov turi") }} <span class="text-red-500">*</span></label>
               <select v-model="paymentType"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20 cursor-pointer appearance-none">
                 <option value="NAQD">{{ $t('Naqd pul') }}</option>
@@ -997,7 +1031,8 @@ const handlePhone2isTelegram = () => {
             <!-- Shartnoma summasi -->
             <div class="sm:col-span-2 space-y-2">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t("Shartnoma summasi (so'mda)") }} <span class="text-red-500">*</span></label>
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t("Shartnoma summasi (so'mda)") }} <span class="text-red-500">*</span></label>
 
               <!-- Quick Select Buttons -->
               <div class="grid grid-cols-3 gap-2">
@@ -1022,7 +1057,8 @@ const handlePhone2isTelegram = () => {
             <!-- Izoh -->
             <div class="sm:col-span-2 space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Murojaatning qisqacha mazmuni') }} <span class="text-red-500">*</span></label>
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t('Murojaatning qisqacha mazmuni') }}</label>
               <textarea v-model="description" rows="3" :placeholder="$t('Murojaatning qisqacha mazmuni...')"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20 resize-none"></textarea>
             </div>
@@ -1046,7 +1082,8 @@ const handlePhone2isTelegram = () => {
         <div
           class="px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3 bg-slate-50 dark:bg-slate-800/50">
           <button @click="$emit('close')"
-            class="px-5 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">{{ $t('Bekor qilish') }}</button>
+            class="px-5 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">{{
+              $t('Bekor qilish') }}</button>
           <button @click="save" class="btn-primary px-5 py-2.5 rounded-lg text-white text-sm">
             {{ props.editing?.id ? $t('Saqlash') : $t('Yaratish') }}
           </button>

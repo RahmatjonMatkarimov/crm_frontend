@@ -37,7 +37,6 @@ onMounted(() => {
 })
 
 
-
 const formatNumberWithDots = (number) => {
   if (!number || isNaN(number)) return "0";
   return Number(number).toLocaleString("uz-UZ", { minimumFractionDigits: 0 }).replace(/,/g, ".");

@@ -67,6 +67,47 @@ const handleImgChange = (e) => {
     }
 }
 
+const handleInput = () => {
+  let val = newUserTelegram.value
+
+  if (!val) return
+
+  // @ bo'lmasa birinchi belgini tekshiramiz
+  const firstChar = val.replace(/^@/, '').charAt(0)
+
+  // Harf bo'lsa
+  if (/[a-zA-Z]/.test(firstChar)) {
+    newUserTelegram.value = '@' + val.replace(/^@/, '')
+    return
+  }
+
+  // Raqam bo'lsa
+  let digits = val.replace(/\D/g, '')
+
+  if (digits.startsWith('998')) {
+    digits = digits.slice(3)
+  }
+
+  digits = digits.slice(0, 9)
+
+  let formatted = '+998'
+
+  if (digits.length > 0) {
+    formatted += ' ' + digits.slice(0, 2)
+  }
+  if (digits.length > 2) {
+    formatted += ' ' + digits.slice(2, 5)
+  }
+  if (digits.length > 5) {
+    formatted += ' ' + digits.slice(5, 7)
+  }
+  if (digits.length > 7) {
+    formatted += ' ' + digits.slice(7, 9)
+  }
+
+  newUserTelegram.value = formatted
+}
+
 // Telefon formatlash
 const handlePhoneInput = (e) => {
     let value = e.target.value.replace(/\D/g, '');
@@ -359,11 +400,19 @@ watch(
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Telegram') }} <span class="text-red-500">*</span></label>
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                                    $t('Telegram') }} <span class="text-red-500">*</span></label>
                                 <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-sm font-medium">@</span>
-                                    <input v-model="newUserTelegram" type="text" :placeholder="$t('username yoki +998XXXXXXXXX')"
-                                        class="w-full pl-7 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400"
+                                            viewBox="0 0 24 24" fill="currentColor">
+                                            <path
+                                                d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+                                        </svg>
+                                    </span>
+                                    <input v-model="newUserTelegram" @input="handleInput" type="text"
+                                        :placeholder="$t('@username yoki +998 XX XXX XX XX')"
+                                        class="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
                                 </div>
                             </div>
 
