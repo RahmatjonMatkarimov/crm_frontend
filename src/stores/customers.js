@@ -50,20 +50,30 @@ export const useCustomersStore = defineStore('customers', {
       if (!res.ok) return { success: false, error: result.message || result.error }
 
       await this.fetchCustomers()
-      return { success: true }
+      return { success: true, customer: result } // yangi yaratilgan mijozni qaytarish
     },
 
+    // ==================== YANGILANGAN updateCustomer ====================
     async updateCustomer(id, data) {
       const res = await fetch(`http://localhost:4000/api/customers/${id}`, {
         method: 'PUT',
         headers: this.headers(),
         body: JSON.stringify(data),
       })
-      const result = await res.json()
-      if (!res.ok) return { success: false, error: result.message || result.error }
 
+      const result = await res.json()
+
+      if (!res.ok) {
+        return { success: false, error: result.message || result.error }
+      }
+
+      // Yangilangan mijoz ma'lumotlarini qaytaramiz (payments ichida yangi to'lov bor)
       await this.fetchCustomers()
-      return { success: true }
+
+      return { 
+        success: true, 
+        customer: result   // <-- Muhim: endi to'liq yangilangan customer qaytadi
+      }
     },
 
     async archiveCustomer(id) {

@@ -11,7 +11,7 @@ const authStore = useAuthStore()
 const store = useCustomersStore()
 const pricesStore = usePricesStore()
 const themeStore = useThemeStore()
-
+const router = useRouter()
 const editingCustomer = ref(null)
 const search = ref('')
 const showModal = ref(false)
@@ -22,6 +22,7 @@ const showPricesModal = ref(false)
 const editingPriceOne = ref(0)
 const editingPriceTwo = ref(0)
 const editingPriceThree = ref(0)
+const price = ref(0)
 
 const paymentAmount = ref(0)
 const paymentType = ref('NAQD')
@@ -31,6 +32,295 @@ onMounted(() => {
   store.fetchCustomers()
   pricesStore.fetchPrices()
 })
+
+
+
+const formatNumberWithDots = (number) => {
+  if (!number || isNaN(number)) return "0";
+  return Number(number).toLocaleString("uz-UZ", { minimumFractionDigits: 0 }).replace(/,/g, ".");
+};
+function numberToUzbekWords(n) {
+  const ones = [
+    '',
+    'bir',
+    'ikki',
+    'uch',
+    "to'rt",
+    'besh',
+    'olti',
+    'yetti',
+    'sakkiz',
+    "to'qqiz",
+  ];
+  const tens = [
+    '',
+    "o'n",
+    'yigirma',
+    "o'ttiz",
+    'qirq',
+    'ellik',
+    'oltmish',
+    'yetmish',
+    'sakson',
+    "to'qson",
+  ];
+  const hundreds = [
+    '',
+    'bir yuz',
+    'ikki yuz',
+    'uch yuz',
+    "to'rt yuz",
+    'besh yuz',
+    'olti yuz',
+    'yetti yuz',
+    'sakkiz yuz',
+    "to'qqiz yuz",
+  ];
+
+  if (typeof n !== 'number' || isNaN(n)) return "Noto'g'ri qiymat";
+  if (n === 0) return 'nol';
+  if (n < 0) return 'manfiy ' + numberToUzbekWords(-n);
+  if (n > 999_999_999_999) return 'Milliardgacha son kiriting.';
+
+  const getThreeDigitWords = (num) => {
+    const h = Math.floor(num / 100);
+    const t = Math.floor((num % 100) / 10);
+    const o = num % 10;
+
+    let parts = [];
+    if (h > 0) parts.push(hundreds[h]);
+    if (t > 0 || o > 0) parts.push(tens[t] + (o > 0 ? ' ' + ones[o] : ''));
+    return parts.join(' ').trim();
+  };
+
+  let result = '';
+
+  const billions = Math.floor(n / 1_000_000_000);
+  const millions = Math.floor((n % 1_000_000_000) / 1_000_000);
+  const thousands = Math.floor((n % 1_000_000) / 1_000);
+  const rest = n % 1_000;
+
+  if (billions > 0) result += getThreeDigitWords(billions) + ' milliard ';
+  if (millions > 0) result += getThreeDigitWords(millions) + ' million ';
+  if (thousands > 0) result += getThreeDigitWords(thousands) + ' ming ';
+  if (rest > 0) result += getThreeDigitWords(rest);
+
+  return result.trim();
+}
+
+import html2pdf from 'html2pdf.js'
+import { useRouter } from 'vue-router'
+// const generateReceiptPDF = async (customer, paymentAmount) => {
+//   console.log('🚀 generateReceiptPDF chaqirildi');
+//   console.log('Customer:', customer?.surname, customer?.name);
+//   console.log('Payment Amount:', paymentAmount);
+
+//   if (!customer) {
+//     console.error("❌ Mijoz ma'lumotlari yo'q");
+//     return null;
+//   }
+
+//   if (!paymentAmount || paymentAmount <= 0) {
+//     console.error("❌ Payment amount noto'g'ri:", paymentAmount);
+//     return null;
+//   }
+
+//   const today = new Date();
+//   const day = String(today.getDate()).padStart(2, '0');
+//   const month = String(today.getMonth() + 1).padStart(2, '0');
+//   const year = today.getFullYear();
+//   const formattedDate = `${day}.${month}.${year}`;
+
+//   const receiptHTML = `
+//      <!DOCTYPE html>
+//     <html>
+//     <head>
+//       <title>Chek</title>
+//     </head>
+//     <body>
+//       <table style="border: 1px solid black; height:80px; width:100%; border-collapse: collapse;">
+//         <tr>
+//             <td rowspan="8" style="text-align: center; color: black; border: 1px solid black;"><div style="display: flex; justify-content: center; align-items: center;"><img src="/telegram-cloud.jpg"  width="150px" alt=""></div></td>
+//             <td rowspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Markaziy korxona manzili</td>
+//             <td rowspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Xorazm viloyati, Xiva shaxar, <br> Yangi-hayot mahallasi, Sportchilar ko'chasi 14-uy</td>
+//             <td rowspan="5" style="width: 70px; text-align: center; color: black; padding-bottom:10px; border: 1px solid black;"></td>
+//         </tr>
+//         <tr>
+//         </tr>
+//         <tr>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px;">Shartnoma raqami</td>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px; ">№${1 || 'Mavjud emas'}</td>
+//         </tr>
+//         <tr>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px; ">To'lov maqsadi</td>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px; ">Konsalting xizmat</td>
+//         </tr>
+//         <tr>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px; ">Shartnomani umumiy bahosi</td>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px; ">${formatNumberWithDots(customer.price)} so'm</td>
+//         </tr>
+//         <tr>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; height:15px;font-size:10px; padding-bottom:10px; ">Joriy to'lov</td>
+//           <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;height:15px;font-size:10px; padding-bottom:10px; ">${formatNumberWithDots(paymentAmount)} so'm</td>
+//         </tr>
+//         <tr>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">Qoldiq qarzdorlik</td>
+//           <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">${customer.price - (customer.payments.reduce((a, b) => a + b.amount, 0) + paymentAmount) <= 0 ? "To'landi" : formatNumberWithDots(customer.price - (customer.payments.reduce((a, b) => a + b.amount, 0) + paymentAmount)) + " so'm"}</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">Joriy to'lov qilingan sana</td>
+//             <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">${formattedDate}</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">To'lovchining F.I.O.:</td>
+//             <td colspan="3" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">${customer.name} ${customer.surname} ${customer.father_name}</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">Xiva Shaxar</td>
+//             <td colspan="3" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">STIR 307675491      MFO: 01037</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">To'lovni qabul qiluvchi korxona</td>
+//             <td colspan="3" style="width: 100px; text-align: center; color: black;font-size:10px; padding-bottom:10px;  border: 1px solid black;">"YURIST KONSUL KONSALTING" X/k</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">TO'LOV SUMMASI SO"Z BILAN</td>
+//             <td colspan="3" style="width: 100px; text-align: center; color: black;font-size:10px;  text-transform: uppercase; border: 1px solid black; padding-bottom:10px; ">${numberToUzbekWords(+paymentAmount)} so'm</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 80px; text-align: center; color: black; font-size:10px;  border: 1px solid black; padding-bottom:10px; ">Texnik yordam: +998 62 226 99 00</td>
+//             <td colspan="3" style="width: 110px; text-align: center; color: black;font-size:10px;  border: 1px solid black; padding-bottom:10px; ">ushbu to'lov ARIZASUD.UZ tizimi orqali amalga oshirilgan</td>
+//         </tr>
+//         <tr>
+//             <td colspan="4" style="width: 100px; text-align: center; color: black;font-size:9px; padding-bottom:10px; text-transform: uppercase; border: 1px solid black;">To'lov pattasi faqatgina kassa muhri bilan tasdiqlangandan so'ng haqiqiy hisoblanadi. Agar pattada muhr bo'lmasa, u rasmiy kuchga ega emas va yaroqsiz deb topiladi. Shu sababli, har qanday to'lov hujjatining muhrlanganligiga e'tibor berish lozim.</td>
+//         </tr>
+//     </table>
+//       <script>
+//         window.onload = () => {
+//           setTimeout(() => {
+//             window.print();
+//             setTimeout(() => window.close(), 500);
+//           }, 300);
+//         }
+//       <\/script>
+//     </body>
+//     </html>
+//   `;
+
+//   console.log('📄 HTML tayyorlandi (length:', receiptHTML.length, ')');
+
+//   const element = document.createElement('div');
+//   element.innerHTML = receiptHTML;
+
+//   const options = {
+//     margin: [1, 1, 1, 1],
+//     image: { type: 'jpeg', quality: 0.98 },
+//     html2canvas: { scale: 2, useCORS: true },
+//     jsPDF: { unit: 'mm', format: [100, 250], orientation: 'landscape' }
+//   };
+
+//   try {
+//     console.log('🔄 html2pdf ishga tushmoqda...');
+//     const pdfBlob = await html2pdf()
+//       .from(element)
+//       .set(options)
+//       .outputPdf('blob');
+
+//     console.log('✅ PDF muvaffaqiyatli yaratildi! Size:', pdfBlob.size, 'bytes');
+//     return pdfBlob;
+//   } catch (error) {
+//     console.error('❌ PDF yaratish xatosi:', error);
+//     return null;
+//   }
+// };
+// const printReceiptFrontend = async (customer) => {
+//   if (paymentType.value !== 'NAQD' || !paymentAmount.value) return
+
+//   const today = new Date();
+//   const day = String(today.getDate()).padStart(2, '0');
+//   const month = String(today.getMonth() + 1).padStart(2, '0');
+//   const year = today.getFullYear();
+//   const formattedDate = `${day}.${month}.${year}`;
+//   // Chek oynasini ochish
+//   const printWindow = window.open('', '_blank')
+//   printWindow.document.write(`
+//     <!DOCTYPE html>
+//     <html>
+//     <head>
+//       <title>Chek</title>
+//     </head>
+//     <body>
+//       <table style="border: 1px solid black; height:80px; width:100%; border-collapse: collapse;">
+//         <tr>
+//             <td rowspan="8" style="text-align: center; color: black; border: 1px solid black;"><img src="/telegram-cloud.jpg" width="150px" alt=""></td>
+//             <td rowspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; vertical-align: middle;">Markaziy korxona manzili</td>
+//             <td rowspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; vertical-align: middle;">Xorazm viloyati, Xiva shaxar, <br> Yangi-hayot mahallasi, Sportchilar ko'chasi 14-uy</td>
+//             <td rowspan="5" style="width: 70px; text-align: center; color: black; border: 1px solid black;"></td>
+//         </tr>
+//         <tr>
+//         </tr>
+//         <tr>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px;">Shartnoma raqami</td>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">№${1 || 'Mavjud emas'}</td>
+//         </tr>
+//         <tr>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">To'lov maqsadi</td>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Konsalting xizmat</td>
+//         </tr>
+//         <tr>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Shartnomani umumiy bahosi</td>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">${formatNumberWithDots(customer.price)} so'm</td>
+//         </tr>
+//         <tr>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; height:15px;font-size:10px; ">Joriy to'lov</td>
+//           <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;height:15px;font-size:10px; ">${formatNumberWithDots(paymentAmount.value)} so'm</td>
+//         </tr>
+//         <tr>
+//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Qoldiq qarzdorlik</td>
+//           <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">${customer.price - (customer.payments.reduce((a, b) => a + b.amount, 0) + paymentAmount.value) <= 0 ? "To'landi" : formatNumberWithDots(customer.price - (customer.payments.reduce((a, b) => a + b.amount, 0) + paymentAmount.value)) + " so'm"}</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Joriy to'lov qilingan sana</td>
+//             <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">${formattedDate}</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">To'lovchining F.I.O.:</td>
+//             <td colspan="3" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">${customer.name} ${customer.surname} ${customer.father_name}</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Xiva Shaxar</td>
+//             <td colspan="3" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">STIR 307675491      MFO: 01037</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">To'lovni qabul qiluvchi korxona</td>
+//             <td colspan="3" style="width: 100px; text-align: center; color: black;font-size:10px;  border: 1px solid black;">"YURIST KONSUL KONSALTING" X/k</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">TO'LOV SUMMASI SO"Z BILAN</td>
+//             <td colspan="3" style="width: 100px; text-align: center; color: black;font-size:10px;  text-transform: uppercase; border: 1px solid black;">${numberToUzbekWords(+paymentAmount.value)} so'm</td>
+//         </tr>
+//         <tr>
+//             <td style="width: 80px; text-align: center; color: black; font-size:10px;  border: 1px solid black;">Texnik yordam: +998 62 226 99 00</td>
+//             <td colspan="3" style="width: 110px; text-align: center; color: black;font-size:10px;  border: 1px solid black;">ushbu to'lov ARIZASUD.UZ tizimi orqali amalga oshirilgan</td>
+//         </tr>
+//         <tr>
+//             <td colspan="4" style="width: 100px; text-align: center; color: black;font-size:9px;  text-transform: uppercase; border: 1px solid black;">To'lov pattasi faqatgina kassa muhri bilan tasdiqlangandan so'ng haqiqiy hisoblanadi. Agar pattada muhr bo'lmasa, u rasmiy kuchga ega emas va yaroqsiz deb topiladi. Shu sababli, har qanday to'lov hujjatining muhrlanganligiga e'tibor berish lozim.</td>
+//         </tr>
+//     </table>
+//       <script>
+//         window.onload = () => {
+//           setTimeout(() => {
+//             window.print();
+//             setTimeout(() => window.close(), 500);
+//           }, 300);
+//         }
+//       <\/script>
+//     </body>
+//     </html>
+//   `)
+
+//   printWindow.document.close()
+// }
 
 const filtered = computed(() => {
   const q = search.value.toLowerCase().trim()
@@ -44,7 +334,7 @@ const filtered = computed(() => {
     if (!matchesSearch) return false
 
     if (filterTab.value === 'debtors') {
-      const paid = c.payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0
+      const paid = c.payments?.[c.payments?.length - 1]?.amount
       return (c.price || 0) - paid > 0
     }
 
@@ -54,7 +344,7 @@ const filtered = computed(() => {
 
 const debtorsCount = computed(() => {
   return store.customers.filter(c => {
-    const paid = c.payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0
+    const paid = c.payments?.[c.payments?.length - 1]?.amount
     return (c.price || 0) - paid > 0
   }).length
 })
@@ -80,28 +370,68 @@ const savePrices = async () => {
   }
 }
 
-const payDebt = async (customer) => {
-  if (!paymentAmount.value || Number(paymentAmount.value) <= 0) {
-    alert("To'lov summasini kiriting!");
-    return;
-  }
+// const payDebt = async (customer) => {
+//   console.log('💰 payDebt boshlandi - Customer ID:', customer?.id);
 
-  const data = {
-    paymentAmount: Number(paymentAmount.value),
-    paymentType: paymentType.value || 'NAQD',
-  };
+//   if (!paymentAmount.value || Number(paymentAmount.value) <= 0) {
+//     alert("To'lov summasini kiriting!");
+//     return;
+//   }
 
-  const result = await store.updateCustomer(customer.id, data);
+//   const data = {
+//     paymentAmount: Number(paymentAmount.value),
+//     paymentType: paymentType.value || 'NAQD',
+//   };
 
-  if (result.success) {
-    paymentAmount.value = 0;        // modalni tozalash
-    showDebtModal.value = false;
-    await store.fetchCustomers();
-    alert('To\'lov muvaffaqiyatli qo\'shildi!');
-  } else {
-    alert('Xatolik: ' + (result.error || 'Noma\'lum xato'));
-  }
-};
+//   const result = await store.updateCustomer(customer.id, data);
+
+//   if (result.success) {
+//     const newPayment = result.customer?.payments?.[result.customer.payments?.length - 1];
+//     console.log('🆕 Yangi payment:', newPayment);
+
+//     // PDF yaratish
+//     const pdfBlob = await generateReceiptPDF(customer, Number(paymentAmount.value));
+
+//     if (pdfBlob && newPayment?.id) {
+//       console.log('📤 Backendga PDF yuborilmoqda...');
+
+//       const formData = new FormData();
+//       formData.append('checkFile', pdfBlob, `chek-${customer.surname || 'mijoz'}-${Date.now()}.pdf`);
+//       formData.append('paymentId', newPayment.id);
+
+//       // ✅ TOKEN BILAN YUBORISH
+//       const res = await fetch(`http://localhost:4000/api/customers/${customer.id}/check`, {
+//         method: 'POST',
+//         headers: {
+//           'Authorization': `Bearer ${useAuthStore().token}`
+//         },
+//         body: formData
+//       });
+
+//       console.log('Backend javobi status:', res.status);
+
+//       if (res.ok) {
+//         console.log('✅ Chek backendga muvaffaqiyatli saqlandi!');
+//         const checkResult = await res.json();
+//         console.log('Check result:', checkResult);
+//       } else {
+//         const errorText = await res.text();
+//         console.error('❌ Backend xatosi:', res.status, errorText);
+//         alert(`Chek saqlanmadi! Xato: ${res.status}`);
+//       }
+//     }
+
+//     // Chop etish (eski usul)
+//     // await printReceiptFrontend(customer);
+
+//     paymentAmount.value = 0;
+//     showDebtModal.value = false;
+//     await store.fetchCustomers();
+//   } else {
+//     alert('Xatolik: ' + (result.error || 'Noma’lum xato'));
+//   }
+// };
+
 
 const allChecked = computed(() =>
   filtered.value.length > 0 && filtered.value.every(c => selected.value.includes(c.id))
@@ -161,7 +491,9 @@ const paymentTypeLabels = {
   KARTA: 'Plastik karta',
   PUL_OTKAZISH: 'Pul o\'tkazish'
 }
-
+const openCustomer = (id) => {
+  router.push('/customer/' + id)
+}
 const formatMoney = (amount) => {
   if (!amount) return '—'
   return new Intl.NumberFormat('uz-UZ', { maximumFractionDigits: 0 }).format(amount) + ' so\'m'
@@ -197,28 +529,6 @@ const formatMoney = (amount) => {
           Yangi mijoz
         </button>
       </div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="flex gap-1 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl w-fit">
-      <button @click="filterTab = 'all'"
-        class="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer"
-        :class="filterTab === 'all' ? 'bg-white dark:bg-slate-700 text-[#0a1850] dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'">
-        Faol mijozlar
-        <span
-          class="px-1.5 py-0.5 rounded-full text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
-          {{ store.customers.length }}
-        </span>
-      </button>
-      <button @click="filterTab = 'debtors'"
-        class="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer"
-        :class="filterTab === 'debtors' ? 'bg-white dark:bg-slate-700 text-[#0a1850] dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'">
-        Qarzdorlar
-        <span
-          class="px-1.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400">
-          {{ debtorsCount }}
-        </span>
-      </button>
     </div>
 
     <!-- Search -->
@@ -272,7 +582,7 @@ const formatMoney = (amount) => {
         <table class="w-full min-w-[680px]">
           <thead>
             <tr class="border-b border-indigo-100 dark:border-slate-700/60 bg-indigo-50/60 dark:bg-slate-700/30">
-              <th class="px-4 py-3.5 w-10" v-if="authStore.permission.delete_customers">
+              <th class="px-4 py-3.5 w-10" v-if="authStore.permission.delete_customers" @click.stop>
                 <AppCheckbox :checked="allChecked" :indeterminate="indeterminate" @change="toggleAll" />
               </th>
               <th
@@ -307,9 +617,9 @@ const formatMoney = (amount) => {
           <tbody class="divide-y divide-indigo-100/70 dark:divide-slate-700/50">
             <tr v-for="c in filtered" :key="c.id"
               :class="selected.includes(c.id) ? 'bg-indigo-50 dark:bg-blue-900/10' : 'hover:bg-indigo-50/60 dark:hover:bg-slate-700/20'"
-              class="transition-colors group">
-              <td class="px-4 py-3.5" v-if="authStore.permission.delete_customers" @click.stop>
-                <AppCheckbox :checked="selected.includes(c.id)" @change="toggleOne(c.id)" />
+              class="transition-colors group cursor-pointer" @click="openCustomer(c.id)">
+              <td class="px-4 py-3.5 cursor-default" v-if="authStore.permission.delete_customers" @click.stop>
+                <AppCheckbox :checked="selected.includes(c.id)" @change="toggleOne(c.id)" class="cursor-pointer"/>
               </td>
               <td class="px-4 py-3.5">
                 <p class="font-medium text-slate-800 dark:text-slate-100 text-sm">{{ c.surname }} {{ c.name }} {{
@@ -317,11 +627,11 @@ const formatMoney = (amount) => {
                 <p v-if="c.description" class="text-xs text-slate-400 dark:text-slate-500 truncate max-w-[200px]">{{
                   c.description }}</p>
               </td>
-              <td class="px-4 py-3.5 text-sm text-slate-600 dark:text-slate-400">
+              <td class="px-4 min-w-[160px] py-3.5 text-sm text-slate-600 dark:text-slate-400">
                 <p>{{ c.phone }}</p>
                 <p v-if="c.phone2" class="text-xs text-slate-400 dark:text-slate-500">{{ c.phone2 }}</p>
               </td>
-              <td class="px-4 py-3.5 text-sm text-slate-500 dark:text-slate-400">
+              <td class="px-4 py-3.5 min-w-[160px] text-sm text-slate-500 dark:text-slate-400">
                 <a v-if="c.telegram && c.telegram.startsWith('@')" :href="`https://t.me/${c.telegram.slice(1)}`"
                   target="_blank" class="text-blue-500 hover:underline">{{ c.telegram }}</a>
                 <span v-else-if="c.telegram">{{ c.telegram }}</span>
@@ -348,30 +658,31 @@ const formatMoney = (amount) => {
                   <div class="flex items-center gap-1.5 mt-1">
                     <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">To'landi:</span>
                     <span class="font-medium text-emerald-600 dark:text-emerald-400">
-                      {{formatMoney(c.payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0)}}
-                    </span>
-                    <span v-if="c.payments && c.payments.length > 0"
-                      class="text-[10px] text-slate-400 dark:text-slate-500">
-                      ({{ paymentTypeLabels[c.payments[0].type] || c.payments[0].type }})
+                      {{ formatMoney(c.payments.reduce((a, b) => a + b.amount, 0)) }}
                     </span>
                   </div>
+                  <span v-if="c.payments && c.payments.length > 0"
+                    class="text-[10px] w-[60px] text-slate-400 dark:text-slate-500">
+                    ({{ paymentTypeLabels[c.payments[c.payments.length - 1].type] }})
+                  </span>
 
-                  <div v-if="(c.price || 0) - (c.payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0) > 0"
+                  <!-- <div v-if="(c.price || 0) - (c.payments.reduce((a, b) => a + b.amount, 0)) > 0"
                     class="flex items-center gap-1.5 mt-1">
                     <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Qarz:</span>
                     <span class="font-bold text-red-600 dark:text-red-400">
-                      {{formatMoney((c.price || 0) - (c.payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0))}}
+                      {{ formatMoney(c.price - c.payments.reduce((a, b) => a + b.amount, 0))}}
                     </span>
-                  </div>
-                  <div v-else-if="c.price > 0" class="flex items-center gap-1.5 mt-1">
+                  </div> -->
+                  <!-- <div v-else-if="c.price > 0" class="flex items-center gap-1.5 mt-1">
                     <span
                       class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 text-[10px] font-semibold">To'liq
                       to'langan</span>
-                  </div>
+                  </div> -->
                 </div>
               </td>
-              <td class="px-4 py-3.5 text-sm text-slate-400 dark:text-slate-500">{{ formatDate(c.createdAt) }}</td>
-              <td class="px-4 py-3.5"
+              <td class="px-4 py-3.5 text-sm min-w-[120px] text-slate-400 dark:text-slate-500">{{
+                formatDate(c.createdAt) }}</td>
+              <td class="px-4 py-3.5 cursor-default" @click.stop
                 v-if="authStore.permission.edit_customers || authStore.permission.delete_customers">
                 <div
                   class="hidden items-center justify-center gap-1 opacity-0 group-hover:opacity-100 group-hover:flex transition-opacity">
@@ -395,11 +706,12 @@ const formatMoney = (amount) => {
                   </button>
                 </div>
                 <!-- Table ichidagi tugma (har bir qator uchun) -->
-                <button @click.stop="showDebtModal = true; editingCustomer = c;"
-                  v-if="(c.price || 0) - (c.payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0) > 0"
+                <!-- <button
+                  @click.stop="showDebtModal = true; editingCustomer = c; price = c.payments[c.payments?.length - 1].amount"
+                  v-if="(c.price || 0) - (c.payments[c.payments?.length - 1].amount || 0) > 0"
                   class="px-4 py-2 mt-1 text-sm font-medium rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white transition-all active:scale-[0.97] shadow-sm hover:shadow flex items-center gap-1.5">
                   To'lash
-                </button>
+                </button> -->
               </td>
             </tr>
             <tr v-if="filtered.length === 0">
@@ -430,8 +742,8 @@ const formatMoney = (amount) => {
         <div class="px-6 py-5 flex items-center justify-between"
           :style="{ background: themeStore.isDark ? 'linear-gradient(150deg, #0d1b3e 0%, #162766 55%, #1535c4 100%)' : 'linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%)' }">
           <div>
-            <h2 class="text-white text-base font-semibold">Tizim narxlari sozlamalari</h2>
-            <p class="text-white/50 text-xs mt-0.5">Quick-select (tezkor tanlash) narx darajalarini o'zgartiring</p>
+            <h2 class="text-white text-base font-semibold">Xizmat narxlarini o'zgartirish</h2>
+            <p class="text-white/50 text-xs mt-0.5">Narxlarni o'zgartiring</p>
           </div>
           <button @click="showPricesModal = false"
             class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xl leading-none">✕</button>
@@ -441,21 +753,21 @@ const formatMoney = (amount) => {
           <div class="space-y-1">
             <label
               class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">1-narx
-              darajasi (so'mda)</label>
+              (so'mda)</label>
             <input v-model="editingPriceOne" type="number"
               class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
           </div>
           <div class="space-y-1">
             <label
               class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">2-narx
-              darajasi (so'mda)</label>
+              (so'mda)</label>
             <input v-model="editingPriceTwo" type="number"
               class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
           </div>
           <div class="space-y-1">
             <label
               class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">3-narx
-              darajasi (so'mda)</label>
+              (so'mda)</label>
             <input v-model="editingPriceThree" type="number"
               class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
           </div>
@@ -473,89 +785,86 @@ const formatMoney = (amount) => {
     </div>
   </Teleport>
 
-<!-- Debt Payment Modal -->
-<Teleport to="body">
-  <div v-if="showDebtModal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" @click.self="showDebtModal = false">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-      
-      <!-- Header (Prices modal bilan bir xil gradient) -->
-      <div class="px-6 py-5 flex items-center justify-between"
-           :style="{ background: themeStore.isDark ? 'linear-gradient(150deg, #0d1b3e 0%, #162766 55%, #1535c4 100%)' : 'linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%)' }">
-        <div>
-          <h3 class="text-white text-lg font-semibold">Qarzni to‘lash</h3>
-          <p class="text-white/70 text-sm mt-0.5">
-            {{ editingCustomer?.surname }} {{ editingCustomer?.name }}
-          </p>
-        </div>
-        <button @click="showDebtModal = false"
-          class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-2xl leading-none transition-colors">
-          ✕
-        </button>
-      </div>
+  <!-- Debt Payment Modal -->
+  <Teleport to="body">
+    <div v-if="showDebtModal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+      @click.self="showDebtModal = false">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
 
-      <!-- Body -->
-      <div class="p-6 space-y-6">
-        <div class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700">
-          <div class="flex justify-between text-sm">
-            <span class="text-slate-500 dark:text-slate-400">Jami shartnoma summasi:</span>
-            <span class="font-semibold">{{ formatMoney(editingCustomer?.price) }}</span>
+        <!-- Header (Prices modal bilan bir xil gradient) -->
+        <div class="px-6 py-5 flex items-center justify-between"
+          :style="{ background: themeStore.isDark ? 'linear-gradient(150deg, #0d1b3e 0%, #162766 55%, #1535c4 100%)' : 'linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%)' }">
+          <div>
+            <h3 class="text-white text-lg font-semibold">Qarzni to‘lash</h3>
+            <p class="text-white/70 text-sm mt-0.5">
+              {{ editingCustomer?.surname }} {{ editingCustomer?.name }}
+            </p>
           </div>
-          <div class="flex justify-between text-sm mt-2">
-            <span class="text-slate-500 dark:text-slate-400">To‘langan:</span>
-            <span class="font-medium text-emerald-600 dark:text-emerald-400">
-              {{ formatMoney(editingCustomer?.payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0) }}
-            </span>
+          <button @click="showDebtModal = false"
+            class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-2xl leading-none transition-colors">
+            ✕
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-6">
+          <div class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700">
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-500 dark:text-slate-400">Jami shartnoma summasi:</span>
+              <span class="font-semibold">{{ formatMoney(editingCustomer?.price) }}</span>
+            </div>
+            <div class="flex justify-between text-sm mt-2">
+              <span class="text-slate-500 dark:text-slate-400">To‘langan:</span>
+              <span class="font-medium text-emerald-600 dark:text-emerald-400">
+                {{ formatMoney(editingCustomer?.payments.reduce((a, b) => a + b.amount, 0)) }}
+              </span>
+            </div>
+            <div class="h-px bg-slate-200 dark:bg-slate-700 my-3"></div>
+            <div class="flex justify-between text-base font-semibold">
+              <span class="text-slate-600 dark:text-slate-300">Qolgan qarz:</span>
+              <span class="text-red-600 dark:text-red-400">
+                {{ formatMoney((editingCustomer?.price || 0) -
+                  (editingCustomer?.payments.reduce((a, b) => a + b.amount, 0))) }}
+              </span>
+            </div>
           </div>
-          <div class="h-px bg-slate-200 dark:bg-slate-700 my-3"></div>
-          <div class="flex justify-between text-base font-semibold">
-            <span class="text-slate-600 dark:text-slate-300">Qolgan qarz:</span>
-            <span class="text-red-600 dark:text-red-400">
-              {{ formatMoney((editingCustomer?.price || 0) - (editingCustomer?.payments?.reduce((acc, curr) => acc + curr.amount, 0) || 0)) }}
-            </span>
+
+          <div class="space-y-1">
+            <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              To‘lov summasi (so‘m)
+            </label>
+            <input v-model="paymentAmount" type="number" placeholder="0"
+              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-lg font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all" />
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              To‘lov usuli
+            </label>
+            <select v-model="paymentType"
+              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-all">
+              <option value="NAQD">Naqd pul</option>
+              <option value="KARTA">Plastik karta</option>
+              <option value="PUL_OTKAZISH">Pul o‘tkazish</option>
+            </select>
           </div>
         </div>
 
-        <div class="space-y-1">
-          <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-            To‘lov summasi (so‘m)
-          </label>
-          <input 
-            v-model="paymentAmount" 
-            type="number" 
-            placeholder="0"
-            class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-lg font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-          />
+        <!-- Footer -->
+        <div
+          class="px-6 py-5 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
+          <button @click="showDebtModal = false"
+            class="px-6 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+            Bekor qilish
+          </button>
+          <button @click="payDebt(editingCustomer)"
+            class="btn-primary px-6 py-2.5 rounded-xl text-white flex items-center gap-2 active:scale-[0.97] transition-all">
+            To‘lovni saqlash
+          </button>
         </div>
-
-        <div class="space-y-1">
-          <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-            To‘lov usuli
-          </label>
-          <select v-model="paymentType"
-            class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-all">
-            <option value="NAQD">Naqd pul</option>
-            <option value="KARTA">Plastik karta</option>
-            <option value="PUL_OTKAZISH">Pul o‘tkazish</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="px-6 py-5 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
-        <button 
-          @click="showDebtModal = false"
-          class="px-6 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-          Bekor qilish
-        </button>
-        <button 
-          @click="payDebt(editingCustomer)"
-          class="btn-primary px-6 py-2.5 rounded-xl text-white flex items-center gap-2 active:scale-[0.97] transition-all">
-          To‘lovni saqlash
-        </button>
       </div>
     </div>
-  </div>
-</Teleport>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -565,5 +874,67 @@ const formatMoney = (amount) => {
 
 .btn-primary:hover {
   background: linear-gradient(135deg, #1a2e7a, #2a3e9a);
+}
+</style>
+<style>
+@media print {
+  @page {
+    size: 80mm auto;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-left: 170px;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 8px !important;
+    text-align: left;
+    line-height: 1.2 !important;
+    white-space: pre-wrap !important;
+    box-sizing: border-box;
+  }
+
+  h2 {
+    text-align: center;
+    font-size: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  td {
+    padding: 0 !important;
+    vertical-align: top;
+  }
+
+  th {
+    text-align: center;
+  }
+
+  .hidden,
+  [hidden] {
+    display: none !important;
+  }
+
+  * {
+    box-sizing: border-box !important;
+  }
 }
 </style>

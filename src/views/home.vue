@@ -43,7 +43,9 @@ const routeName = {
     customers: 'Mijozlar',
     archive: 'Arxiv',
     users: 'Ishchilar',
-    profile: 'Profil',           // qo'shish tavsiya etiladi
+    profile: 'Profil',
+    'customer': 'Mijoz',
+    // qo'shish tavsiya etiladi
     // kerakli boshqa routelarni ham qo'shishingiz mumkin
 }
 const currentPageTitle = computed(() => {

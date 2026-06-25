@@ -45,6 +45,79 @@ const error = ref('')
 const success = ref('')
 const users = ref([])
 
+const formatNumberWithDots = (number) => {
+  if (!number || isNaN(number)) return "0";
+  return Number(number).toLocaleString("uz-UZ", { minimumFractionDigits: 0 }).replace(/,/g, ".");
+};
+function numberToUzbekWords(n) {
+  const ones = [
+    '',
+    'bir',
+    'ikki',
+    'uch',
+    "to'rt",
+    'besh',
+    'olti',
+    'yetti',
+    'sakkiz',
+    "to'qqiz",
+  ];
+  const tens = [
+    '',
+    "o'n",
+    'yigirma',
+    "o'ttiz",
+    'qirq',
+    'ellik',
+    'oltmish',
+    'yetmish',
+    'sakson',
+    "to'qson",
+  ];
+  const hundreds = [
+    '',
+    'bir yuz',
+    'ikki yuz',
+    'uch yuz',
+    "to'rt yuz",
+    'besh yuz',
+    'olti yuz',
+    'yetti yuz',
+    'sakkiz yuz',
+    "to'qqiz yuz",
+  ];
+
+  if (typeof n !== 'number' || isNaN(n)) return "Noto'g'ri qiymat";
+  if (n === 0) return 'nol';
+  if (n < 0) return 'manfiy ' + numberToUzbekWords(-n);
+  if (n > 999_999_999_999) return 'Milliardgacha son kiriting.';
+
+  const getThreeDigitWords = (num) => {
+    const h = Math.floor(num / 100);
+    const t = Math.floor((num % 100) / 10);
+    const o = num % 10;
+
+    let parts = [];
+    if (h > 0) parts.push(hundreds[h]);
+    if (t > 0 || o > 0) parts.push(tens[t] + (o > 0 ? ' ' + ones[o] : ''));
+    return parts.join(' ').trim();
+  };
+
+  let result = '';
+
+  const billions = Math.floor(n / 1_000_000_000);
+  const millions = Math.floor((n % 1_000_000_000) / 1_000_000);
+  const thousands = Math.floor((n % 1_000_000) / 1_000);
+  const rest = n % 1_000;
+
+  if (billions > 0) result += getThreeDigitWords(billions) + ' milliard ';
+  if (millions > 0) result += getThreeDigitWords(millions) + ' million ';
+  if (thousands > 0) result += getThreeDigitWords(thousands) + ' ming ';
+  if (rest > 0) result += getThreeDigitWords(rest);
+
+  return result.trim();
+}
+
 const appealTypeOptions = [
   { value: 'NIKOH_AJRALISH', label: 'Nikoh / Ajralish' },
   { value: 'UY_JOY', label: 'Uy-joy masalasi' },
@@ -67,85 +140,412 @@ const filteredDistricts = computed(() => {
   return districts.filter(d => d.region_id === selectedRegion.value)
 })
 
-const printReceiptFrontend = () => {
+import html2pdf from 'html2pdf.js'
+
+const generateReceiptPDF = async (data) => {
+  const today = new Date();
+  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const year = today.getFullYear();
+  const formattedDate = `${day}.${month}.${year}`;
+
+  const receiptHTML = `
+      <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Chek</title>
+<style>
+  @page {
+    size: 80mm 200mm;
+    margin: 0;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    width: 80mm;
+    margin: 0;
+    padding-right: 5mm;
+    padding-left: 5mm;
+    padding-top: 10mm;
+    
+    font-family: "Courier New", monospace;
+    color: #000;
+    font-size: 12px;
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  .company {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+
+  .divider {
+    border-top: 1px dashed #000;
+    margin: 8px 0;
+  }
+
+  .info {
+    width: 100%;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0;
+  }
+
+  .label {
+    font-weight: bold;
+  }
+
+  .client-name {
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 10px 0;
+    word-break: break-word;
+  }
+
+  .queue-box {
+    border: 2px solid #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5mm;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .queue-number {
+    font-size: 42px;
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  .queue-text {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 5mm;
+  }
+
+  .notice {
+    text-align: center;
+    font-size: 11px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 12px;
+    padding-bottom: 10mm;
+    font-size: 10px;
+  }
+</style>
+    </head>
+
+<body>
+
+  <div class="center">
+    <div class="company">
+      YURIDIK MASLAHAT 24
+    </div>
+
+    <div class="subtitle">
+      QABUL CHEKI
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="info">
+    <div class="info-row">
+      <span class="label">Sana:</span>
+      <span>${formattedDate}</span>
+    </div>
+
+    <div class="info-row">
+      <span class="label">ID:</span>
+      <span>${data.clientId}</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="center">
+    <div class="label">MIJOZ</div>
+
+    <div class="client-name">
+      ${data.fullName}
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="queue-box">
+    <div class="queue-number">
+      ${data.queueNumber}
+    </div>
+
+    <div class="queue-text">
+      NAVBAT RAQAMI
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="notice">
+    <b>Eslatma</b><br>
+    Ushbu chekni saqlab qo'ying.<br>
+    Navbatni tekshirish uchun ID raqamdan foydalaning.
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="footer">
+    Amal qilish muddati: 7 ish kuni
+    <br><br>
+    Tashrifingiz uchun rahmat!
+  </div>
+
+</body>
+    </html>
+
+  `;
+
+
+  const element = document.createElement('div');
+  element.innerHTML = receiptHTML;
+
+  const options = {
+    margin: [1, 1, 1, 1],
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: [80, 200], orientation: 'portrait' }
+  };
+
+  try {
+    const pdfBlob = await html2pdf()
+      .from(element)
+      .set(options)
+      .outputPdf('blob');
+
+    console.log('✅ PDF muvaffaqiyatli yaratildi! Size:', pdfBlob.size, 'bytes');
+    return pdfBlob;
+  } catch (error) {
+    console.error('❌ PDF yaratishda xatolik:', error);
+    return null;
+  }
+};
+const printReceiptFrontend = (data, qabulxatiUrl = null, w = null) => {
   if (paymentType.value !== 'NAQD' || !paymentAmount.value) return
 
-  const fullName = `${name.value} ${surname.value}`.trim()
-  const amount = Number(paymentAmount.value).toLocaleString('uz-UZ')
-  const currentDate = new Date().toLocaleString('uz-UZ', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  })
+  const today = new Date();
+  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const year = today.getFullYear();
+  const formattedDate = `${day}.${month}.${year}`;
+  if (!w) w = window.open('about:blank', '_blank');
 
-  // Chek oynasini ochish
-  const printWindow = window.open('', '_blank')
-  printWindow.document.write(`
+  w.document.write(`
     <!DOCTYPE html>
     <html>
     <head>
       <title>Chek</title>
-      <style>
-        @page {
-          size: 80mm  auto;
-          margin: 0;
-        }
-        body {
-          font-family: 'Courier New', monospace;
-          width: 80mm;
-          margin: 0 auto;
-          padding: 5mm;
-          font-size: 12px;
-          line-height: 1.4;
-        }
-        .center { text-align: center; }
-        .bold { font-weight: bold; }
-        .title { font-size: 14px; margin: 8px 0; }
-        .separator { border-top: 1px dashed #000; margin: 8px 0; }
-      </style>
+<style>
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    width: 80mm;
+    margin: 0;
+    padding-right: 5mm;
+    padding-left: 5mm;
+    padding-top: 10mm;
+    
+    font-family: "Courier New", monospace;
+    color: #000;
+    font-size: 12px;
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  .company {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+
+  .divider {
+    border-top: 1px dashed #000;
+    margin: 8px 0;
+  }
+
+  .info {
+    width: 100%;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0;
+  }
+
+  .label {
+    font-weight: bold;
+  }
+
+  .client-name {
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 10px 0;
+    word-break: break-word;
+  }
+
+  .queue-box {
+    border: 2px solid #000;
+    text-align: center;
+    padding: 10px 0;
+    margin: 10px 0;
+  }
+
+  .queue-number {
+    font-size: 42px;
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  .queue-text {
+    font-size: 12px;
+    margin-top: 5px;
+    font-weight: bold;
+  }
+
+  .notice {
+    text-align: center;
+    font-size: 11px;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 10px;
+  }
+</style>
     </head>
-    <body>
-      <div class="center">
-        <h2 class="title bold">YURIDIK MASLAHAT 24</h2>
-        <p>Telefon: +998 XX XXX XX XX</p>
-        <div class="separator"></div>
-      </div>
 
-      <p><strong>Mijoz:</strong> ${fullName}</p>
-      <p><strong>Telefon:</strong> ${phone.value}</p>
-      ${telegram.value ? `<p><strong>Telegram:</strong> ${telegram.value}</p>` : ''}
-      
-      <div class="separator"></div>
+<body>
 
-      <p><strong>Sana:</strong> ${currentDate}</p>
-      <p><strong>To'lov turi:</strong> NAQD PUL</p>
-      ${description.value ? `<p><strong>Izoh:</strong> ${description.value}</p>` : ''}
+  <div class="center">
+    <div class="company">
+      YURIDIK MASLAHAT 24
+    </div>
 
-      <div class="separator"></div>
+    <div class="subtitle">
+      QABUL CHEKI
+    </div>
+  </div>
 
-      <div class="center bold" style="font-size: 16px; margin: 12px 0;">
-        ${amount} so'm
-      </div>
+  <div class="divider"></div>
 
-      <div class="separator"></div>
-      
-      <p class="center">Rahmat! Yana murojaat qiling ❤️</p>
-      <p class="center" style="font-size: 10px; margin-top: 15px;">
-        Powered by Your Company
-      </p>
+  <div class="info">
+    <div class="info-row">
+      <span class="label">Sana:</span>
+      <span>${formattedDate}</span>
+    </div>
 
-      <script>
-        window.onload = () => {
-          setTimeout(() => {
-            window.print();
-            setTimeout(() => window.close(), 500);
-          }, 300);
-        }
-      <\/script>
-    </body>
+    <div class="info-row">
+      <span class="label">ID:</span>
+      <span>${data.clientId}</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="center">
+    <div class="label">MIJOZ</div>
+
+    <div class="client-name">
+      ${data.fullName}
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="queue-box">
+    <div class="queue-number">
+      A-${String(data.queueNumber).padStart(2, '0')}
+    </div>
+
+    <div class="queue-text">
+      NAVBAT RAQAMI
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="notice">
+    <b>Eslatma</b><br>
+    Ushbu chekni saqlab qo'ying.<br>
+    Navbatni tekshirish uchun ID raqamdan foydalaning.
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="footer">
+    Amal qilish muddati: 7 ish kuni
+    <br><br>
+    Tashrifingiz uchun rahmat!
+  </div>
+
+</body>
     </html>
-  `)
+  `);
 
-  printWindow.document.close()
+  w.document.close();
+
+  setTimeout(() => {
+    w.focus();
+    w.onafterprint = () => {
+      if (qabulxatiUrl) {
+        w.location.href = qabulxatiUrl
+      } else {
+        w.close()
+      }
+    };
+    w.print();
+  }, 400);
 }
 
 const formatDate = (d) => d ? new Date(d).toLocaleString('uz-UZ', {
@@ -173,8 +573,8 @@ onMounted(async () => {
 
 // ==================== EDITING WATCH ====================
 watch(() => props.editing, (val) => {
-  // Yangi mijoz yaratish
   if (!val) {
+    // Yangi mijoz yaratish
     name.value = ''
     surname.value = ''
     father_name.value = ''
@@ -186,8 +586,6 @@ watch(() => props.editing, (val) => {
     source.value = ''
     telegram.value = ''
     appealType.value = ''
-    selectedRegion.value = null
-    selectedDistrict.value = null
     paymentAmount.value = ''
     paymentType.value = 'NAQD'
     price.value = ''
@@ -196,7 +594,7 @@ watch(() => props.editing, (val) => {
     return
   }
 
-  // Tahrirlash rejimi
+  // === TAHRIRLASH REJIMI ===
   name.value = val.name || ''
   surname.value = val.surname || ''
   father_name.value = val.father_name || ''
@@ -208,41 +606,30 @@ watch(() => props.editing, (val) => {
   telegram.value = val.telegram || ''
   appealType.value = val.appealType || ''
   price.value = val.price || ''
+
+  // 🔴 ASOSIY O'ZGARTIRISH
   if (val.payments && val.payments.length > 0) {
-    paymentAmount.value = val.payments[0].amount || ''
-    paymentType.value = val.payments[0].type || 'NAQD'
+    const lastPayment = 0
+    paymentAmount.value = lastPayment.amount || ''   // Oxirgi to'lovni yuklaymiz
+    paymentType.value = lastPayment.type || 'NAQD'
   } else {
     paymentAmount.value = ''
     paymentType.value = 'NAQD'
   }
 
-  // Reset
+  // Address qismi (o'zgartirmasangiz ham bo'ladi)
   selectedRegion.value = null
   selectedDistrict.value = null
   address.value = ''
-
-  // Addressdan region va districtni ajratib olish
   if (val.address) {
     const parts = val.address.split(',').map(p => p.trim())
-
-    const foundRegion = regions.find(r =>
-      parts.some(part => part === r.name_uz || part.includes(r.name_uz))
-    )
-
+    const foundRegion = regions.find(r => parts.some(part => part === r.name_uz || part.includes(r.name_uz)))
     if (foundRegion) {
       selectedRegion.value = foundRegion.id
-
-      const foundDistrict = districts.find(d =>
-        d.region_id === foundRegion.id &&
-        parts.some(part => part === d.name_uz || part.includes(d.name_uz))
-      )
-
-      if (foundDistrict) {
-        selectedDistrict.value = foundDistrict.id
-      }
+      const foundDistrict = districts.find(d => d.region_id === foundRegion.id &&
+        parts.some(part => part === d.name_uz || part.includes(d.name_uz)))
+      if (foundDistrict) selectedDistrict.value = foundDistrict.id
     }
-
-    // Qo'shimcha manzil
     if (parts.length > 2) {
       address.value = parts.slice(2).join(', ')
     } else if (!foundRegion) {
@@ -253,7 +640,6 @@ watch(() => props.editing, (val) => {
   error.value = ''
   success.value = ''
 }, { immediate: true })
-
 const handlePhone = (e, field) => {
   let v = e.target.value.replace(/\D/g, '')
   if (v.startsWith('998')) v = v.slice(3)
@@ -316,6 +702,13 @@ const save = async () => {
     return
   }
 
+  // Popup brauzer tomonidan bloklanmasligi uchun user gesture paytida ochib qo'yamiz
+  const isNewCash = !props.editing?.id && paymentAmount.value && paymentType.value === 'NAQD'
+  let popupWindow = null
+  if (isNewCash) {
+    popupWindow = window.open('about:blank', '_blank')
+  }
+
   // To'liq manzilni birlashtirish
   let fullAddress = ''
   if (selectedRegion.value) {
@@ -356,20 +749,66 @@ const save = async () => {
   if (result?.success) {
     success.value = props.editing?.id ? 'Mijoz yangilandi!' : 'Mijoz yaratildi!'
 
-    // NAQD bo'lsa chekni chop et
-    if (paymentType.value === 'NAQD' && paymentAmount.value) {
-      setTimeout(() => {
-        printReceiptFrontend()
-      }, 800) // biroz kutib turib chop etadi (success xabari ko'rinishi uchun)
+    // Yangi mijoz yaratilganda va naqd to'lov bo'lsa — PDF yaratib backendga saqlaymiz
+    const isNewCustomerWithCashPayment = !props.editing?.id &&
+      paymentAmount.value &&
+      paymentType.value === 'NAQD'
+    if (isNewCustomerWithCashPayment) {
+      const customerData = result.customer || result
+      const createdCustomer = result.customer || result
+
+      const pdfBlob = await generateReceiptPDF({
+        fullName: `${surname.value} ${name.value} ${father_name.value}`,
+        clientId: createdCustomer?.customer_id || '—',
+        queueNumber: createdCustomer?.queueNumber || '—',
+      })
+
+      if (pdfBlob) {
+        const formData = new FormData()
+        formData.append('checkFile', pdfBlob, `chek-${surname.value || 'mijoz'}-${Date.now()}.pdf`)
+
+        const newPayment = customerData.payments?.[customerData.payments?.length - 1]
+        if (newPayment?.id) {
+          formData.append('paymentId', newPayment.id)
+        }
+
+        const res = await fetch(`http://localhost:4000/api/customers/${customerData.id}/check`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authStore.token}`
+          },
+          body: formData
+        })
+
+        if (res.ok) {
+          const fish = `${surname.value} ${name.value} ${father_name.value}`.trim()
+          const params = new URLSearchParams({
+            fish,
+            telefon: phone.value || '',
+            manzil: fullAddress || '',
+            id: createdCustomer?.customer_id || '',
+            raqam: createdCustomer?.queueNumber || '',
+            yurist: createdCustomer.assignedTo ? `${createdCustomer.assignedTo.surname} ${createdCustomer.assignedTo.name}` : '—',
+            sana: new Date().toLocaleDateString('uz-UZ'),
+          })
+          printReceiptFrontend({
+            fullName: fish,
+            clientId: createdCustomer?.customer_id || '—',
+            queueNumber: createdCustomer?.queueNumber || '—',
+          }, `/qabulxati.html?${params.toString()}`, popupWindow)
+        } else {
+          console.error('❌ Chek saqlanmadi:', res.status)
+          if (popupWindow) popupWindow.close()
+        }
+      }
     }
 
     emit('saved')
-    setTimeout(() => emit('close'), 2000)
+    setTimeout(() => emit('close'), 1800)
   } else {
     error.value = result?.error || 'Xatolik yuz berdi'
   }
 }
-
 const phone2isTelegram = ref(false)
 
 watch(phone2, (newVal) => {
@@ -459,9 +898,9 @@ const handlePhone2isTelegram = () => {
                 Qo'shimcha telefon
               </label>
 
-              
+
               <input v-model="phone2" @input="handlePhone($event, 2)" type="tel" placeholder="+998 XX XXX XX XX"
-              class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
               <label class="flex items-center mt-1 gap-2 text-sm cursor-pointer">
                 <input type="checkbox" v-model="phone2isTelegram" @change="handlePhone2isTelegram"
                   class="w-4 h-4 accent-blue-600">
@@ -548,9 +987,10 @@ const handlePhone2isTelegram = () => {
 
             <!-- To'lov summasi -->
             <div class="space-y-1">
-              <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">To'lov
-                summasi (so'mda) <span class="text-red-500">*</span></label>
+              <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                {{ props.editing?.id ? 'Qarzni to\'lash summasi (so\'mda)' : 'To\'lov summasi (so\'mda)' }}
+                <span class="text-red-500">*</span>
+              </label>
               <input v-model="paymentAmount" type="number" placeholder="Masalan: 500000"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
             </div>
@@ -592,10 +1032,6 @@ const handlePhone2isTelegram = () => {
                   {{ formatMoney(pricesStore.prices.price_three) }}
                 </button>
               </div>
-
-              <!-- Manual Input -->
-              <input v-model="price" type="number" placeholder="Boshqa summa kiriting"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
             </div>
 
             <!-- Izoh -->

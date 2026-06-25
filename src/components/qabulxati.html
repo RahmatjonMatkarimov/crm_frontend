@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qabul Kartasi — Yuridik Xizmatlar Byurosi</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #e8e8e8;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .page-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: -30px;
+      align-self: flex-start;
+      margin-left: calc(50% - 300px);
+    }
+
+    /* Card wrapper */
+    .card {
+      width: 600px;
+      background: #fff;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.13);
+      border-radius: 4px;
+      height: 1050px;
+      overflow: hidden;
+      position: relative;
+    }
+
+
+    /* ===== OLDI TOMON ===== */
+
+    .card-front .header {
+      background: #1a2744;
+      padding: 22px 30px 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .card-front .header-left .bureau-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #c8a84b;
+      line-height: 1.4;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      max-width: 260px;
+    }
+
+    .card-front .header-left .subtitle {
+      font-size: 9.5px;
+      color: rgba(255, 255, 255, 0.55);
+      margin-top: 5px;
+      letter-spacing: 0.3px;
+      line-height: 1.5;
+    }
+
+    .card-front .header-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .card-front .header-right .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .card-front .header-right .not-contract {
+      font-size: 8.5px;
+      color: rgba(255, 255, 255, 0.45);
+      margin-top: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .gold-bar {
+      height: 3px;
+      background: linear-gradient(90deg, #c8a84b, #f0d080, #c8a84b);
+    }
+
+    /* Meta row */
+    .meta-row {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .meta-cell {
+      flex: 1;
+      padding: 12px 16px;
+      border-right: 1px solid #e8e8e8;
+    }
+
+    .meta-cell:last-child {
+      border-right: none;
+    }
+
+    .meta-cell .meta-label {
+      font-size: 8.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999;
+      margin-bottom: 6px;
+    }
+
+    .meta-cell .meta-line {
+      height: 1px;
+      background: #1a2744;
+      margin-top: 2px;
+    }
+
+    .meta-cell .meta-value {
+      font-size: 11px;
+      color: #1a2744;
+      font-weight: 500;
+    }
+
+    .meta-cell .date-slots {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .meta-cell .date-slot {
+      width: 28px;
+      height: 18px;
+      border-bottom: 1px solid #1a2744;
+      display: inline-block;
+    }
+
+    .date-sep {
+      font-size: 12px;
+      color: #1a2744;
+      font-weight: 600;
+    }
+
+    .validity-tag {
+      display: inline-block;
+      background: #f0f4ff;
+      color: #1a2744;
+      font-size: 8px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+      border: 1px solid #c8d0e8;
+    }
+
+    /* Section title */
+    .section-head {
+      background: #f5f7fb;
+      padding: 7px 20px;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #1a2744;
+      border-bottom: 1px solid #e2e6f0;
+      border-top: 1px solid #e2e6f0;
+    }
+
+    /* Fields */
+    .fields-block {
+      padding: 14px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .field {
+      flex: 1;
+    }
+
+    .field label {
+      display: block;
+      font-size: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999;
+      margin-bottom: 5px;
+    }
+    .field .field-line {
+      border: none;
+      width: 100%;
+      height: 22px;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: #1a2744;
+      outline: none;
+    }
+
+    /* Muroja'at / Documents row */
+    .two-col {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .col-half {
+      flex: 1;
+      padding: 14px 20px;
+      border-right: 1px solid #eee;
+    }
+
+    .col-half:last-child {
+      border-right: none;
+    }
+
+    .col-half label {
+      display: block;
+      font-size: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+
+    .textarea-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .textarea-lines .line {
+      width: 100%;
+      height: 1px;
+      background: #dde2ec;
+    }
+
+    /* Natija */
+    .natija-block {
+      padding: 14px 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .natija-block .check-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .check-box {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid #c8a84b;
+      border-radius: 2px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .check-item span {
+      font-size: 10.5px;
+      color: #2c3a5c;
+      line-height: 1.4;
+    }
+
+    /* Imzolar */
+    .sign-row {
+      display: flex;
+      gap: 0;
+    }
+
+    .sign-cell {
+      flex: 1;
+      padding: 14px 20px 10px;
+      border-right: 1px solid #eee;
+    }
+
+    .sign-cell:last-child {
+      border-right: none;
+    }
+
+    .sign-cell label {
+      display: block;
+      font-size: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999;
+      margin-bottom: 14px;
+    }
+
+    .sign-cell .sign-line {
+      border-bottom: 1px solid #c0c8d8;
+      height: 28px;
+    }
+
+    .card-front {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Footer confirmation */
+    .front-footer {
+      background: #f5f7fb;
+      padding: 10px 20px;
+      
+      border-top: 1px solid #e2e6f0;
+    }
+
+    .front-footer p {
+      font-size: 8.5px;
+      color: #7a8499;
+      line-height: 1.5;
+      font-style: italic;
+      text-align: center;
+    }
+
+    /* ===== ORQA TOMON ===== */
+
+    .card-back .back-header {
+      background: #1a2744;
+      padding: 18px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-back .back-header .back-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.3px;
+    }
+
+    .card-back .back-header .back-note {
+      font-size: 8.5px;
+      color: rgba(255, 255, 255, 0.45);
+      max-width: 200px;
+      text-align: right;
+      line-height: 1.4;
+    }
+
+    /* Terms */
+    .terms-block {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .term-item {
+      display: flex;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f2f7;
+    }
+
+    .term-item:last-child {
+      border-bottom: none;
+    }
+
+    .term-num {
+      width: 22px;
+      height: 22px;
+      background: #1a2744;
+      color: #c8a84b;
+      border-radius: 50%;
+      font-size: 9px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .term-text {
+      font-size: 10px;
+      color: #3a4460;
+      line-height: 1.6;
+    }
+
+    /* Cabinet QR block */
+    .cabinet-block {
+      margin: 0 24px 20px;
+      background: linear-gradient(135deg, #f5f7fb 0%, #eef1f9 100%);
+      border: 1px solid #d8ddf0;
+      border-radius: 6px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .qr-placeholder {
+      width: 64px;
+      height: 64px;
+      border: 2px solid #1a2744;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: #fff;
+    }
+
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 7px);
+      grid-template-rows: repeat(7, 7px);
+      gap: 1px;
+    }
+
+    .qr-cell {
+      background: #1a2744;
+      border-radius: 0.5px;
+    }
+
+    .qr-empty {
+      background: transparent;
+    }
+
+    .cabinet-info .cab-title {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #1a2744;
+      margin-bottom: 4px;
+    }
+
+    .cabinet-info .cab-desc {
+      font-size: 9.5px;
+      color: #5a6480;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .cabinet-info .cab-url {
+      font-size: 10px;
+      font-weight: 600;
+      color: #c8a84b;
+      letter-spacing: 0.3px;
+    }
+
+    .cabinet-info .client-id-row {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .client-id-row label {
+      font-size: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999;
+    }
+
+    .client-id-row .id-line {
+      flex: 1;
+      border-bottom: 1px solid #c0c8d8;
+      height: 20px;
+    }
+
+    /* Back sign */
+    .back-sign-area {
+      margin: 0 24px 20px;
+      border-top: 1px solid #e2e6f0;
+      padding-top: 14px;
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+    }
+
+    .back-confirm-text {
+      flex: 1;
+      font-size: 8.5px;
+      color: #7a8499;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    .back-sign-box {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .back-sign-box label {
+      display: block;
+      font-size: 7.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999;
+      margin-bottom: 10px;
+    }
+
+    .back-sign-box .sign-line {
+      width: 140px;
+      border-bottom: 1px solid #1a2744;
+      height: 24px;
+    }
+
+    .card-back{
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .back-footer {
+      background: #1a2744;
+      padding: 8px 24px;
+      text-align: center;
+    }
+
+    .back-footer p {
+      font-size: 8px;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 0.5px;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+        gap: 0;
+      }
+
+      .page-label {
+        display: none;
+      }
+
+      .card {
+        box-shadow: none;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========= OLDI TOMONI ========= -->
+  <div class="card card-front">
+<div>
+
+    <div class="header">
+      <div class="header-left">
+        <div class="bureau-name">Юридик Хизматлар ва<br>Ҳужжатлар Тайёрлаш Бюроси</div>
+        <div class="subtitle">Мижоз қабул картаси — ички ҳисоб ва қабулни рўйхатга олиш ҳужжати</div>
+      </div>
+      <div class="header-right">
+        <div class="card-title">ҚАБУЛ КАРТАСИ</div>
+        <div class="not-contract">Шартнома ва тўлов ҳужжати эмас</div>
+      </div>
+    </div>
+
+    <div class="gold-bar"></div>
+
+    <!-- Meta row -->
+    <div class="meta-row">
+      <div class="meta-cell">
+        <div class="meta-label">Навбат рақами №</div>
+        <div class="meta-value" id="qabul-raqam"></div>
+        <div class="meta-line"></div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Мижоз ID</div>
+        <div class="meta-value" id="mijoz-id"></div>
+        <div class="meta-line"></div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Берилган сана</div>
+        <div class="meta-value" id="berilgan-sana"></div>
+        <div class="meta-line"></div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Амал қилиш муддати</div>
+        <div class="validity-tag">7 иш куни</div>
+      </div>
+    </div>
+
+    <!-- Yurist -->
+    <div class="fields-block" style="padding-bottom:10px;">
+      <div class="field-row">
+        <div class="field">
+          <label>Қабулни амалга оширган юрист</label>
+          <div class="field-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head">Мижоз маълумотлари</div>
+
+    <div class="fields-block">
+      <div class="field-row">
+        <div class="field">
+          <label>Мижоз Ф.И.Ш.</label>
+          <div class="field-line" id="mijoz-fish"></div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Телефон рақами</label>
+          <div class="field-line" id="mijoz-telefon"></div>
+        </div>
+        <div class="field">
+          <label>Яшаш манзили</label>
+          <div class="field-line" id="mijoz-manzil"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head">Мурожаат мавзуси</div>
+
+    <div class="two-col">
+      <div class="col-half">
+        <label>Юрист изоҳи</label>
+        <div class="textarea-lines">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head">Қабул натижаси / йўналтириш</div>
+
+    <div class="natija-block">
+      <div class="check-items">
+        <div class="check-item">
+          <div class="check-box"></div><span>Дастлабки ҳуқуқий маслаҳат ва тушунтириш берилди</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div><span>Шартнома асосида юридик хизмат кўрсатиш тавсия этилди</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div><span>Юридик хизмат кўрсатиш шартномаси расмийлаштирилди</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div><span>Ҳужжатларни расмийлаштириш бўлимига юборилди</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div><span>Ижро бўлимига юборилди</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sign-row">
+      <div class="sign-cell">
+        <label>Мижоз имзоси</label>
+        <div class="sign-line"></div>
+      </div>
+      <div class="sign-cell">
+        <label>Юрист имзоси</label>
+        <div class="sign-line"></div>
+      </div>
+    </div>
+</div>
+
+    <div class="front-footer">
+      <p>«Ушбу қабул картасининг олди ва орқа томонидаги шартлар билан танишганлигимни тасдиқлайман.»</p>
+    </div>
+
+  </div>
+
+  <!-- ========= ORQA TOMONI ========= -->
+
+  <div class="card card-back">
+<div>
+
+    <div class="back-header">
+      <div class="back-title">Қабул Картаси Шартлари</div>
+      <div class="back-note">Орқа бетда логотип ва реклама элементлари жойлаштирилмайди</div>
+    </div>
+
+    <div class="gold-bar"></div>
+
+    <div class="terms-block">
+      <div class="term-item">
+        <div class="term-num">1</div>
+        <div class="term-text">Ушбу қабул картаси берилган санадан бошлаб <strong>7 (етти) иш куни</strong>
+          давомида амал қилади.</div>
+      </div>
+      <div class="term-item">
+        <div class="term-num">2</div>
+        <div class="term-text">Қабул картаси фақат мазкур қабул жараёнида баён қилинган ҳуқуқий масала бўйича
+          амал қилади. Бошқа ҳуқуқий масалалар бўйича мурожаатлар алоҳида тартибда кўриб чиқилади.</div>
+      </div>
+      <div class="term-item">
+        <div class="term-num">3</div>
+        <div class="term-text">Мазкур қабул картаси мижозга ҳуқуқий маслаҳат ва тушунтириш берилганлигини
+          тасдиқлайди.</div>
+      </div>
+      <div class="term-item">
+        <div class="term-num">4</div>
+        <div class="term-text">Ҳуқуқий ҳужжатлар тайёрлаш, судга ёки давлат органларига мурожаатлар тайёрлаш,
+          ҳуқуқий ҳамроҳлик қилиш ва бошқа юридик хизматлар <strong>алоҳида шартнома</strong> асосида амалга
+          оширилади.</div>
+      </div>
+      <div class="term-item">
+        <div class="term-num">5</div>
+        <div class="term-text">Зарур ҳолларда мижоз юридик хизмат кўрсатиш шартномасини расмийлаштириш, ҳуқуқий
+          ҳужжатларни тайёрлаш ва кейинги ижро ҳаракатларини амалга ошириш учун тегишли бўлимларга
+          йўналтирилади.</div>
+      </div>
+      <div class="term-item">
+        <div class="term-num">6</div>
+        <div class="term-text">Юридик маслаҳат мижоз томонидан тақдим этилган маълумотлар ва ҳужжатларга
+          асосланиб берилади. Тақдим этилган маълумотлар ва ҳужжатларнинг ҳаққонийлиги учун <strong>мижоз
+            жавобгар ҳисобланади.</strong></div>
+      </div>
+      <div class="term-item">
+        <div class="term-num">7</div>
+        <div class="term-text">Қабул картасининг амал қилиш муддати тугагач, мазкур карта бўйича хизмат кўрсатиш
+          тўхтатилади. Юридик хизмат кўрсатиш шартномаси расмийлаштирилган ҳолатлар бундан мустасно.</div>
+      </div>
+      <div class="term-item">
+        <div class="term-num">8</div>
+        <div class="term-text">Қабул картаси шартнома, чек ёки молиявий ҳисоб-китобни тасдиқловчи ҳужжат
+          ҳисобланмайди.</div>
+      </div>
+    </div>
+</div>
+<div>
+
+    <!-- QR / Cabinet block -->
+    <div class="cabinet-block">
+      <div class="qr-placeholder">
+        <!-- Minimal QR visual hint -->
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="14" height="14" rx="1" fill="#1a2744" />
+          <rect x="4" y="4" width="10" height="10" rx="0.5" fill="white" />
+          <rect x="6" y="6" width="6" height="6" rx="0.5" fill="#1a2744" />
+          <rect x="32" y="2" width="14" height="14" rx="1" fill="#1a2744" />
+          <rect x="34" y="4" width="10" height="10" rx="0.5" fill="white" />
+          <rect x="36" y="6" width="6" height="6" rx="0.5" fill="#1a2744" />
+          <rect x="2" y="32" width="14" height="14" rx="1" fill="#1a2744" />
+          <rect x="4" y="34" width="10" height="10" rx="0.5" fill="white" />
+          <rect x="6" y="36" width="6" height="6" rx="0.5" fill="#1a2744" />
+          <rect x="20" y="2" width="4" height="4" fill="#1a2744" />
+          <rect x="26" y="2" width="4" height="4" fill="#1a2744" />
+          <rect x="20" y="8" width="4" height="4" fill="#1a2744" />
+          <rect x="26" y="8" width="4" height="4" fill="#1a2744" />
+          <rect x="20" y="20" width="6" height="6" fill="#1a2744" />
+          <rect x="28" y="20" width="4" height="4" fill="#1a2744" />
+          <rect x="34" y="20" width="4" height="4" fill="#1a2744" />
+          <rect x="40" y="20" width="6" height="6" fill="#1a2744" />
+          <rect x="20" y="28" width="4" height="4" fill="#1a2744" />
+          <rect x="26" y="28" width="4" height="4" fill="#1a2744" />
+          <rect x="34" y="28" width="6" height="6" fill="#1a2744" />
+          <rect x="20" y="34" width="4" height="4" fill="#1a2744" />
+          <rect x="26" y="40" width="4" height="4" fill="#1a2744" />
+          <rect x="34" y="40" width="6" height="4" fill="#1a2744" />
+          <rect x="42" y="34" width="4" height="4" fill="#1a2744" />
+        </svg>
+      </div>
+      <div class="cabinet-info">
+        <div class="cab-title">Мижоз Кабинети</div>
+        <div class="cab-desc">Ҳужжатлар ҳолатини кузатиш ва онлайн хизматлардан фойдаланиш учун QR-кодни сканер
+          қилинг.</div>
+        <div class="cab-url">www.arizasud.uz</div>
+        <div class="client-id-row">
+          <label>Мижоз ID:</label>
+          <div class="id-line" id="mijoz-id-print"></div>
+          <div class="id-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back signature -->
+    <div class="back-sign-area">
+      <div class="back-confirm-text">
+        Мижоз тасдиғи: ушбу қабул картасининг олди ва орқа томонидаги шартлар билан танишганлигимни
+        тасдиқлайман.<br>
+        <em>Мижоз имзоси олди бетда қўйилади. Мазкур карта қабулни рўйхатга олиш учун мўлжалланган.</em>
+      </div>
+      <div class="back-sign-box">
+        <label>Мижоз имзоси</label>
+        <div class="sign-line"></div>
+      </div>
+    </div>
+
+    <div class="back-footer">
+      <p>Юридик хизматлар ва ҳужжатлар тайёрлаш бюроси — www.arizasud.uz</p>
+    </div>
+</div>
+
+  </div>
+
+  <script>
+    window.onload = function () {
+      const p = new URLSearchParams(window.location.search);
+
+      const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val) el.textContent = val;
+      };
+
+      set('mijoz-fish', p.get('fish'));
+      set('mijoz-telefon', p.get('telefon'));
+      set('mijoz-manzil', p.get('manzil'));
+      set('mijoz-id', p.get('id'));
+      set('mijoz-id-print', p.get('id'));
+      set('qabul-raqam', p.get('raqam'));
+
+      const sana = p.get('sana') || new Date().toLocaleDateString('uz-UZ');
+      set('berilgan-sana', sana);
+
+      setTimeout(function () {
+        window.print();
+      }, 800);
+    };
+  </script>
+</body>
+
+</html>
