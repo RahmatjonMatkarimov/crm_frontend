@@ -1,11 +1,11 @@
-import axios from 'axios'
 import { defineStore } from 'pinia'
+import api, { ENDPOINTS, BASE_URL } from '@/api'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('token') || null,
     user: JSON.parse(localStorage.getItem('user')) || null,
-    permission: null,
+    permission: JSON.parse(localStorage.getItem('permission')) || null,
     error: null,
     loading: false,
   }),
@@ -16,13 +16,12 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-
     async fetchPermission() {
       try {
         this.loading = true
-        const id = this.user.id
-        const { data } = await axios.get(`http://localhost:4000/permissions/${id}`)
+        const { data } = await api.get(ENDPOINTS.PERMISSION(this.user.id))
         this.permission = { ...data }
+        localStorage.setItem('permission', JSON.stringify(this.permission))
       } catch (err) {
         this.error = 'Maʼlumotni yuklashda xatolik'
         console.error(err)
@@ -31,49 +30,20 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    // Yangi foydalanuvchi yaratish (rasm bilan)
     async createUser(userData) {
       this.loading = true
       this.error = null
-
       try {
         const formData = new FormData()
+        const fields = ['username', 'password', 'name', 'surname', 'father_name', 'role', 'phone', 'phone2', 'birthDate', 'userCode', 'uniqueCode']
+        fields.forEach(f => { if (userData[f]) formData.append(f, userData[f]) })
+        if (userData.img instanceof File) formData.append('img', userData.img)
 
-        if (userData.username) formData.append('username', userData.username)
-        if (userData.password) formData.append('password', userData.password)
-        if (userData.name) formData.append('name', userData.name)
-        if (userData.surname) formData.append('surname', userData.surname)
-        if (userData.father_name) formData.append('father_name', userData.father_name)
-        if (userData.role) formData.append('role', userData.role)
-        if (userData.phone) formData.append('phone', userData.phone)
-        if (userData.phone2) formData.append('phone2', userData.phone2)
-        if (userData.birthDate) formData.append('birthDate', userData.birthDate)
-        if (userData.userCode) formData.append('userCode', userData.userCode)
-        if (userData.uniqueCode) formData.append('uniqueCode', userData.uniqueCode)
-
-        // Rasm yuklash
-        if (userData.img && userData.img instanceof File) {
-          formData.append('img', userData.img)
-        }
-
-        const response = await fetch('http://localhost:4000/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${this.token}`,
-          },
-          body: formData,
-        })
-
-        const data = await response.json()
-
-        if (!response.ok) {
-          throw new Error(data.message || 'Foydalanuvchi yaratishda xatolik yuz berdi')
-        }
-
+        const { data } = await api.post(ENDPOINTS.REGISTER, formData)
         return { success: true, user: data.user }
       } catch (err) {
-        this.error = err.message
-        return { success: false, error: err.message }
+        this.error = err.response?.data?.message || err.message
+        return { success: false, error: this.error }
       } finally {
         this.loading = false
       }
@@ -83,22 +53,15 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true
       this.error = null
       try {
-        const response = await fetch('http://localhost:4000/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        })
-        const data = await response.json()
-        if (!response.ok) throw new Error(data.message || 'Kirishda xatolik')
-          
-          this.token = data.access_token
-          this.user = data.user
-          localStorage.setItem('token', data.access_token)
-          localStorage.setItem('user', JSON.stringify(data.user))
-          await this.fetchPermission()
+        const { data } = await api.post(ENDPOINTS.LOGIN, { username, password })
+        this.token = data.access_token
+        this.user = data.user
+        localStorage.setItem('token', data.access_token)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        await this.fetchPermission()
         return { success: true }
       } catch (err) {
-        this.error = err.message
+        this.error = err.response?.data?.message || err.message || 'Kirishda xatolik'
         return { success: false }
       } finally {
         this.loading = false
@@ -109,64 +72,43 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true
       this.error = null
       try {
-        const response = await fetch(`http://localhost:4000/api/users/${userId}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${this.token}`,
-          },
-          body: formData,
-        })
-        const data = await response.json()
-        if (!response.ok) {
-          throw new Error(data.message || 'Foydalanuvchini yangilashda xatolik')
-        }
+        const { data } = await api.put(ENDPOINTS.USER(userId), formData)
         return { success: true, user: data.user }
       } catch (err) {
-        this.error = err.message
-        return { success: false, error: err.message }
+        this.error = err.response?.data?.message || err.message
+        return { success: false, error: this.error }
       } finally {
         this.loading = false
       }
     },
 
     async archiveUser(userId) {
-      const response = await fetch(`http://localhost:4000/api/users/${userId}/archive`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${this.token}` },
-      })
-      const data = await response.json()
-      if (!response.ok) return { success: false, error: data.message }
-      return { success: true }
+      try {
+        await api.put(ENDPOINTS.USER_ARCHIVE(userId))
+        return { success: true }
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.message }
+      }
     },
 
     async restoreUser(userId) {
-      const response = await fetch(`http://localhost:4000/api/users/${userId}/restore`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${this.token}` },
-      })
-      const data = await response.json()
-      if (!response.ok) return { success: false, error: data.message }
-      return { success: true }
+      try {
+        await api.put(ENDPOINTS.USER_RESTORE(userId))
+        return { success: true }
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.message }
+      }
     },
 
     async deleteUser(userId) {
       this.loading = true
       this.error = null
       try {
-        const response = await fetch(`http://localhost:4000/api/users/${userId}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${this.token}`,
-          },
-        })
-        const data = await response.json()
-        if (!response.ok) {
-          throw new Error(data.message || 'Foydalanuvchini o\'chirishda xatolik')
-        }
+        await api.delete(ENDPOINTS.USER(userId))
         return { success: true }
       } catch (err) {
-        this.error = err.message
-        return { success: false, error: err.message }
+        this.error = err.response?.data?.message || err.message
+        return { success: false, error: this.error }
       } finally {
         this.loading = false
       }
@@ -175,8 +117,10 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       this.token = null
       this.user = null
+      this.permission = null
       localStorage.removeItem('token')
       localStorage.removeItem('user')
-    }
-  }
+      localStorage.removeItem('permission')
+    },
+  },
 })

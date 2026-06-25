@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useAuthStore } from './auth'
+import api, { ENDPOINTS } from '@/api'
 
 export const usePricesStore = defineStore('prices', {
   state: () => ({
@@ -12,22 +12,11 @@ export const usePricesStore = defineStore('prices', {
   }),
 
   actions: {
-    headers() {
-      return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${useAuthStore().token}`,
-      }
-    },
-
     async fetchPrices() {
       this.loading = true
       try {
-        const res = await fetch('http://localhost:4000/api/customers/settings/prices', {
-          headers: this.headers()
-        })
-        if (res.ok) {
-          this.prices = await res.json()
-        }
+        const { data } = await api.get(ENDPOINTS.PRICES)
+        this.prices = data
       } catch (err) {
         console.error('Narxlarni yuklashda xatolik:', err)
       } finally {
@@ -35,26 +24,18 @@ export const usePricesStore = defineStore('prices', {
       }
     },
 
-    async updatePrices(data) {
+    async updatePrices(payload) {
       this.loading = true
       try {
-        const res = await fetch('http://localhost:4000/api/customers/settings/prices', {
-          method: 'PUT',
-          headers: this.headers(),
-          body: JSON.stringify(data),
-        })
-        if (res.ok) {
-          this.prices = await res.json()
-          return { success: true }
-        }
-        const result = await res.json()
-        return { success: false, error: result.message || result.error }
+        const { data } = await api.put(ENDPOINTS.PRICES, payload)
+        this.prices = data
+        return { success: true }
       } catch (err) {
         console.error('Narxlarni yangilashda xatolik:', err)
-        return { success: false, error: 'Xatolik yuz berdi' }
+        return { success: false, error: err.response?.data?.message || 'Xatolik yuz berdi' }
       } finally {
         this.loading = false
       }
-    }
-  }
+    },
+  },
 })

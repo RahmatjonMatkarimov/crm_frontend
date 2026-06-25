@@ -1,45 +1,131 @@
-const translitMap = {
-    // Maxsus harf juftliklari (2 harfli kombinatsiyalar)
-    "sh": "ш", "Sh": "Ш", "SH": "Ш",
-    "ch": "ч", "Ch": "Ч", "CH": "Ч",
-    "yo'": "ё", "Yo'": "Ё", "YO'": "Ё", "yo'": "ё", "Yoʻ": "Ё", "YOʻ": "Ё",
-    "yu": "ю", "Yu": "Ю", "YU": "Ю",
-    "ya": "я", "Ya": "Я", "YA": "Я",
-    "ye": "е", "Ye": "Е", "YE": "Е",
-    "o'": "ў", "oʻ": "ў", "Oʻ": "Ў",
-    "g'": "ғ", "G'": "Ғ",
+// Uzbek Latin → Cyrillic transliteration
+// Character-by-character approach for correctness
 
-    "a": "а", "b": "б", "d": "д",
-    "f": "ф", "g": "г", "h": "ҳ",
-    "i": "и", "j": "ж", "k": "к", "l": "л", "m": "м", "n": "н", "o": "о",
-    "p": "п", "q": "қ", "r": "р", "s": "с", "t": "т", "u": "у", "v": "в",
-    "x": "х", "y": "й", "z": "з", "'": "ъ", "ʻ": "ъ",
+const map1 = {
+  'a': 'а', 'A': 'А',
+  'b': 'б', 'B': 'Б',
+  'd': 'д', 'D': 'Д',
+  'f': 'ф', 'F': 'Ф',
+  'g': 'г', 'G': 'Г',
+  'h': 'ҳ', 'H': 'Ҳ',
+  'i': 'и', 'I': 'И',
+  'j': 'ж', 'J': 'Ж',
+  'k': 'к', 'K': 'К',
+  'l': 'л', 'L': 'Л',
+  'm': 'м', 'M': 'М',
+  'n': 'н', 'N': 'Н',
+  'o': 'о', 'O': 'О',
+  'p': 'п', 'P': 'П',
+  'q': 'қ', 'Q': 'Қ',
+  'r': 'р', 'R': 'Р',
+  's': 'с', 'S': 'С',
+  't': 'т', 'T': 'Т',
+  'u': 'у', 'U': 'У',
+  'v': 'в', 'V': 'В',
+  'x': 'х', 'X': 'Х',
+  'y': 'й', 'Y': 'Й',
+  'z': 'з', 'Z': 'З',
+  "'": 'ъ', 'ʻ': 'ъ',
+}
 
-    "A": "А", "B": "Б", "D": "Д", "F": "Ф", "G": "Г", "H": "Ҳ",
-    "I": "И", "J": "Ж", "K": "К", "L": "Л", "M": "М", "N": "Н", "O": "О",
-    "P": "П", "Q": "Қ", "R": "Р", "S": "С", "T": "Т", "U": "У", "V": "В",
-    "X": "Х", "Y": "Й", "Z": "З", 'O‘': 'Ў', "O'": "Ў", ",": ",",
-};
+const isLetter = (c) => c && /[a-zA-Z''ʻ]/.test(c)
+const isWordStart = (text, i) => i === 0 || !isLetter(text[i - 1])
 
 const translateText = (text) => {
-    let translated = text;
+  if (!text || typeof text !== 'string') return text
 
-    translated = translated.replace(/\b[e]/g, "э").replace(/\b[E]/g, "Э");
+  let result = ''
+  let i = 0
 
-    const twoLetterKeys = Object.keys(translitMap).filter(key => key.length === 2);
-    const oneLetterKeys = Object.keys(translitMap).filter(key => key.length === 1);
+  while (i < text.length) {
+    const c = text[i]
+    const c1 = text[i + 1] || ''
+    const c2 = text[i + 2] || ''
+    const lc = c.toLowerCase()
+    const lc1 = c1.toLowerCase()
+    const lc2 = c2.toLowerCase()
+    const upper = c === c.toUpperCase() && c !== c.toLowerCase()
 
-    for (const key of twoLetterKeys) {
-        const regex = new RegExp(key, "g");
-        translated = translated?.replace(regex, translitMap[key]);
+    // yo' / Yo' — 3 chars (ё)
+    if (lc === 'y' && lc1 === 'o' && (c2 === "'" || c2 === 'ʻ')) {
+      result += upper ? 'Ё' : 'ё'
+      i += 3
+      continue
     }
 
-    for (const key of oneLetterKeys) {
-        const regex = new RegExp(key, "g");
-        translated = translated?.replace(regex, translitMap[key]);
+    // sh / Sh — (ш)
+    if (lc === 's' && lc1 === 'h') {
+      result += upper ? 'Ш' : 'ш'
+      i += 2
+      continue
     }
 
-    return translated;
-};
+    // ch / Ch — (ч)
+    if (lc === 'c' && lc1 === 'h') {
+      result += upper ? 'Ч' : 'ч'
+      i += 2
+      continue
+    }
 
-export default translateText;
+    // ng — (нг)
+    if (lc === 'n' && lc1 === 'g') {
+      result += upper ? 'НГ' : 'нг'
+      i += 2
+      continue
+    }
+
+    // yu / Yu — (ю)
+    if (lc === 'y' && lc1 === 'u') {
+      result += upper ? 'Ю' : 'ю'
+      i += 2
+      continue
+    }
+
+    // ya / Ya — (я)
+    if (lc === 'y' && lc1 === 'a') {
+      result += upper ? 'Я' : 'я'
+      i += 2
+      continue
+    }
+
+    // ye / Ye — (е)
+    if (lc === 'y' && lc1 === 'e') {
+      result += upper ? 'Е' : 'е'
+      i += 2
+      continue
+    }
+
+    // o' / O' — (ў)
+    if (lc === 'o' && (c1 === "'" || c1 === 'ʻ')) {
+      result += upper ? 'Ў' : 'ў'
+      i += 2
+      continue
+    }
+
+    // g' / G' — (ғ)
+    if (lc === 'g' && (c1 === "'" || c1 === 'ʻ')) {
+      result += upper ? 'Ғ' : 'ғ'
+      i += 2
+      continue
+    }
+
+    // e / E — word start → э/Э, otherwise → е/Е
+    if (lc === 'e') {
+      if (isWordStart(text, i)) {
+        result += upper ? 'Э' : 'э'
+      } else {
+        result += upper ? 'Е' : 'е'
+      }
+      i++
+      continue
+    }
+
+    // Single char map
+    result += map1[c] ?? c
+    i++
+  }
+
+  return result
+}
+
+export default translateText

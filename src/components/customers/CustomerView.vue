@@ -2,12 +2,12 @@
     <div class="customer-detail p-6 max-w-6xl mx-auto">
         <!-- Yuklanmoqda -->
         <div v-if="loading" class="text-center py-20">
-            <p class="text-xl text-gray-600 dark:text-gray-400">Ma'lumotlar yuklanmoqda...</p>
+            <p class="text-xl text-gray-600 dark:text-gray-400">{{ $t("Ma'lumotlar yuklanmoqda...") }}</p>
         </div>
 
         <!-- Mijoz topilmadi -->
         <div v-else-if="!customer" class="text-center py-20">
-            <p class="text-red-500 text-xl">Mijoz topilmadi</p>
+            <p class="text-red-500 text-xl">{{ $t('Mijoz topilmadi') }}</p>
         </div>
 
         <!-- Asosiy kontent -->
@@ -15,78 +15,78 @@
             <!-- Sarlavha -->
             <div class="flex justify-between items-center mb-8">
                 <h1 class="text-3xl font-bold text-gray-800 dark:text-white">
-                    {{ customer.fullName || customer.name || 'Noma\'lum mijoz' }}
+                    {{ $t(customer.fullName || customer.name || 'Noma\'lum mijoz') }}
                 </h1>
                 <button @click="goBack" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 
                  text-gray-700 dark:text-gray-200 rounded-xl flex items-center gap-2 transition-colors">
-                    ← Orqaga
+                    ← {{ $t('Orqaga') }}
                 </button>
             </div>
 
             <!-- Mijoz ma'lumotlari -->
             <div
                 class="bg-white dark:bg-gray-800 shadow rounded-2xl p-8 mb-10 border border-gray-100 dark:border-gray-700">
-                <h2 class="text-2xl font-semibold mb-6 text-gray-800 dark:text-white">Mijoz haqida</h2>
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800 dark:text-white">{{ $t('Mijoz haqida') }}</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 text-lg">
                     <!-- Asosiy ma'lumotlar -->
                     <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">F.I.Sh:</span>
+                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('F.I.Sh') }}:</span>
                         <span class="font-semibold text-gray-800 dark:text-white">
-                            {{ customer.surname }} {{ customer.name }} {{ customer.father_name || '' }}
+                            {{ $t(customer.surname) }} {{ $t(customer.name) }} {{ $t(customer.father_name || '') }}
                         </span>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">Telefon 1:</span>
+                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('Telefon 1') }}:</span>
                         <span class="font-semibold text-gray-800 dark:text-white">{{ customer.phone || '-' }}</span>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">Telefon 2:</span>
+                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('Telefon 2') }}:</span>
                         <span class="font-semibold text-gray-800 dark:text-white">{{ customer.phone2 || '-' }}</span>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">Telegram:</span>
+                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('Telegram') }}:</span>
                         <span class="font-semibold text-gray-800 dark:text-white">{{ customer.telegram || '-' }}</span>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">Manzil:</span>
+                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('Manzil') }}:</span>
                         <span class="font-semibold text-gray-800 dark:text-white">
-                            {{ customer.address || '-' }}
+                            {{ $t(customer.address || '') }}
                             <span v-if="customer.region || customer.district" class="text-sm text-gray-500">
-                                ({{ customer.region }} {{ customer.district }})
+                                ({{ $t(customer.region) }} {{ $t(customer.district) }})
                             </span>
                         </span>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">Maslahat narxi:</span>
+                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('Maslahat narxi') }}:</span>
                         <span class="font-semibold text-gray-800 dark:text-white">
-                            {{ Number(customer.price || 0) }} so'm
+                            {{ Number(customer.price || 0) }} {{ $t('so\'m') }}
                         </span>
                     </div>
 
                     <!-- Tavsif -->
                     <div class="md:col-span-2" v-if="authStore.userRole ==='YURIST'||authStore.userRole==='RAHBAR'">
-                        <span class="block text-gray-600 dark:text-gray-400 font-medium mb-1">Izoh / Tavsif:</span>
+                        <span class="block text-gray-600 dark:text-gray-400 font-medium mb-1">{{ $t('Izoh / Tavsif') }}:</span>
                         <p
                             class="text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-4 rounded-xl whitespace-pre-wrap">
-                            {{ customer.description || 'Izoh yo‘q' }}
+                            {{ $t(customer.description) || $t("Izoh yo'q") }}
                         </p>
                     </div>
 
-                    <!-- Qo‘shimcha ma'lumotlar -->
+                    <!-- Qo'shimcha ma'lumotlar -->
                     <div class="md:col-span-2 pt-4 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-500">
                         <div class="grid grid-cols-2 gap-4">
-                            <div>Yaratilgan sana: <span class="font-medium text-gray-700 dark:text-gray-300">{{
+                            <div>{{ $t('Yaratilgan sana') }}: <span class="font-medium text-gray-700 dark:text-gray-300">{{
                                     formatDate(customer.createdAt) }}</span></div>
                             <div v-if="customer.assignedTo">
-                                Mas'ul:
+                                {{ $t("Mas'ul") }}:
                                 <span class="font-medium text-gray-700 dark:text-gray-300">
-                                    {{ customer.assignedTo.name }} {{ customer.assignedTo.surname }}
+                                    {{ $t(customer.assignedTo.name) }} {{ $t(customer.assignedTo.surname) }}
                                 </span>
                             </div>
                         </div>
@@ -96,14 +96,14 @@
 
             <!-- To'lov Tarixi -->
             <div class="mb-10">
-                <h2 class="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">To'lov Tarixi</h2>
+                <h2 class="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">{{ $t("To'lov Tarixi") }}</h2>
                 <div
                     class="bg-white dark:bg-gray-800 shadow rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700">
                     <table class="w-full">
                         <thead class="bg-gray-50 dark:bg-gray-900">
                             <tr>
-                                <th class="px-6 py-4 text-left text-gray-600 dark:text-gray-400">Sana</th>
-                                <th class="px-6 py-4 text-left text-gray-600 dark:text-gray-400">Summa</th>
+                                <th class="px-6 py-4 text-left text-gray-600 dark:text-gray-400">{{ $t('Sana') }}</th>
+                                <th class="px-6 py-4 text-left text-gray-600 dark:text-gray-400">{{ $t('Summa') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -113,12 +113,12 @@
                                     {{ formatDate(payment.createdAt) }}
                                 </td>
                                 <td class="px-6 py-5 font-semibold text-emerald-600 dark:text-emerald-500">
-                                    +{{ payment.amount }} so'm
+                                    +{{ payment.amount }} {{ $t("so'm") }}
                                 </td>
                             </tr>
                             <tr v-if="payments.length === 0">
                                 <td colspan="4" class="px-6 py-16 text-center text-gray-500 dark:text-gray-400">
-                                    Hali hech qanday to‘lov yo‘q
+                                    {{ $t("Hali hech qanday to'lov yo'q") }}
                                 </td>
                             </tr>
                         </tbody>
@@ -128,7 +128,7 @@
 
             <!-- Checklar -->
             <div>
-                <h2 class="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">Checklar</h2>
+                <h2 class="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">{{ $t('Checklar') }}</h2>
 
                 <div v-if="checks.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     <div v-for="check in checks" :key="check.id" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
@@ -145,7 +145,8 @@
                             <div v-else-if="isPDF(check.checkUrl)"
                                 class="flex flex-col items-center justify-center text-6xl">
                                 <span class="text-red-500 dark:text-red-400">📕</span>
-                                <span class="text-sm mt-3 text-gray-600 dark:text-gray-400 font-medium">PDF</span>
+                                <span class="text-sm mt-3 text-gray-600 dark:text-gray-400 font-medium">{{ $t("PDF")
+                                    }}</span>
                             </div>
 
                             <!-- Boshqa -->
@@ -158,7 +159,7 @@
                             </div>
                             <button @click="openCheck(check)"
                                 class="mt-3 text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 text-sm font-medium flex items-center gap-1 transition">
-                                Ochish →
+                                {{ $t('Ochish') }} →
                             </button>
                         </div>
                     </div>
@@ -166,7 +167,7 @@
 
                 <div v-else class="bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 
                           rounded-2xl p-16 text-center">
-                    <p class="text-gray-500 dark:text-gray-400">Bu mijoz uchun hali check yuklanmagan</p>
+                    <p class="text-gray-500 dark:text-gray-400">{{ $t('Bu mijoz uchun hali check yuklanmagan') }}</p>
                 </div>
             </div>
         </div>
@@ -175,8 +176,11 @@
 
 <script setup>
 import { useAuthStore } from '@/stores/auth'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import api, { ENDPOINTS, BASE_URL } from '@/api'
+
+const { proxy } = getCurrentInstance()
 
 const route = useRoute()
 const router = useRouter()
@@ -188,33 +192,22 @@ const loading = ref(false)
 
 const authStore = useAuthStore()
 
-const token = localStorage.getItem('token')
-
-const headers = () => ({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-})
-
-// Ma'lumotlarni yuklash
 const fetchCustomerData = async () => {
     const id = route.params.id
     if (!id) return
 
     loading.value = true
     try {
-        const customerRes = await fetch(`http://localhost:4000/api/customers/${id}`, { headers: headers() })
-        if (customerRes.ok) {
-            customer.value = await customerRes.json()
-            payments.value = customer.value.payments || []
-        }
-
-        const checksRes = await fetch(`http://localhost:4000/api/customers/${id}/checks`, { headers: headers() })
-        if (checksRes.ok) {
-            checks.value = await checksRes.json()
-        }
+        const [{ data: cust }, { data: ch }] = await Promise.all([
+            api.get(ENDPOINTS.CUSTOMER(id)),
+            api.get(`${ENDPOINTS.CUSTOMER(id)}/checks`),
+        ])
+        customer.value = cust
+        payments.value = cust.payments || []
+        checks.value = ch
     } catch (error) {
         console.error('Xatolik:', error)
-        alert('Ma\'lumotlarni yuklashda xatolik yuz berdi')
+        alert("Ma'lumotlarni yuklashda xatolik yuz berdi")
     } finally {
         loading.value = false
     }
@@ -253,7 +246,7 @@ const openCheck = (check) => {
             .replace(/^uploads\//i, '/');             // uploads/ ni / ga aylantiradi
     };
     console.log(filterUrl(check.check_url));
-    window.location.href = `http://localhost:4000/${filterUrl(check.check_url)}`
+    window.location.href = `${BASE_URL}/${filterUrl(check.check_url)}`
 }
 
 const goBack = () => {

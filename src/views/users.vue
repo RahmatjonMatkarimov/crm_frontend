@@ -1,11 +1,14 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, getCurrentInstance } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useUserModalStore } from '@/stores/users.modal'
 import UsersModal from '@/components/users/users.modal.vue'
 import UsersModalUpdate from '@/components/users/usersUpdateModal.vue'
 import AppCheckbox from '@/components/ui/AppCheckbox.vue'
+import api, { ENDPOINTS, BASE_URL } from '@/api'
+import translateText from '@/utils/translete.js'
 
+const { proxy } = getCurrentInstance()
 const authStore = useAuthStore()
 const userModalStore = useUserModalStore()
 
@@ -19,10 +22,8 @@ const fetchUsers = async () => {
     loading.value = true
     selected.value = []
     try {
-        const res = await fetch('http://localhost:4000/api/auth/all-users', {
-            headers: { 'Authorization': `Bearer ${authStore.token}` }
-        })
-        users.value = await res.json()
+        const { data } = await api.get(ENDPOINTS.ALL_USERS)
+        users.value = data
     } catch (err) {
         console.error(err)
     } finally {
@@ -35,22 +36,20 @@ onMounted(() => fetchUsers())
 const filteredUsers = computed(() => {
     return users.value.filter(user => {
         const q = searchQuery.value.toLowerCase()
-        const matchSearch =
-            (user.name?.toLowerCase() || '').includes(q) ||
-            (user.surname?.toLowerCase() || '').includes(q) ||
-            (user.username?.toLowerCase() || '').includes(q)
+        const m = (val) => { const v = val?.toLowerCase() || ''; return v.includes(q) || translateText(v).toLowerCase().includes(q) }
+        const matchSearch = m(user.name) || m(user.surname) || m(user.username)
         const matchRole = selectedRole.value === 'all' || user.role === selectedRole.value
         return matchSearch && matchRole
     })
 })
 
-const roles = [
-    { value: 'all', label: 'Barchasi' },
-    { value: 'ADMIN', label: 'Administrator' },
-    { value: 'RAHBAR', label: 'Rahbar' },
-    { value: 'YURIST', label: 'Yurist' },
-    { value: 'KASSIR', label: 'Kassir' },
-]
+const roles = computed(() => [
+    { value: 'all', label: proxy.$t('Barchasi') },
+    { value: 'ADMIN', label: proxy.$t('Administrator') },
+    { value: 'RAHBAR', label: proxy.$t('Rahbar') },
+    { value: 'YURIST', label: proxy.$t('Yurist') },
+    { value: 'KASSIR', label: proxy.$t('Kassir') },
+])
 
 const allChecked = computed(() =>
     filteredUsers.value.length > 0 && filteredUsers.value.every(u => selected.value.includes(u.id))
@@ -90,7 +89,12 @@ const detailUser = ref(null)
 const openDetail = (user) => { detailUser.value = user }
 const closeDetail = () => { detailUser.value = null }
 
-const roleLabel = (role) => ({ ADMIN: 'Administrator', RAHBAR: 'Rahbar', YURIST: 'Yurist', KASSIR: 'Kassir' }[role] || role)
+const roleLabel = (role) => ({
+    ADMIN: proxy.$t('Administrator'),
+    RAHBAR: proxy.$t('Rahbar'),
+    YURIST: proxy.$t('Yurist'),
+    KASSIR: proxy.$t('Kassir'),
+}[role] || role)
 const roleBadgeClass = (role) => ({
     ADMIN: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
     RAHBAR: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
@@ -104,8 +108,8 @@ const roleBadgeClass = (role) => ({
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-[#0a1850] dark:text-white">Ishchilar</h1>
-                <p class="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Barcha xodimlar ro'yxati</p>
+                <h1 class="text-2xl font-bold text-[#0a1850] dark:text-white">{{ $t('Ishchilar') }}</h1>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-0.5">{{ $t("Barcha xodimlar ro'yxati") }}</p>
             </div>
             <button @click="userModalStore.openUserModal()"
             v-if="authStore.permission.add_users"
@@ -114,7 +118,7 @@ const roleBadgeClass = (role) => ({
                     stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
-                Yangi xodim
+                {{ $t('Yangi xodim') }}
             </button>
         </div>
 
@@ -129,12 +133,12 @@ const roleBadgeClass = (role) => ({
                             d="M21 21l-6-6m2-5a7 7 0 01-14 0 7 7 0 0114 0z" />
                     </svg>
                 </span>
-                <input v-model="searchQuery" type="text" placeholder="Ism, familiya yoki login..."
+                <input v-model="searchQuery" type="text" :placeholder="$t('Ism, familiya yoki login...')"
                     class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-700/50 dark:text-slate-100 dark:placeholder-slate-500 border border-slate-200 dark:border-slate-600/50 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 dark:focus:border-blue-500 transition-all" />
             </div>
             <select v-model="selectedRole"
                 class="md:w-44 px-4 py-2.5 bg-white dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 dark:border-slate-600/50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all cursor-pointer">
-                <option v-for="role in roles" :key="role.value" :value="role.value">{{ role.label }}</option>
+                <option v-for="role in roles" :key="role.value" :value="role.value">{{ $t(role.label) }}</option>
             </select>
         </div>
 
@@ -143,11 +147,11 @@ const roleBadgeClass = (role) => ({
             leave-active-class="transition-all duration-150" leave-to-class="opacity-0 -translate-y-2">
             <div v-if="selected.length > 0"
                 class="flex items-center justify-between px-5 py-3 bg-blue-950 dark:bg-blue-900/40 border border-blue-800/40 dark:border-blue-700/40 rounded-2xl shadow-lg">
-                <span class="text-blue-200 text-sm font-medium">{{ selected.length }} ta tanlandi</span>
+                <span class="text-blue-200 text-sm font-medium">{{ selected.length }} {{ $t('ta tanlandi') }}</span>
                 <div class="flex gap-2">
                     <button @click="selected = []"
                         class="px-4 py-1.5 rounded-lg text-sm text-blue-300 hover:text-white hover:bg-white/10 transition-colors">
-                        Bekor qilish
+                        {{ $t('Bekor qilish') }}
                     </button>
                     <button @click="archiveSelected"
                         class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/30 transition-colors">
@@ -156,7 +160,7 @@ const roleBadgeClass = (role) => ({
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                         </svg>
-                        O'chirish
+                        {{ $t("O'chirish") }}
                     </button>
                 </div>
             </div>
@@ -169,7 +173,7 @@ const roleBadgeClass = (role) => ({
                 <div
                     class="w-5 h-5 border-2 border-slate-300 dark:border-slate-600 border-t-blue-500 rounded-full animate-spin">
                 </div>
-                Yuklanmoqda...
+                {{ $t('Yuklanmoqda...') }}
             </div>
             <div v-else class="overflow-x-auto">
                 <table class="w-full min-w-[820px]">
@@ -181,24 +185,14 @@ const roleBadgeClass = (role) => ({
                             >
                                 <AppCheckbox :checked="allChecked" :indeterminate="indeterminate" @change="toggleAll" />
                             </th>
-                            <th
-                                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                                Xodim</th>
-                            <th
-                                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                                Lavozim</th>
-                            <th
-                                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                                Telefon</th>
-                            <th
-                                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                                Login</th>
-                            <th
-                                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                                JShSHIR</th>
-                            <th
-                                class="px-4 py-3.5 text-center text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                                Amallar</th>
+                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Xodim') }}</th>
+                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Lavozim') }}</th>
+                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Telefon') }}</th>
+                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Qo\'shimcha telefon') }}</th>
+                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Telegram') }}</th>
+                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Login') }}</th>
+                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('JShSHIR') }}</th>
+                            <th class="px-4 py-3.5 text-center text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Amallar') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-indigo-100/70 dark:divide-slate-700/50">
@@ -214,14 +208,14 @@ const roleBadgeClass = (role) => ({
                                 <div class="flex items-center gap-3">
                                     <div
                                         class="w-9 h-9 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600/50 shrink-0 bg-slate-100 dark:bg-slate-700">
-                                        <img v-if="user.img" :src="`http://localhost:4000${user.img}`"
+                                        <img v-if="user.img" :src="`${BASE_URL}${user.img}`"
                                             class="w-full h-full object-cover" />
                                         <img v-else src="../../public/User-avatar.svg.png"
                                             class="w-full h-full object-cover opacity-60" />
                                     </div>
                                     <div>
                                         <p class="font-medium text-slate-800 dark:text-slate-100 text-sm">{{
-                                            user.surname }} {{ user.name }} {{ user.father_name }}</p>
+                                            $t(user.surname) }} {{ $t(user.name) }} {{ $t(user.father_name) }}</p>
                                         <p class="text-xs text-slate-400 dark:text-slate-500">{{ user.userCode }}</p>
                                     </div>
                                 </div>
@@ -233,11 +227,15 @@ const roleBadgeClass = (role) => ({
                                     'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300': user.role === 'YURIST',
                                     'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300': user.role === 'KASSIR',
                                 }">
-                                    {{ user.role === 'ADMIN' ? 'Administrator' : user.role === 'RAHBAR' ? 'Rahbar' :
-                                        user.role === 'YURIST' ? 'Yurist' : 'Kassir' }}
+                                    {{ $t(user.role === 'ADMIN' ? 'Administrator' : user.role === 'RAHBAR' ? 'Rahbar' :
+                                        user.role === 'YURIST' ? 'Yurist' : 'Kassir') }}
                                 </span>
                             </td>
                             <td class="px-4 py-3.5 text-sm text-slate-600 dark:text-slate-400">{{ user.phone || '—' }}
+                            </td>
+                            <td class="px-4 py-3.5 text-sm text-slate-600 dark:text-slate-400">{{ user.phone2 || '—' }}
+                            </td>
+                            <td class="px-4 py-3.5 text-sm text-slate-600 dark:text-slate-400">{{ user.telegram || '—' }}
                             </td>
                             <td class="px-4 py-3.5 text-sm font-mono text-slate-700 dark:text-slate-300">{{
                                 user.username }}</td>
@@ -276,7 +274,7 @@ const roleBadgeClass = (role) => ({
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
-                                    <p class="text-sm">Xodim topilmadi</p>
+                                    <p class="text-sm">{{ $t('Xodim topilmadi') }}</p>
                                 </div>
                             </td>
                         </tr>
@@ -302,8 +300,8 @@ const roleBadgeClass = (role) => ({
                 <div class="px-6 py-5 flex items-center justify-between shrink-0"
                     style="background: linear-gradient(150deg, #0a1850 0%, #1a2e7a 55%, #1535c4 100%)">
                     <div>
-                        <h2 class="text-white text-base font-semibold">Xodim ma'lumotlari</h2>
-                        <p class="text-white/50 text-xs mt-0.5">To'liq profil</p>
+                        <h2 class="text-white text-base font-semibold">{{ $t("Xodim ma'lumotlari") }}</h2>
+                        <p class="text-white/50 text-xs mt-0.5">{{ $t("To'liq profil") }}</p>
                     </div>
                     <button @click="closeDetail"
                         class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
@@ -321,18 +319,18 @@ const roleBadgeClass = (role) => ({
                     <div class="flex items-center gap-4">
                         <div
                             class="w-16 h-16 rounded-2xl overflow-hidden border-2 border-slate-200 dark:border-slate-600 shrink-0 bg-slate-100 dark:bg-slate-700">
-                            <img v-if="detailUser.img" :src="`http://localhost:4000${detailUser.img}`"
+                            <img v-if="detailUser.img" :src="`${BASE_URL}${detailUser.img}`"
                                 class="w-full h-full object-cover" />
                             <img v-else src="../../public/User-avatar.svg.png"
                                 class="w-full h-full object-cover opacity-60" />
                         </div>
                         <div>
                             <p class="font-semibold text-slate-800 dark:text-slate-100 text-base leading-tight">
-                                {{ detailUser.surname }} {{ detailUser.name }} {{ detailUser.father_name }}
+                                {{ $t(detailUser.surname) }} {{ $t(detailUser.name) }} {{ $t(detailUser.father_name) }}
                             </p>
                             <span class="inline-flex mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium"
                                 :class="roleBadgeClass(detailUser.role)">
-                                {{ roleLabel(detailUser.role) }}
+                                {{ $t(roleLabel(detailUser.role)) }}
                             </span>
                         </div>
                     </div>
@@ -344,58 +342,56 @@ const roleBadgeClass = (role) => ({
 
                         <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
                             <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">Login</span>
+                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Login') }}</span>
                             <span class="text-sm font-mono text-slate-800 dark:text-slate-200">{{ detailUser.username
                             }}</span>
                         </div>
 
                         <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
                             <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">Telefon</span>
+                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Telefon') }}</span>
                             <span class="text-sm text-slate-800 dark:text-slate-200">{{ detailUser.phone || '—'
                             }}</span>
                         </div>
 
                         <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
                             <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">Qo'shimcha
-                                tel.</span>
+                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Qo\'shimcha tel.') }}</span>
                             <span class="text-sm text-slate-800 dark:text-slate-200">{{ detailUser.phone2 || '—'
                             }}</span>
                         </div>
 
                         <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
                             <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">Telegram</span>
+                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Telegram') }}</span>
                             <span class="text-sm text-slate-800 dark:text-slate-200">{{ detailUser.telegram || '—'
                             }}</span>
                         </div>
 
                         <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
                             <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">Tug'ilgan
-                                sana</span>
+                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Tug\'ilgan sana') }}</span>
                             <span class="text-sm text-slate-800 dark:text-slate-200">{{ detailUser.birthDate ?
                                 detailUser.birthDate.split('T')[0] : '—' }}</span>
                         </div>
 
                         <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
                             <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">Passport</span>
+                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Passport') }}</span>
                             <span class="text-sm font-mono text-slate-800 dark:text-slate-200">{{ detailUser.userCode ||
                                 '—' }}</span>
                         </div>
 
                         <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
                             <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">JShSHIR</span>
+                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('JShSHIR') }}</span>
                             <span class="text-sm font-mono text-slate-800 dark:text-slate-200">{{ detailUser.uniqueCode
                                 || '—' }}</span>
                         </div>
 
                         <div class="flex items-start gap-3 py-2">
                             <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">Qo'shilgan</span>
+                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Qo\'shilgan') }}</span>
                             <span class="text-sm text-slate-800 dark:text-slate-200">{{ detailUser.createdAt ? new
                                 Date(detailUser.createdAt).toLocaleDateString('uz-UZ') : '—' }}</span>
                         </div>
@@ -415,7 +411,7 @@ const roleBadgeClass = (role) => ({
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 5.232z" />
                         </svg>
-                        Tahrirlash
+                        {{ $t('Tahrirlash') }}
                     </button>
                     <button @click="archiveUser(detailUser); closeDetail()" v-if="authStore.permission.delete_users"
                         class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-sm font-medium transition-all border border-red-200 dark:border-red-800/50">
@@ -424,7 +420,7 @@ const roleBadgeClass = (role) => ({
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                         </svg>
-                        O'chirish
+                        {{ $t("O'chirish") }}
                     </button>
                     <button @click="$router.push(`/permissions/${detailUser.id}`); closeDetail()"
                         v-if="authStore.permission.permisisons"
@@ -434,7 +430,7 @@ const roleBadgeClass = (role) => ({
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
-                        Ruxsatlar
+                        {{ $t('Ruxsatlar') }}
                     </button>
                 </div>
 

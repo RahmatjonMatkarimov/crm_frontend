@@ -1,8 +1,10 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, getCurrentInstance } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
+import api, { ENDPOINTS, BASE_URL } from '@/api'
 
+const { proxy } = getCurrentInstance()
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
 
@@ -59,15 +61,12 @@ const fullName = computed(() => {
     return parts.length ? parts.join(' ') : (form.username || 'Foydalanuvchi')
 })
 
-const roleLabel = computed(() => {
-    const roles = {
-        ADMIN: 'Administrator',
-        YURIST: 'Yurist',
-        KASSIR: 'Kassir',
-        RAHBAR: 'Rahbar',
-    }
-    return roles[authStore.userRole] || authStore.userRole
-})
+const roleLabel = computed(() => ({
+    ADMIN: proxy.$t('Administrator'),
+    YURIST: proxy.$t('Yurist'),
+    KASSIR: proxy.$t('Kassir'),
+    RAHBAR: proxy.$t('Rahbar'),
+}[authStore.userRole] || authStore.userRole))
 
 const handleImgChange = (e) => {
     const file = e.target.files[0]
@@ -124,20 +123,11 @@ const saveProfile = async () => {
             formData.append('img', imgFile.value);
         }
 
-        const response = await fetch('http://localhost:4000/api/users/me', {
-            method: 'POST',           // yoki 'PATCH'
-            headers: {
-                'Authorization': `Bearer ${authStore.token}`,
-            },
-            body: formData,
-        });
+        const { data } = await api.post(ENDPOINTS.ME, formData)
 
-        const data = await response.json();
+        if (!data) throw new Error('Saqlashda xatolik')
 
-        if (!response.ok) throw new Error(data.message || 'Saqlashda xatolik');
-
-        // Local store yangilash
-        authStore.user = { ...authStore.user, ...data.user };
+        authStore.user = { ...authStore.user, ...data.user }
         localStorage.setItem('user', JSON.stringify(authStore.user));
 
         saveSuccess.value = true;
@@ -233,7 +223,7 @@ const formatField = (field, e) => {
             <!-- Avatar -->
             <div class="relative shrink-0">
                 <div class="w-20 h-20 rounded-2xl overflow-hidden border-2 border-white/20">
-                    <img v-if="imgPreview" :src="`http://localhost:4000${imgPreview}`"
+                    <img v-if="imgPreview" :src="imgPreview.startsWith('blob:') ? imgPreview : `${BASE_URL}${imgPreview}`"
                         class="w-full h-full object-cover" />
                     <img v-else src="../../public/User-avatar.svg.png" class="w-full h-full object-cover" />
                     <button v-if="isEditing && imgPreview" @click="removeImage"
@@ -279,13 +269,13 @@ const formatField = (field, e) => {
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
                         </svg>
-                        Tahrirlash
+                        {{ $t('Tahrirlash') }}
                     </button>
                 </template>
                 <template v-else>
                     <button @click="cancelEdit"
                         class="px-4 py-2 rounded-xl bg-white/10 text-white text-xs font-medium hover:bg-white/20 transition-all">
-                        Bekor
+                        {{ $t('Bekor') }}
                     </button>
                     <button @click="saveProfile" :disabled="isSaving"
                         class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-[#0a1850] text-xs font-semibold hover:bg-slate-100 transition-all active:scale-[0.98] disabled:opacity-60">
@@ -295,7 +285,7 @@ const formatField = (field, e) => {
                             stroke="currentColor" class="w-3.5 h-3.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
-                        {{ isSaving ? 'Saqlanmoqda...' : 'Saqlash' }}
+                        {{ isSaving ? $t('Saqlanmoqda...') : $t('Saqlash') }}
                     </button>
                 </template>
             </div>
@@ -310,7 +300,7 @@ const formatField = (field, e) => {
                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
                     clip-rule="evenodd" />
             </svg>
-            Ma'lumotlar muvaffaqiyatli saqlandi!
+            {{ $t("Ma'lumotlar muvaffaqiyatli saqlandi!") }}
         </div>
         <div v-if="saveError"
             class="p-3.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-400 text-sm flex items-center gap-2">
@@ -331,7 +321,7 @@ const formatField = (field, e) => {
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
-                <h3 class="text-sm font-semibold text-[#0a1850] dark:text-slate-100">Shaxsiy ma'lumotlar</h3>
+                <h3 class="text-sm font-semibold text-[#0a1850] dark:text-slate-100">{{ $t("Shaxsiy ma'lumotlar") }}</h3>
             </div>
 
             <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -364,7 +354,7 @@ const formatField = (field, e) => {
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                     </svg>
-                    <h3 class="text-sm font-semibold text-[#0a1850] dark:text-slate-100">Parolni o'zgartirish</h3>
+                    <h3 class="text-sm font-semibold text-[#0a1850] dark:text-slate-100">{{ $t("Parolni o'zgartirish") }}</h3>
                 </div>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                     stroke="currentColor" class="w-4 h-4 text-slate-400 transition-transform"

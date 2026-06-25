@@ -4,15 +4,15 @@
       <!-- Header -->
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h1 class="text-2xl font-bold text-black dark:text-white">Ruxsatlar</h1>
-          <p class="text-black dark:text-white text-sm mt-1">Foydalanuvchi uchun ruxsatlarni sozlash</p>
+          <h1 class="text-2xl font-bold text-black dark:text-white">{{ $t('Ruxsatlar') }}</h1>
+          <p class="text-black dark:text-white text-sm mt-1">{{ $t("Foydalanuvchi uchun ruxsatlarni sozlash") }}</p>
         </div>
       </div>
 
       <!-- Permissions List -->
       <div v-if="loading" class="text-center py-20 text-slate-400">
         <div class="w-6 h-6 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin mx-auto mb-3"></div>
-        Yuklanmoqda...
+        {{ $t('Yuklanmoqda...') }}
       </div>
 
       <div v-else-if="error" class="bg-red-900/30 border border-red-700 text-red-400 p-6 rounded-2xl text-center">
@@ -46,16 +46,16 @@
       <!-- Auto saving -->
       <div v-if="saving" class="mt-6 flex items-center justify-center gap-2 text-slate-400 text-sm">
         <div class="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></div>
-        Saqlanmoqda...
+        {{ $t('Saqlanmoqda...') }}
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, getCurrentInstance } from 'vue'
 import { useRoute } from 'vue-router'
-import axios from 'axios'
+import api, { ENDPOINTS } from '@/api'
 
 const route = useRoute()
 const permission = ref(null)
@@ -63,7 +63,8 @@ const loading = ref(true)
 const error = ref('')
 const saving = ref(false)
 
-const API_BASE = 'http://localhost:4000'
+const { proxy } = getCurrentInstance()
+const t = (text) => proxy.$t(text)
 
 const filteredPermissions = computed(() => {
   if (!permission.value) return {}
@@ -75,8 +76,7 @@ const filteredPermissions = computed(() => {
 const fetchPermission = async () => {
   try {
     loading.value = true
-    const id = route.params.id
-    const { data } = await axios.get(`http://localhost:4000/permissions/${id}`)
+    const { data } = await api.get(ENDPOINTS.PERMISSION(route.params.id))
     permission.value = { ...data }
   } catch (err) {
     error.value = 'Maʼlumotni yuklashda xatolik'
@@ -93,8 +93,7 @@ const autoSave = async () => {
   saveTimeout = setTimeout(async () => {
     try {
       saving.value = true
-      const id = route.params.id
-      await axios.put(`${API_BASE}/permissions/${id}`, permission.value)
+      await api.put(ENDPOINTS.PERMISSION(route.params.id), permission.value)
     } catch (err) {
       console.error(err)
       error.value = 'Saqlashda xatolik yuz berdi'
@@ -114,18 +113,19 @@ const toggleAndSave = (key) => {
 
 const formatLabel = (key) => {
   const labels = {
-    permisisons: 'Ruxsatlarni boshqarish',
-    view_users: 'Foydalanuvchilarni ko‘rish uchun ruxsat',
-    edit_users: 'Foydalanuvchilarni tahrirlash uchun ruxsat',
-    delete_users: 'Foydalanuvchilarni o‘chirish uchun ruxsat',
-    add_users: 'Foydalanuvchi qo‘shish uchun ruxsat',
-    view_customers: 'Mijozlarni ko‘rish uchun ruxsat',
-    edit_customers: 'Mijozlarni tahrirlash uchun ruxsat',
-    delete_customers: 'Mijozlarni o‘chirish uchun ruxsat',
-    add_customers: 'Mijoz qo‘shish uchun ruxsat',
-    archive: 'Arxiv uchun ruxsat'
+    permisisons: "Ruxsatlarni boshqarish",
+    view_users: "Foydalanuvchilarni ko'rish uchun ruxsat",
+    edit_users: "Foydalanuvchilarni tahrirlash uchun ruxsat",
+    delete_users: "Foydalanuvchilarni o'chirish uchun ruxsat",
+    add_users: "Foydalanuvchi qo'shish uchun ruxsat",
+    view_customers: "Mijozlarni ko'rish uchun ruxsat",
+    edit_customers: "Mijozlarni tahrirlash uchun ruxsat",
+    delete_customers: "Mijozlarni o'chirish uchun ruxsat",
+    add_customers: "Mijoz qo'shish uchun ruxsat",
+    archive: "Arxiv uchun ruxsat",
   }
-  return labels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  const label = labels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  return t(label)
 }
 
 onMounted(fetchPermission)

@@ -1,11 +1,14 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, getCurrentInstance } from 'vue'
 import { useCustomersStore } from '@/stores/customers'
 import CustomerModal from '@/components/customers/CustomerModal.vue'
 import AppCheckbox from '@/components/ui/AppCheckbox.vue'
 import { useAuthStore } from '@/stores/auth'
 import { usePricesStore } from '@/stores/prices'
 import { useThemeStore } from '@/stores/theme'
+import translateText from '@/utils/translete.js'
+
+const { proxy } = getCurrentInstance()
 
 const authStore = useAuthStore()
 const store = useCustomersStore()
@@ -325,11 +328,17 @@ import { useRouter } from 'vue-router'
 const filtered = computed(() => {
   const q = search.value.toLowerCase().trim()
   return store.customers.filter(c => {
+    const matchField = (val) => {
+      if (!val) return false
+      const v = val.toLowerCase()
+      const vKirill = translateText(v).toLowerCase()
+      return v.includes(q) || vKirill.includes(q)
+    }
     const matchesSearch = !q ||
-      c.name?.toLowerCase().includes(q) ||
-      c.surname?.toLowerCase().includes(q) ||
+      matchField(c.name) ||
+      matchField(c.surname) ||
       c.phone?.includes(q) ||
-      c.address?.toLowerCase().includes(q)
+      matchField(c.address)
 
     if (!matchesSearch) return false
 
@@ -428,7 +437,7 @@ const savePrices = async () => {
 //     showDebtModal.value = false;
 //     await store.fetchCustomers();
 //   } else {
-//     alert('Xatolik: ' + (result.error || 'Noma’lum xato'));
+//     alert('Xatolik: ' + (result.error || 'Noma'lum xato'));
 //   }
 // };
 
@@ -486,11 +495,11 @@ const sourceColors = {
   TANISHIDAN: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
 }
 
-const paymentTypeLabels = {
-  NAQD: 'Naqd pul',
-  KARTA: 'Plastik karta',
-  PUL_OTKAZISH: 'Pul o\'tkazish'
-}
+const paymentTypeLabels = computed(() => ({
+  NAQD: proxy.$t('Naqd pul'),
+  KARTA: proxy.$t('Plastik karta'),
+  PUL_OTKAZISH: proxy.$t("Pul o'tkazish"),
+}))
 const openCustomer = (id) => {
   router.push('/customer/' + id)
 }
@@ -505,9 +514,8 @@ const formatMoney = (amount) => {
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-[#0a1850] dark:text-white">Mijozlar</h1>
-        <p class="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Faol mijozlar — jami {{ store.customers.length }}
-          ta</p>
+        <h1 class="text-2xl font-bold text-[#0a1850] dark:text-white">{{ $t('Mijozlar') }}</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-sm mt-0.5">{{ $t('Faol mijozlar') }} — {{ $t('jami') }} {{ store.customers.length }} {{ $t('ta') }}</p>
       </div>
       <div class="flex items-center gap-2">
         <button @click="openPricesModal" v-if="authStore.permission.add_customers"
@@ -518,7 +526,7 @@ const formatMoney = (amount) => {
               d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
           </svg>
-          Narx sozlamalari
+          {{ $t('Narx sozlamalari') }}
         </button>
         <button @click="openCreate" v-if="authStore.permission.add_customers"
           class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-medium btn-primary shadow-lg shadow-blue-900/20 active:scale-[0.98] transition-all cursor-pointer">
@@ -526,7 +534,7 @@ const formatMoney = (amount) => {
             stroke="currentColor" class="w-4 h-4">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          Yangi mijoz
+          {{ $t('Yangi mijoz') }}
         </button>
       </div>
     </div>
@@ -541,7 +549,7 @@ const formatMoney = (amount) => {
               d="M21 21l-6-6m2-5a7 7 0 01-14 0 7 7 0 0114 0z" />
           </svg>
         </span>
-        <input v-model="search" type="text" placeholder="Ism, familiya, telefon yoki manzil..."
+        <input v-model="search" type="text" :placeholder="$t('Ism, familiya, telefon yoki manzil...')"
           class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-700/50 dark:text-slate-100 dark:placeholder-slate-500 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 dark:focus:border-blue-500 transition-all" />
       </div>
     </div>
@@ -551,11 +559,10 @@ const formatMoney = (amount) => {
       leave-active-class="transition-all duration-150" leave-to-class="opacity-0 -translate-y-2">
       <div v-if="selected.length > 0"
         class="flex items-center justify-between px-5 py-3 bg-indigo-100 dark:bg-blue-900/40 border border-indigo-200 dark:border-blue-700/40 rounded-2xl shadow-lg">
-        <span class="text-indigo-700 dark:text-blue-200 text-sm font-medium">{{ selected.length }} ta tanlandi</span>
+        <span class="text-indigo-700 dark:text-blue-200 text-sm font-medium">{{ selected.length }} {{ $t('ta tanlandi') }}</span>
         <div class="flex gap-2">
           <button @click="selected = []"
-            class="px-4 py-1.5 rounded-lg text-sm text-indigo-600 dark:text-blue-300 hover:text-indigo-900 dark:hover:text-white hover:bg-indigo-200/60 dark:hover:bg-white/10 transition-colors">Bekor
-            qilish</button>
+            class="px-4 py-1.5 rounded-lg text-sm text-indigo-600 dark:text-blue-300 hover:text-indigo-900 dark:hover:text-white hover:bg-indigo-200/60 dark:hover:bg-white/10 transition-colors">{{ $t('Bekor qilish') }}</button>
           <button @click="archiveSelected"
             class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm bg-red-500/20 text-red-600 dark:text-red-300 hover:bg-red-500/30 border border-red-500/30 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
@@ -563,7 +570,7 @@ const formatMoney = (amount) => {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
             </svg>
-            Arxivga o'tkazish
+            {{ $t("Arxivga o'tkazish") }}
           </button>
         </div>
       </div>
@@ -576,7 +583,7 @@ const formatMoney = (amount) => {
         <div
           class="w-5 h-5 border-2 border-slate-300 dark:border-slate-600 border-t-blue-500 rounded-full animate-spin">
         </div>
-        Yuklanmoqda...
+        {{ $t('Yuklanmoqda...') }}
       </div>
       <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[680px]">
@@ -586,32 +593,15 @@ const formatMoney = (amount) => {
                 <AppCheckbox :checked="allChecked" :indeterminate="indeterminate" @change="toggleAll" />
               </th>
               <th
-                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                Mijoz</th>
-              <th
-                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                Telefon</th>
-              <th
-                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                Telegram</th>
-              <th
-                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                Qayerdan</th>
-              <th
-                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                Manzil</th>
-              <th
-                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                Mas'ul yurist</th>
-              <th
-                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                To'lov</th>
-              <th
-                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                Sana</th>
-              <th
-                class="px-4 py-3.5 text-center text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">
-                Amallar</th>
+                class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Mijoz') }}</th>
+              <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Telefon') }}</th>
+              <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Telegram') }}</th>
+              <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Qayerdan') }}</th>
+              <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Manzil') }}</th>
+              <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t("Mas'ul yurist") }}</th>
+              <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t("To'lov") }}</th>
+              <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Sana') }}</th>
+              <th class="px-4 py-3.5 text-center text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Amallar') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-indigo-100/70 dark:divide-slate-700/50">
@@ -622,10 +612,8 @@ const formatMoney = (amount) => {
                 <AppCheckbox :checked="selected.includes(c.id)" @change="toggleOne(c.id)" class="cursor-pointer"/>
               </td>
               <td class="px-4 py-3.5">
-                <p class="font-medium text-slate-800 dark:text-slate-100 text-sm">{{ c.surname }} {{ c.name }} {{
-                  c.father_name }}</p>
-                <p v-if="c.description" class="text-xs text-slate-400 dark:text-slate-500 truncate max-w-[200px]">{{
-                  c.description }}</p>
+                <p class="font-medium text-slate-800 dark:text-slate-100 text-sm">{{ $t(c.surname) }} {{ $t(c.name) }} {{
+                  $t(c.father_name) }}</p>
               </td>
               <td class="px-4 min-w-[160px] py-3.5 text-sm text-slate-600 dark:text-slate-400">
                 <p>{{ c.phone }}</p>
@@ -640,30 +628,30 @@ const formatMoney = (amount) => {
               <td class="px-4 py-3.5">
                 <span v-if="c.source"
                   :class="['text-[11px] font-medium px-2 py-0.5 rounded-full', sourceColors[c.source]]">{{
-                    sourceLabels[c.source] }}</span>
+                    $t(sourceLabels[c.source]) }}</span>
                 <span v-else class="text-sm text-slate-400 dark:text-slate-500">—</span>
               </td>
-              <td class="px-4 max-w-[200px] py-3.5 text-sm text-slate-500 dark:text-slate-400">{{ c.address || '—' }}
+              <td class="px-4 max-w-[200px] py-3.5 text-sm text-slate-500 dark:text-slate-400">{{ $t(c.address) || '' }}
               </td>
               <td class="px-4 py-3.5 text-sm text-slate-500 dark:text-slate-400">
-                {{ c.assignedTo ? `${c.assignedTo.surname} ${c.assignedTo.name}` : '—' }}
+                {{ c.assignedTo ? `${$t(c.assignedTo.surname)} ${$t(c.assignedTo.name)}` : '' }}
               </td>
               <td class="px-4 min-w-[200px] py-3.5 text-sm">
                 <div>
                   <div class="flex items-center gap-1.5">
-                    <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Shartnoma:</span>
+                    <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">{{ $t('Maslahat narxi') }}:</span>
                     <span class="font-semibold text-slate-800 dark:text-slate-200">{{ formatMoney(c.price) }}</span>
                   </div>
 
                   <div class="flex items-center gap-1.5 mt-1">
-                    <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">To'landi:</span>
+                    <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">{{ $t('To\'landi') }}:</span>
                     <span class="font-medium text-emerald-600 dark:text-emerald-400">
                       {{ formatMoney(c.payments.reduce((a, b) => a + b.amount, 0)) }}
                     </span>
                   </div>
                   <span v-if="c.payments && c.payments.length > 0"
                     class="text-[10px] w-[60px] text-slate-400 dark:text-slate-500">
-                    ({{ paymentTypeLabels[c.payments[c.payments.length - 1].type] }})
+                    ({{ $t(paymentTypeLabels[c.payments[c.payments.length - 1].type] || c.payments[c.payments.length - 1].type) }})
                   </span>
 
                   <!-- <div v-if="(c.price || 0) - (c.payments.reduce((a, b) => a + b.amount, 0)) > 0"
@@ -722,7 +710,7 @@ const formatMoney = (amount) => {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                       d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <p class="text-sm">Mijoz topilmadi</p>
+                  <p class="text-sm">{{ $t('Mijoz topilmadi') }}</p>
                 </div>
               </td>
             </tr>
@@ -742,8 +730,8 @@ const formatMoney = (amount) => {
         <div class="px-6 py-5 flex items-center justify-between"
           :style="{ background: themeStore.isDark ? 'linear-gradient(150deg, #0d1b3e 0%, #162766 55%, #1535c4 100%)' : 'linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%)' }">
           <div>
-            <h2 class="text-white text-base font-semibold">Xizmat narxlarini o'zgartirish</h2>
-            <p class="text-white/50 text-xs mt-0.5">Narxlarni o'zgartiring</p>
+            <h2 class="text-white text-base font-semibold">{{ $t("Xizmat narxlarini o'zgartirish") }}</h2>
+            <p class="text-white/50 text-xs mt-0.5">{{ $t("Narxlarni o'zgartiring") }}</p>
           </div>
           <button @click="showPricesModal = false"
             class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xl leading-none">✕</button>
@@ -752,22 +740,19 @@ const formatMoney = (amount) => {
         <div class="p-6 space-y-4 flex-1">
           <div class="space-y-1">
             <label
-              class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">1-narx
-              (so'mda)</label>
+              class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('1-narx (so\'mda)') }}</label>
             <input v-model="editingPriceOne" type="number"
               class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
           </div>
           <div class="space-y-1">
             <label
-              class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">2-narx
-              (so'mda)</label>
+              class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{$t('2-narx (so\'mda)') }}</label>
             <input v-model="editingPriceTwo" type="number"
               class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
           </div>
           <div class="space-y-1">
             <label
-              class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">3-narx
-              (so'mda)</label>
+              class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('3-narx (so\'mda)') }}</label>
             <input v-model="editingPriceThree" type="number"
               class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
           </div>
@@ -776,10 +761,9 @@ const formatMoney = (amount) => {
         <div
           class="px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3 bg-slate-50 dark:bg-slate-800/50">
           <button @click="showPricesModal = false"
-            class="px-5 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm cursor-pointer">Bekor
-            qilish</button>
+            class="px-5 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm cursor-pointer">{{ $t('Bekor qilish') }}</button>
           <button @click="savePrices"
-            class="btn-primary px-5 py-2.5 rounded-lg text-white text-sm cursor-pointer">Saqlash</button>
+            class="btn-primary px-5 py-2.5 rounded-lg text-white text-sm cursor-pointer">{{ $t('Saqlash') }}</button>
         </div>
       </div>
     </div>
@@ -795,7 +779,7 @@ const formatMoney = (amount) => {
         <div class="px-6 py-5 flex items-center justify-between"
           :style="{ background: themeStore.isDark ? 'linear-gradient(150deg, #0d1b3e 0%, #162766 55%, #1535c4 100%)' : 'linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%)' }">
           <div>
-            <h3 class="text-white text-lg font-semibold">Qarzni to‘lash</h3>
+            <h3 class="text-white text-lg font-semibold">{{ $t("Qarzni to'lash") }}</h3>
             <p class="text-white/70 text-sm mt-0.5">
               {{ editingCustomer?.surname }} {{ editingCustomer?.name }}
             </p>
@@ -810,18 +794,18 @@ const formatMoney = (amount) => {
         <div class="p-6 space-y-6">
           <div class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700">
             <div class="flex justify-between text-sm">
-              <span class="text-slate-500 dark:text-slate-400">Jami shartnoma summasi:</span>
+              <span class="text-slate-500 dark:text-slate-400">{{ $t('Jami shartnoma summasi') }}:</span>
               <span class="font-semibold">{{ formatMoney(editingCustomer?.price) }}</span>
             </div>
             <div class="flex justify-between text-sm mt-2">
-              <span class="text-slate-500 dark:text-slate-400">To‘langan:</span>
+              <span class="text-slate-500 dark:text-slate-400">{{ $t("To'langan") }}:</span>
               <span class="font-medium text-emerald-600 dark:text-emerald-400">
                 {{ formatMoney(editingCustomer?.payments.reduce((a, b) => a + b.amount, 0)) }}
               </span>
             </div>
             <div class="h-px bg-slate-200 dark:bg-slate-700 my-3"></div>
             <div class="flex justify-between text-base font-semibold">
-              <span class="text-slate-600 dark:text-slate-300">Qolgan qarz:</span>
+              <span class="text-slate-600 dark:text-slate-300">{{ $t('Qolgan qarz') }}:</span>
               <span class="text-red-600 dark:text-red-400">
                 {{ formatMoney((editingCustomer?.price || 0) -
                   (editingCustomer?.payments.reduce((a, b) => a + b.amount, 0))) }}
@@ -831,7 +815,7 @@ const formatMoney = (amount) => {
 
           <div class="space-y-1">
             <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              To‘lov summasi (so‘m)
+              {{ $t("To'lov summasi (so'm)") }}
             </label>
             <input v-model="paymentAmount" type="number" placeholder="0"
               class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-lg font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all" />
@@ -839,13 +823,13 @@ const formatMoney = (amount) => {
 
           <div class="space-y-1">
             <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              To‘lov usuli
+              {{ $t("To'lov usuli") }}
             </label>
             <select v-model="paymentType"
               class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-all">
-              <option value="NAQD">Naqd pul</option>
-              <option value="KARTA">Plastik karta</option>
-              <option value="PUL_OTKAZISH">Pul o‘tkazish</option>
+              <option value="NAQD">{{ $t('Naqd pul') }}</option>
+              <option value="KARTA">{{ $t('Plastik karta') }}</option>
+              <option value="PUL_OTKAZISH">{{ $t("Pul o'tkazish") }}</option>
             </select>
           </div>
         </div>
@@ -855,11 +839,11 @@ const formatMoney = (amount) => {
           class="px-6 py-5 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
           <button @click="showDebtModal = false"
             class="px-6 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-            Bekor qilish
+            {{ $t('Bekor qilish') }}
           </button>
           <button @click="payDebt(editingCustomer)"
             class="btn-primary px-6 py-2.5 rounded-xl text-white flex items-center gap-2 active:scale-[0.97] transition-all">
-            To‘lovni saqlash
+            {{ $t("To'lovni saqlash") }}
           </button>
         </div>
       </div>

@@ -1,12 +1,14 @@
 <!-- components/users.modal.update.vue -->
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, getCurrentInstance } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import { useUserModalStore } from '../../stores/users.modal'
 import { useThemeStore } from '../../stores/theme'
+import { BASE_URL } from '@/api'
 
 const emit = defineEmits(['user-created'])
 
+const { proxy } = getCurrentInstance()
 const authStore = useAuthStore()
 const userModalStore = useUserModalStore()
 const themeStore = useThemeStore()
@@ -17,15 +19,15 @@ const isEditing = computed(() => !!userModalStore.editingUser?.id)
 const availableRoles = computed(() => {
     if (authStore.user?.role === 'ADMIN') {
         return [
-            { value: 'KASSIR', label: 'Kassir' },
-            { value: 'YURIST', label: 'Yurist' },
-            { value: 'RAHBAR', label: 'Rahbar' },
-            { value: 'ADMIN', label: 'Administrator' },
+            { value: 'KASSIR', label: proxy.$t('Kassir') },
+            { value: 'YURIST', label: proxy.$t('Yurist') },
+            { value: 'RAHBAR', label: proxy.$t('Rahbar') },
+            { value: 'ADMIN', label: proxy.$t('Administrator') },
         ]
     }
     return [
-        { value: 'KASSIR', label: 'Kassir' },
-        { value: 'YURIST', label: 'Yurist' },
+        { value: 'KASSIR', label: proxy.$t('Kassir') },
+        { value: 'YURIST', label: proxy.$t('Yurist') },
     ]
 })
 const editingUser = ref(null)
@@ -118,7 +120,7 @@ const fillForm = () => {
     newUserUserCode.value = user.userCode || ''
     newUserUniqueCode.value = user.uniqueCode || ''
     newUserRole.value = user.role || 'KASSIR'
-    imgPreview.value = user.img ? `http://localhost:4000${user.img}` : ''
+    imgPreview.value = user.img ? `${BASE_URL}${user.img}` : ''
     newUserPassword.value = ''
 }
 
@@ -226,9 +228,9 @@ watch(
                         :style="{ background: themeStore.isDark ? 'linear-gradient(150deg, #0d1b3e 0%, #162766 55%, #1535c4 100%)' : 'linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%)' }">
                         <div>
                             <h2 class="text-white text-base font-semibold">
-                                {{ isEditing ? 'Xodimni tahrirlash' : 'Yangi xodim qo\'shish' }}
+                                {{ isEditing ? $t('Xodimni tahrirlash') : $t("Yangi xodim qo'shish") }}
                             </h2>
-                            <p class="text-white/50 text-xs mt-0.5">Barcha majburiy maydonlarni to'ldiring</p>
+                            <p class="text-white/50 text-xs mt-0.5">{{ $t("Barcha majburiy maydonlarni to'ldiring") }}</p>
                         </div>
                         <button @click="closeModal"
                             class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
@@ -253,22 +255,21 @@ watch(
                         <!-- Avatar -->
                         <div>
                             <label
-                                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Profil
-                                rasmi</label>
+                                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">{{ $t('Profil rasmi') }}</label>
                             <label class="cursor-pointer inline-block">
                                 <div
                                     class="w-24 h-24 border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-2xl overflow-hidden flex items-center justify-center hover:border-[#1a2e7a] bg-slate-50 dark:bg-slate-700">
                                     <img v-if="imgPreview" :src="imgPreview" class="w-full h-full object-cover" />
                                     <div v-else class="flex flex-col items-center gap-1 text-slate-400">
                                         <span class="text-3xl">+</span>
-                                        <span class="text-xs">Rasm</span>
+                                        <span class="text-xs">{{ $t('Rasm') }}</span>
                                     </div>
                                 </div>
                                 <input type="file" accept="image/*" @change="handleImgChange" class="hidden" />
                             </label>
                             <button v-if="imgPreview && isEditing" @click="removeImage"
                                 class="ml-4 text-red-500 text-sm hover:underline">
-                                Rasmni o‘chirish
+                                {{ $t("Rasmni o'chirish") }}
                             </button>
                         </div>
 
@@ -276,31 +277,30 @@ watch(
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ism
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Ism') }}
                                     </label>
-                                <input v-model="newUserName" type="text" placeholder="Ismni kiriting"
+                                <input v-model="newUserName" type="text" :placeholder="$t('Ismni kiriting')"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
                             </div>
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Familiya
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Familiya') }}
                                     </label>
-                                <input v-model="newUserSurname" type="text" placeholder="Familiyani kiriting"
+                                <input v-model="newUserSurname" type="text" :placeholder="$t('Familiyani kiriting')"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
                             </div>
                             <div class="space-y-1 sm:col-span-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Otasining
-                                    ismi</label>
-                                <input v-model="newUserFatherName" type="text" placeholder="Otasining ismini kiriting"
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Otasining ismi') }}</label>
+                                <input v-model="newUserFatherName" type="text" :placeholder="$t('Otasining ismini kiriting')"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
                             </div>
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Login
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Login') }}
                                    </label>
-                                <input v-model="newUserUsername" type="text" placeholder="Loginni kiriting"
+                                <input v-model="newUserUsername" type="text" :placeholder="$t('Loginni kiriting')"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
                             </div>
 
@@ -308,7 +308,7 @@ watch(
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                    {{ isEditing ? 'Yangi parol (ixtiyoriy)' : 'Parol' }}
+                                    {{ isEditing ? $t('Yangi parol (ixtiyoriy)') : $t('Parol') }}
                                     
                                 </label>
                                 <div class="relative">
@@ -320,7 +320,7 @@ watch(
                                         </svg>
                                     </span>
                                     <input v-model="newUserPassword" :type="showPassword ? 'text' : 'password'" required
-                                        placeholder="Parolni kiriting"
+                                        :placeholder="$t('Parolni kiriting')"
                                         class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
                                     <button type="button" @click="showPassword = !showPassword"
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
@@ -344,15 +344,14 @@ watch(
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Telefon</label>
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Telefon') }}</label>
                                 <input v-model="newUserPhone" @input="handlePhoneInput" type="tel"
                                     placeholder="+998 XX XXX XX XX"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
                             </div>
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Qo‘shimcha
-                                    telefon</label>
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t("Qo'shimcha telefon") }}</label>
                                 <input v-model="newUserPhone2" @input="handlePhoneInput2" type="tel"
                                     placeholder="+998 XX XXX XX XX"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
@@ -360,43 +359,41 @@ watch(
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Telegram <span class="text-red-500">*</span></label>
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Telegram') }} <span class="text-red-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-sm font-medium">@</span>
-                                    <input v-model="newUserTelegram" type="text" placeholder="username yoki +998XXXXXXXXX"
+                                    <input v-model="newUserTelegram" type="text" :placeholder="$t('username yoki +998XXXXXXXXX')"
                                         class="w-full pl-7 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
                                 </div>
                             </div>
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tug’ilgan
-                                    sana</label>
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t("Tug'ilgan sana") }}</label>
                                 <input v-model="newUserBirthDate" type="date"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
                             </div>
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Passport
-                                    seriya</label>
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Passport seriya') }}</label>
                                 <input v-model="newUserUserCode" @input="handlePassportInput" type="text"
-                                    placeholder="AA1234567"
+                                    :placeholder="$t('AA1234567')"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
                             </div>
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">JShSHIR
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('JShSHIR') }}
                                 </label>
-                                <input v-model="newUserUniqueCode" type="text" maxlength="14" placeholder="14 raqam"
+                                <input v-model="newUserUniqueCode" type="text" maxlength="14" :placeholder="$t('14 raqam')"
                                     @input="newUserUniqueCode = $event.target.value.replace(/\D/g, '').slice(0, 14)"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
                             </div>
 
                             <div class="space-y-1 sm:col-span-2">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Lavozim
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Lavozim') }}
                                     </label>
                                 <select v-model="newUserRole"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]">
@@ -413,13 +410,13 @@ watch(
                         class="px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3 bg-slate-50 dark:bg-slate-800/50">
                         <button @click="closeModal"
                             class="px-5 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-sm font-medium">
-                            Bekor qilish
+                            {{ $t('Bekor qilish') }}
                         </button>
                         <button @click="saveUser" :disabled="authStore.loading"
                             class="btn-primary px-5 py-2.5 rounded-lg text-white flex items-center gap-2">
                             <span v-if="authStore.loading"
                                 class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                            {{ authStore.loading ? 'Saqlanmoqda...' : (isEditing ? 'Saqlash' : 'Yaratish') }}
+                            {{ authStore.loading ? $t('Saqlanmoqda...') : (isEditing ? $t('Saqlash') : $t('Yaratish')) }}
                         </button>
                     </div>
                 </div>

@@ -2,54 +2,55 @@
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
+import { useLangStore } from '@/stores/lang'
+import { BASE_URL } from '@/api'
 import { computed, ref, watch } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
+const langStore = useLangStore()
 
 const isSidebarOpen = ref(false)
 
 const routerList = computed(() => [
     {
         path: '/dashboard',
-        name: 'Bosh sahifa',
+        name: langStore.t('Bosh sahifa'),
         icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
         permission: true
     },
     {
         path: '/customers',
-        name: 'Mijozlar',
+        name: langStore.t('Mijozlar'),
         icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z',
         permission: authStore.permission?.view_customers || false
     },
     {
         path: '/archive',
-        name: 'Arxiv',
+        name: langStore.t('Arxiv'),
         icon: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4',
         permission: authStore.permission?.archive || false
     },
     {
         path: '/users',
-        name: 'Ishchilar',
+        name: langStore.t('Ishchilar'),
         icon: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z',
         permission: authStore.permission?.view_users || false
     },
 ])
 
-const routeName = {
-    Dashboard: 'Bosh sahifa',
-    customers: 'Mijozlar',
-    archive: 'Arxiv',
-    users: 'Ishchilar',
-    profile: 'Profil',
-    'customer': 'Mijoz',
-    // qo'shish tavsiya etiladi
-    // kerakli boshqa routelarni ham qo'shishingiz mumkin
-}
 const currentPageTitle = computed(() => {
-    return routeName[route.name] || route.meta.title || 'Sahifa'
+    const routeName = {
+        Dashboard: langStore.t('Bosh sahifa'),
+        customers: langStore.t('Mijozlar'),
+        archive: langStore.t('Arxiv'),
+        users: langStore.t('Ishchilar'),
+        profile: langStore.t('Profil'),
+        'customer': langStore.t('Mijoz'),
+    }
+    return routeName[route.name] || route.meta.title || langStore.t('Sahifa')
 })
 
 // Router o'zgarganda sidebar avtomatik yopiladi
@@ -125,7 +126,7 @@ const handleLogout = () => {
                     <router-link to="/profile"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-all group">
                         <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 shrink-0">
-                            <img v-if="authStore.user?.img" :src="`http://localhost:4000${authStore.user.img}`"
+                            <img v-if="authStore.user?.img" :src="`${BASE_URL}${authStore.user.img}`"
                                 class="w-full h-full object-cover" />
                             <img v-else src="../../public/User-avatar.svg.png" class="w-full h-full object-cover" />
                         </div>
@@ -143,7 +144,7 @@ const handleLogout = () => {
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                         </svg>
-                        Chiqish
+                        {{ langStore.t('Chiqish') }}
                     </button>
                 </div>
             </aside>
@@ -179,6 +180,13 @@ const handleLogout = () => {
                                 <span class="text-black dark:text-white font-bold text-xl">Yuridik </span>
                                 maslahat <span class="text-red-500 font-bold">24</span></span>
                         </div>
+
+                        <!-- Lang toggle (Lotin / Kiril) -->
+                        <button @click="langStore.toggleLang()"
+                            class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors text-[#1a2e7a] dark:text-slate-400 text-xs font-bold"
+                            :title="langStore.isKiril ? 'Lotinga o\'tish' : 'Kirilga o\'tish'">
+                            {{ langStore.isKiril ? 'Лт' : 'Кр' }}
+                        </button>
 
                         <!-- Dark mode toggle -->
                         <button @click="themeStore.toggleTheme()"

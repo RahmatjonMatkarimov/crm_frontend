@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useAuthStore } from './auth'
+import api, { ENDPOINTS } from '@/api'
 
 export const useCustomersStore = defineStore('customers', {
   state: () => ({
@@ -9,20 +9,11 @@ export const useCustomersStore = defineStore('customers', {
   }),
 
   actions: {
-    headers() {
-      return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${useAuthStore().token}`,
-      }
-    },
-
     async fetchCustomers() {
       this.loading = true
       try {
-        const res = await fetch('http://localhost:4000/api/customers', {
-          headers: this.headers()
-        })
-        this.customers = await res.json()
+        const { data } = await api.get(ENDPOINTS.CUSTOMERS)
+        this.customers = data
       } finally {
         this.loading = false
       }
@@ -31,72 +22,45 @@ export const useCustomersStore = defineStore('customers', {
     async fetchArchived() {
       this.loading = true
       try {
-        const res = await fetch('http://localhost:4000/api/customers?archived=true', {
-          headers: this.headers()
-        })
-        this.archived = await res.json()
+        const { data } = await api.get(ENDPOINTS.CUSTOMERS, { params: { archived: true } })
+        this.archived = data
       } finally {
         this.loading = false
       }
     },
 
-    async createCustomer(data) {
-      const res = await fetch('http://localhost:4000/api/customers', {
-        method: 'POST',
-        headers: this.headers(),
-        body: JSON.stringify(data),
-      })
-      const result = await res.json()
-      if (!res.ok) return { success: false, error: result.message || result.error }
-
-      await this.fetchCustomers()
-      return { success: true, customer: result } // yangi yaratilgan mijozni qaytarish
+    async createCustomer(payload) {
+      try {
+        const { data } = await api.post(ENDPOINTS.CUSTOMERS, payload)
+        await this.fetchCustomers()
+        return { success: true, customer: data }
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.response?.data?.error || err.message }
+      }
     },
 
-    // ==================== YANGILANGAN updateCustomer ====================
-    async updateCustomer(id, data) {
-      const res = await fetch(`http://localhost:4000/api/customers/${id}`, {
-        method: 'PUT',
-        headers: this.headers(),
-        body: JSON.stringify(data),
-      })
-
-      const result = await res.json()
-
-      if (!res.ok) {
-        return { success: false, error: result.message || result.error }
-      }
-
-      // Yangilangan mijoz ma'lumotlarini qaytaramiz (payments ichida yangi to'lov bor)
-      await this.fetchCustomers()
-
-      return { 
-        success: true, 
-        customer: result   // <-- Muhim: endi to'liq yangilangan customer qaytadi
+    async updateCustomer(id, payload) {
+      try {
+        const { data } = await api.put(ENDPOINTS.CUSTOMER(id), payload)
+        await this.fetchCustomers()
+        return { success: true, customer: data }
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.response?.data?.error || err.message }
       }
     },
 
     async archiveCustomer(id) {
-      await fetch(`http://localhost:4000/api/customers/${id}/archive`, {
-        method: 'PUT',
-        headers: this.headers()
-      })
+      await api.put(ENDPOINTS.CUSTOMER_ARCHIVE(id))
       await this.fetchCustomers()
     },
 
     async restoreCustomer(id) {
-      await fetch(`http://localhost:4000/api/customers/${id}/restore`, {
-        method: 'PUT',
-        headers: this.headers()
-      })
+      await api.put(ENDPOINTS.CUSTOMER_RESTORE(id))
       await this.fetchArchived()
     },
 
     async deleteCustomer(id) {
-      await fetch(`http://localhost:4000/api/customers/${id}`, {
-        method: 'DELETE',
-        headers: this.headers()
-      })
+      await api.delete(ENDPOINTS.CUSTOMER(id))
       await this.fetchArchived()
     },
   },
