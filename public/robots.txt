@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /users
+Disallow: /customers
+Disallow: /customer/
+Disallow: /archive
+Disallow: /permissions/
+
+Sitemap: https://yuridikbyuro.uz/sitemap.xml

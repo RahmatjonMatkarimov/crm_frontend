@@ -188,7 +188,7 @@ const generateReceiptPDF = async (data) => {
   }
 
   .company {
-    font-size: 18px;
+    font-size: 13px;
     font-weight: bold;
     text-transform: uppercase;
     margin-bottom: 2px;
@@ -269,7 +269,7 @@ const generateReceiptPDF = async (data) => {
 
   <div class="center">
     <div class="company">
-      YURIDIK MASLAHAT 24
+      Yuridik Xizmatlar va Hujjatlar Tayyorlash Byurosi
     </div>
 
     <div class="subtitle">
@@ -287,7 +287,7 @@ const generateReceiptPDF = async (data) => {
 
     <div class="info-row">
       <span class="label">ID:</span>
-      <span>${data.clientId}</span>
+      <span>${'MJZ-' + data.clientId}</span>
     </div>
   </div>
 
@@ -305,7 +305,7 @@ const generateReceiptPDF = async (data) => {
 
   <div class="queue-box">
     <div class="queue-number">
-      ${data.queueNumber}
+      A-${String(data.queueNumber).padStart(2, '0')}
     </div>
 
     <div class="queue-text">
@@ -400,7 +400,7 @@ const printReceiptFrontend = (data, qabulxatiUrl = null, w = null) => {
   }
 
   .company {
-    font-size: 18px;
+    font-size: 13px;
     font-weight: bold;
     text-transform: uppercase;
     margin-bottom: 2px;
@@ -476,7 +476,7 @@ const printReceiptFrontend = (data, qabulxatiUrl = null, w = null) => {
 
   <div class="center">
     <div class="company">
-      YURIDIK MASLAHAT 24
+Yuridik Xizmatlar va Hujjatlar Tayyorlash Byurosi
     </div>
 
     <div class="subtitle">
@@ -494,7 +494,7 @@ const printReceiptFrontend = (data, qabulxatiUrl = null, w = null) => {
 
     <div class="info-row">
       <span class="label">ID:</span>
-      <span>${data.clientId}</span>
+      <span>MJZ-${data.clientId}</span>
     </div>
   </div>
 
@@ -800,10 +800,10 @@ const save = async () => {
             fish,
             telefon: phone.value || '',
             manzil: fullAddress || '',
-            id: createdCustomer?.customer_id || '',
-            raqam: createdCustomer?.queueNumber || '',
+            id: `MJZ-${createdCustomer?.customer_id || ''}`,
+            raqam: `A-${String(createdCustomer?.queueNumber).padStart(2, '0')}` || '',
             yurist: createdCustomer.assignedTo ? `${createdCustomer.assignedTo.surname} ${createdCustomer.assignedTo.name}` : '—',
-            sana: new Date().toLocaleDateString('uz-UZ'),
+            sana: Date.now().toString()
           })
           printReceiptFrontend({
             fullName: fish,
@@ -874,7 +874,7 @@ const handlePhone2isTelegram = () => {
             <div class="space-y-1">
               <label
                 class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
-                $t('Ism') }}
+                  $t('Ism') }}
                 <span class="text-red-500">*</span></label>
               <input v-model="name" type="text" :placeholder="$t('Ismni kiriting')"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />

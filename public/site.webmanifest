@@ -1,0 +1,29 @@
+{
+  "name": "Yuridik Xizmatlar va Hujjatlar Tayyorlash Byurosi",
+  "short_name": "Yuridik Byuro",
+  "description": "Professional yuridik xizmatlar va hujjatlar tayyorlash byurosi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a3a5c",
+  "lang": "uz",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

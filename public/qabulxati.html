@@ -42,11 +42,15 @@
     /* ===== OLDI TOMON ===== */
 
     .card-front .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    
+    .header-bg{
       background: #1a2744;
       padding: 22px 30px 18px;
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
     }
 
     .card-front .header-left .bureau-name {
@@ -57,7 +61,7 @@
       line-height: 1.4;
       text-transform: uppercase;
       letter-spacing: 0.4px;
-      max-width: 400px;
+      max-width: 500px;
     }
 
     .card-front .header-left .subtitle {
@@ -94,7 +98,7 @@
     }
 
     .meta-cell .meta-label {
-      font-size:10px;
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -136,7 +140,9 @@
 
     .field-row {
       display: flex;
-      gap: 16px;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 50px;
     }
 
     .field {
@@ -153,13 +159,14 @@
     .field .field-line {
       border: none;
       width: 100%;
-      height: 22px;
+      height: 20px;
       background: transparent;
       font-family: 'Inter', sans-serif;
       font-size: 12px;
       color: #1a2744;
       border-bottom: 1px solid #1a2744;
       outline: none;
+      margin-top: 10px;
     }
 
     .textarea-lines {
@@ -436,37 +443,37 @@
       border-bottom: 1px solid #000;
     }
 
-@media print {
+    @media print {
 
-  @page {
-    size: A4;
-    margin: 0;
-  }
+      @page {
+        size: A4;
+        margin: 0;
+      }
 
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: #fff;
-    display: block;
-  }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        display: block;
+      }
 
-  .card {
-    box-shadow: none;
-    border-radius: 0;
-    width: 210mm;
-    height: 296mm;
-    margin: 0;
-    page-break-after: always;
-    break-after: page;
-    overflow: hidden;
-  }
+      .card {
+        box-shadow: none;
+        border-radius: 0;
+        width: 210mm;
+        height: 296mm;
+        margin: 0;
+        page-break-after: always;
+        break-after: page;
+        overflow: hidden;
+      }
 
-  .card:last-child {
-    page-break-after: auto;
-    break-after: auto;
-  }
-}
-
+      .card:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+    }
   </style>
 </head>
 
@@ -476,24 +483,32 @@
   <div class="card card-front">
     <div>
 
-      <div class="header">
-        <div style="background: #c8a84b; border-radius: 15px;width:20px; height: 80px;"></div>
+      <div class="header header-bg">
+        <div style="background: #c8a84b; padding: 10px; border-radius: 20px;">
+          <img src="./logo2.png" width="200" alt="">
+        </div>
         <div class="header-left">
-          <div class="bureau-name">Юридик Хизматлар ва<br>Ҳужжатлар Тайёрлаш Бюроси</div>
-          <div class="subtitle">Мижоз қабул картаси — ички ҳисоб ва қабулни рўйхатга олиш ҳужжати</div>
+          <div class="bureau-name">Юридик Хизматлар ва Ҳужжатлар Тайёрлаш Бюроси</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+            <div class="subtitle">Мижоз қабул картаси — ички ҳисоб ва қабулни рўйхатга олиш ҳужжати </div>
+            <div class="subtitle" id="mijoz-id"></div>
+          </div>
         </div>
-        <div class="header-right">
-        </div>
+        <!-- <div style="display: flex; align-items: center; gap: 10px; max-width: 200px;">
+            <img src="../../public/logo.png" alt="" width="70">
+            <span style="border-right: 2px solid white; height: 50px; width: 0;"></span>
+            <span style="color: white; font-weight: 600; font-size: 14px; letter-spacing: 1px;"><span
+                style="color: white; font-size: 20px;">Yuridik
+              </span>maslahat <span style="color: red;">24</span></span>
+          </div> -->
       </div>
       <div style="padding: 0 30px;">
         <div style="display: flex;justify-content: space-between; align-items: center;  ">
-
-          <div
-            style="font-weight: 600; color: #1a2744; font-size: 20px; margin-top: 10px; margin-bottom: 5px;">
+          <div style="font-weight: 600; color: #1a2744; font-size: 20px; margin-top: 10px; margin-bottom: 5px;">
             Кабул
             картаси</div>
           <div style="color: #bebebe; font-size: 10px; margin-top: 5px;font-weight: 600;">
-            Шартнома ва тўлов ҳужжати эмас
+            Шартнома ёки тўлов ҳужжати эмас
           </div>
         </div>
         <div class="gold-bar"></div>
@@ -505,11 +520,11 @@
             <div class="meta-value" id="qabul-raqam"></div>
             <div class="meta-line"></div>
           </div>
-          <div class="meta-cell">
+          <!-- <div class="meta-cell">
             <div class="meta-label">Мижоз ID</div>
             <div class="meta-value" id="mijoz-id"></div>
             <div class="meta-line"></div>
-          </div>
+          </div> -->
           <div class="meta-cell">
             <div class="meta-label">Берилган сана</div>
             <div class="meta-value" id="berilgan-sana"></div>
@@ -518,21 +533,11 @@
           <div class="meta-cell">
             <div class="meta-label">Амал қилиш муддати</div>
             <div class="validity-tag">7 иш куни</div>
+            <div class="validity-tag" id="amal-qilish-muddat"></div>
           </div>
         </div>
 
-        <!-- Yurist -->
-        <div class="fields-block" style="padding-bottom:10px;">
-          <div class="field-row">
-            <div class="field">
-              <label>Қабулни амалга оширган юрист</label>
-              <div class="field-line" id="qabul-yurist"></div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          style="font-weight: 600; color: #1a2744; font-size: 20px; margin-top: 10px; margin-bottom: 5px;">
+        <div style="font-weight: 600; color: #1a2744; font-size: 20px; margin-top: 10px; margin-bottom: 5px;">
           Мижоз маълумотлари</div>
         <div class="gold-bar"></div>
 
@@ -554,8 +559,7 @@
             </div>
           </div>
         </div>
-        <div
-          style="font-weight: 600; color: #1a2744; font-size: 20px; margin-top: 10px; margin-bottom: 5px;">
+        <div style="font-weight: 600; color: #1a2744; font-size: 20px; margin-top: 10px; margin-bottom: 5px;">
           Мурожаат мавзуси</div>
         <div class="gold-bar"></div>
 
@@ -574,8 +578,7 @@
           <div class="line-border"></div>
         </div>
 
-        <div
-          style="font-weight: 600; color: #1a2744; font-size: 20px; margin-top: 20px; margin-bottom: 5px;">
+        <div style="font-weight: 600; color: #1a2744; font-size: 20px; margin-top: 20px; margin-bottom: 5px;">
           Қабул натижаси / йўналтириш</div>
         <div class="gold-bar"></div>
 
@@ -600,23 +603,20 @@
           </div>
         </div>
 
-        <div class="sign-row">
-          <div class="sign-cell">
-            <label>Мижоз имзоси</label>
-            <div class="sign-line"></div>
-          </div>
-          <div class="sign-cell">
-            <label>Юрист имзоси</label>
-            <div class="sign-line"></div>
+        <div class="fields-block">
+          <div class="field-row">
+            <div class="field">
+              <label>Қабулни амалга оширган юрист</label>
+              <div class="field-line" id="qabul-yurist"></div>
+            </div>
+            <div class="field">
+              <label>Юрист имзоси</label>
+              <div style="border-bottom: 1px solid black; padding-top: 30px; width: 50%;"></div>
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="front-footer">
-        <p>«Ушбу қабул картасининг олди ва орқа томонидаги шартлар билан танишганлигимни тасдиқлайман.»</p>
-      </div>
     </div>
-
   </div>
 
   <!-- ========= ORQA TOMONI ========= -->
@@ -626,7 +626,6 @@
 
       <div class="back-header">
         <div class="back-title">Қабул Картаси Шартлари</div>
-        <div class="back-note">Орқа бетда логотип ва реклама элементлари жойлаштирилмайди</div>
       </div>
 
       <div class="gold-bar"></div>
@@ -727,7 +726,7 @@
         <div class="back-confirm-text">
           Мижоз тасдиғи: ушбу қабул картасининг олди ва орқа томонидаги шартлар билан танишганлигимни
           тасдиқлайман.<br>
-          <em>Мижоз имзоси олди бетда қўйилади. Мазкур карта қабулни рўйхатга олиш учун мўлжалланган.</em>
+          <em>Мижоз имзоси қўйилади. Мазкур карта қабулни рўйхатга олиш учун мўлжалланган.</em>
         </div>
         <div class="back-sign-box">
           <label>Мижоз имзоси</label>
@@ -754,9 +753,28 @@
       set('mijoz-id-print', p.get('id'));
       set('qabul-raqam', p.get('raqam'));
       set('qabul-yurist', p.get('yurist'));
+const sana = p.get('sana');
+const date = new Date(Number(sana));
 
-      const sana = p.get('sana') || new Date().toLocaleDateString('uz-UZ');
-      set('berilgan-sana', sana);
+// Sana formatlash funksiyasi
+const formatDateTime = (d) => {
+  return (
+    String(d.getDate()).padStart(2, '0') + '.' +
+    String(d.getMonth() + 1).padStart(2, '0') + '.' +
+    d.getFullYear() + ' ' +
+    String(d.getHours()).padStart(2, '0') + ':' +
+    String(d.getMinutes()).padStart(2, '0')
+  );
+};
+
+// Berilgan sana
+set('berilgan-sana', formatDateTime(date));
+
+// Amal qilish muddati (+8 kun)
+const expireDate = new Date(Number(sana));
+expireDate.setDate(expireDate.getDate() + 8);
+
+set('amal-qilish-muddat', formatDateTime(expireDate));
     };
   </script>
 </body>
