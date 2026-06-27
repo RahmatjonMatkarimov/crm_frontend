@@ -258,14 +258,14 @@ const formatMoney = (amount) => {
                 <div class="flex gap-2">
                     <button @click="selectedC = []" class="px-4 py-1.5 rounded text-sm transition-colors" :style="themeStore.isDark ? 'color:#9ca3af;' : 'color:#4a5568;'">{{ $t('Bekor qilish') }}</button>
                     <button @click="restoreSelectedC"
-                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30 transition-colors">
+                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/30 border border-emerald-500/30 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                         </svg>
                         {{ $t('Qaytarish') }}
                     </button>
                     <button @click="deleteSelectedC"
-                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/30 transition-colors">
+                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-red-500/20 text-red-500 hover:bg-red-500/30 border border-red-500/30 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.595 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.595-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -284,14 +284,14 @@ const formatMoney = (amount) => {
                 <div class="flex gap-2">
                     <button @click="selectedU = []" class="px-4 py-1.5 rounded text-sm transition-colors" :style="themeStore.isDark ? 'color:#9ca3af;' : 'color:#4a5568;'">{{ $t('Bekor qilish') }}</button>
                     <button @click="restoreSelectedU"
-                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30 transition-colors">
+                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/30 border border-emerald-500/30 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                         </svg>
                         {{ $t('Qaytarish') }}
                     </button>
                     <button @click="deleteSelectedU"
-                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/30 transition-colors">
+                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-red-500/20 text-red-500 hover:bg-red-500/30 border border-red-500/30 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.595 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.595-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>

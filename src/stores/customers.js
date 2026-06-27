@@ -56,7 +56,7 @@ export const useCustomersStore = defineStore('customers', {
 
     async restoreCustomer(id) {
       await api.put(ENDPOINTS.CUSTOMER_RESTORE(id))
-      await this.fetchArchived()
+      await Promise.all([this.fetchArchived(), this.fetchCustomers()])
     },
 
     async deleteCustomer(id) {
