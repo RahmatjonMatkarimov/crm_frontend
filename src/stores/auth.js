@@ -35,7 +35,7 @@ export const useAuthStore = defineStore('auth', {
       this.error = null
       try {
         const formData = new FormData()
-        const fields = ['username', 'password', 'name', 'surname', 'father_name', 'role', 'phone', 'phone2', 'birthDate', 'userCode', 'uniqueCode']
+        const fields = ['username', 'password', 'name', 'surname', 'father_name', 'role', 'phone', 'phone2', 'telegram', 'birthDate', 'userCode', 'uniqueCode']
         fields.forEach(f => { if (userData[f]) formData.append(f, userData[f]) })
         if (userData.img instanceof File) formData.append('img', userData.img)
 

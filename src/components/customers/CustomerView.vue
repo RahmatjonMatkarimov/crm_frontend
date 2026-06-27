@@ -112,7 +112,7 @@
                             <!-- Status -->
                             <div>
                                 <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
-                                    {{ $t('Status') }}
+                                    {{ $t('Ish jarayoni') }}
                                 </p>
                                 <div class="relative">
                                     <select

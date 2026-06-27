@@ -59,7 +59,6 @@ const allChecked = computed(() =>
 const indeterminate = computed(() =>
     selected.value.length > 0 && !allChecked.value
 )
-
 const toggleAll = () => {
     if (allChecked.value) {
         selected.value = selected.value.filter(id => !filteredUsers.value.find(u => u.id === id))

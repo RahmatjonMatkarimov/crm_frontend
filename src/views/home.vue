@@ -13,7 +13,6 @@ const themeStore = useThemeStore()
 const langStore = useLangStore()
 
 const isSidebarOpen = ref(false)
-
 const routerList = computed(() => [
     {
         path: '/',
