@@ -1,6 +1,6 @@
 <!-- components/users.modal.vue -->
 <script setup>
-import { ref, computed, getCurrentInstance } from 'vue'
+import { ref, computed, watch, getCurrentInstance } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import { useUserModalStore } from '../../stores/users.modal'
 import { useThemeStore } from '../../stores/theme'
@@ -150,6 +150,16 @@ const handlePassportInput = (e) => {
     newUserUserCode.value = digits ? `${letters} ${digits}` : letters;
 };
 
+const autoCapFirst = (fieldRef) => {
+    if (fieldRef.value && fieldRef.value[0] !== fieldRef.value[0].toUpperCase()) {
+        fieldRef.value = fieldRef.value.charAt(0).toUpperCase() + fieldRef.value.slice(1)
+    }
+}
+
+watch(newUserName, () => autoCapFirst(newUserName))
+watch(newUserSurname, () => autoCapFirst(newUserSurname))
+watch(newUserFatherName, () => autoCapFirst(newUserFatherName))
+
 const resetForm = () => {
     newUserName.value = ''
     newUserSurname.value = ''
@@ -177,11 +187,11 @@ const addUser = async () => {
         return
     }
     if (newUserPassword.value.length < 6) {
-        userCreateError.value = "Parol kamida 6 ta belgidan iborat bo'lishi kerak"
+        userCreateError.value = proxy.$t("Parol kamida 6 ta belgidan iborat bo'lishi kerak")
         return
     }
     if (newUserUniqueCode.value.length !== 14) {
-        userCreateError.value = "JShSHIR 14 ta raqamdan iborat bo'lishi kerak"
+        userCreateError.value = proxy.$t("JSHSHIR 14 ta raqamdan iborat bo'lishi kerak")
         return
     }
 
@@ -220,23 +230,21 @@ const closeModal = () => {
     <Teleport to="body">
         <Transition name="modal">
             <div v-if="userModalStore.isUserModalVisible" @click.self="closeModal"
-                class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-                <div
-                    class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+                class="fixed inset-0 z-50 flex"
+                :class="themeStore.isDark ? 'bg-black/70' : 'bg-black/40'"
+                style="backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+                <div class="relative w-full h-full flex flex-col overflow-hidden shadow-2xl"
+                    :style="themeStore.isDark ? 'background:#1f2937;' : 'background:#ffffff;'">
 
-                    <!-- Modal header (styled like login gradient) -->
-                    <div class="px-6 py-5 flex items-center justify-between relative overflow-hidden"
-                        :style="{ background: themeStore.isDark ? 'linear-gradient(150deg, #0d1b3e 0%, #162766 55%, #1535c4 100%)' : 'linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%)' }">
-                        <div
-                            class="absolute top-[-30px] right-[-30px] w-32 h-32 rounded-full border border-white/5 pointer-events-none">
-                        </div>
+                    <!-- Modal header -->
+                    <div class="px-6 py-5 flex items-center justify-between shrink-0" style="background:#1e3a5f;">
                         <div>
-                            <h2 class="text-white text-base font-semibold">{{ $t("Yangi xodim qo'shish") }}</h2>
-                            <p class="text-white/50 text-xs mt-0.5">{{ $t("Barcha majburiy maydonlarni to'ldiring") }}
-                            </p>
+                            <h2 class="text-white text-base font-bold">{{ $t("Yangi xodim qo'shish") }}</h2>
+                            <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.55);">{{ $t("Barcha majburiy maydonlarni to'ldiring") }}</p>
                         </div>
                         <button @click="closeModal"
-                            class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+                            class="w-8 h-8 rounded flex items-center justify-center text-white transition-all"
+                            style="background:rgba(255,255,255,0.12);">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-4 h-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -245,7 +253,7 @@ const closeModal = () => {
                     </div>
 
                     <!-- Scrollable body -->
-                    <div class="flex-1 overflow-y-auto p-6 space-y-5">
+                    <div class="flex-1 overflow-y-auto p-6 sm:p-8 space-y-5">
 
                         <!-- Alerts -->
                         <div v-if="userCreateSuccess"
@@ -300,7 +308,7 @@ const closeModal = () => {
                                     class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
                                     $t('Ism') }} <span class="text-red-500">*</span></label>
                                 <input v-model="newUserName" type="text" :placeholder="$t('Ismni kiriting')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                             </div>
 
                             <!-- Surname -->
@@ -309,7 +317,7 @@ const closeModal = () => {
                                     class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
                                     $t('Familiya') }} <span class="text-red-500">*</span></label>
                                 <input v-model="newUserSurname" type="text" :placeholder="$t('Familiyani kiriting')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                             </div>
 
                             <!-- Father name -->
@@ -319,7 +327,7 @@ const closeModal = () => {
                                     $t('Otasining ismi') }} <span class="text-red-500">*</span></label>
                                 <input v-model="newUserFatherName" type="text"
                                     :placeholder="$t('Otasining ismini kiriting')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                             </div>
 
                             <!-- Username -->
@@ -338,7 +346,7 @@ const closeModal = () => {
                                     </span>
                                     <input v-model="newUserUsername" type="text" required
                                         :placeholder="$t('Loginni kiriting')"
-                                        class="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                        class="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                                 </div>
                             </div>
 
@@ -358,7 +366,7 @@ const closeModal = () => {
                                     </span>
                                     <input v-model="newUserPassword" :type="showPassword ? 'text' : 'password'" required
                                         :placeholder="$t('Parolni kiriting')"
-                                        class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                        class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                                     <button type="button" @click="showPassword = !showPassword"
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
                                         <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -385,7 +393,7 @@ const closeModal = () => {
                                     $t('Telefon') }} <span class="text-red-500">*</span></label>
                                 <input v-model="newUserPhone" @input="handlePhoneInput" type="tel"
                                     placeholder="+998 XX XXX XX XX"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                             </div>
 
                             <!-- Phone 2 -->
@@ -395,7 +403,7 @@ const closeModal = () => {
                                     $t("Qo'shimcha telefon") }}</label>
                                 <input v-model="newUserPhone2" @input="handlePhoneInput2" type="tel"
                                     placeholder="+998 XX XXX XX XX"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                             </div>
 
                             <!-- Telegram -->
@@ -405,7 +413,7 @@ const closeModal = () => {
                                     $t('Telegram') }} <span class="text-red-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400"
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400"
                                             viewBox="0 0 24 24" fill="currentColor">
                                             <path
                                                 d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
@@ -413,7 +421,7 @@ const closeModal = () => {
                                     </span>
                                     <input v-model="newUserTelegram" @input="handleInput" type="text"
                                         :placeholder="$t('@username yoki +998 XX XXX XX XX')"
-                                        class="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                        class="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                                 </div>
                             </div>
 
@@ -423,29 +431,29 @@ const closeModal = () => {
                                     class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
                                     $t("Tug'ilgan sana") }} <span class="text-red-500">*</span></label>
                                 <input v-model="newUserBirthDate" type="date"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                             </div>
 
                             <!-- User code -->
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
-                                    $t('Passport seriya raqami') }} <span class="text-red-500">*</span></label>
+                                    $t('Pasport seriya raqami') }} <span class="text-red-500">*</span></label>
                                 <input v-model="newUserUserCode" @input="handlePassportInput" type="text"
                                     :placeholder="$t('AA1234567')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                             </div>
 
                             <!-- Unique code -->
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
-                                    $t('JShSHIR') }}
+                                    $t('JSHSHIR') }}
                                     <span class="text-red-500">*</span></label>
                                 <input v-model="newUserUniqueCode" type="text" inputmode="numeric"
                                     :placeholder="$t('14 raqam')" maxlength="14"
                                     @input="newUserUniqueCode = $event.target.value.replace(/\D/g, '').slice(0, 14)"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                             </div>
                             <!-- Role -->
                             <div class="space-y-1 sm:col-span-2">
@@ -453,7 +461,7 @@ const closeModal = () => {
                                     class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
                                     $t('Lavozim') }} <span class="text-red-500">*</span></label>
                                 <select v-model="newUserRole"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20 cursor-pointer">
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20 cursor-pointer">
                                     <option v-for="role in availableRoles" :key="role.value" :value="role.value">
                                         {{ role.label }}
                                     </option>
@@ -464,14 +472,16 @@ const closeModal = () => {
                     </div>
 
                     <!-- Modal footer -->
-                    <div
-                        class="px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-end gap-3 bg-slate-50 dark:bg-slate-800/50">
+                    <div class="px-6 py-4 flex items-center justify-end gap-3 shrink-0"
+                        :style="themeStore.isDark ? 'border-top:1px solid #374151; background:#111827;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
                         <button @click="closeModal"
-                            class="px-5 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                            class="px-5 py-2 rounded text-sm font-medium transition-all"
+                            :style="themeStore.isDark ? 'color:#9ca3af;' : 'color:#4a5568;'">
                             {{ $t('Bekor qilish') }}
                         </button>
                         <button @click="addUser" :disabled="authStore.loading"
-                            class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-white text-sm font-medium btn-primary transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed">
+                            class="flex items-center gap-2 px-5 py-2 rounded text-white text-sm font-semibold transition-all active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed"
+                            style="background:#1e3a5f;">
                             <span v-if="authStore.loading"
                                 class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                             <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -490,21 +500,6 @@ const closeModal = () => {
 </template>
 
 <style scoped>
-.modal-header {
-    background: linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%);
-}
-
-:global(.dark) .modal-header {
-    background: linear-gradient(150deg, #0a1a5c 0%, #0f2a9e 55%, #1535c4 100%);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #0a1850, #1a2e7a);
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, #1a2e7a, #2a3e9a);
-}
 
 .modal-enter-active,
 .modal-leave-active {

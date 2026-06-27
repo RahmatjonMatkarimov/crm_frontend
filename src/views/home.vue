@@ -53,96 +53,91 @@ const currentPageTitle = computed(() => {
     return routeName[route.name] || route.meta.title || langStore.t('Sahifa')
 })
 
-// Router o'zgarganda sidebar avtomatik yopiladi
-watch(route, () => {
-    isSidebarOpen.value = false
-})
-
-const toggleSidebar = () => {
-    isSidebarOpen.value = !isSidebarOpen.value
-}
-
-const handleLogout = () => {
-    authStore.logout()
-    router.push('/login')
-}
+watch(route, () => { isSidebarOpen.value = false })
+const toggleSidebar = () => { isSidebarOpen.value = !isSidebarOpen.value }
+const handleLogout = () => { authStore.logout(); router.push('/login') }
 </script>
 
 <template>
-    <div class="min-h-screen w-full font-sans overflow-hidden"
-        :style="themeStore.isDark ? { backgroundColor: '#0f172a' } : { backgroundColor: '#eef1fb' }">
+    <div class="min-h-screen w-full font-sans overflow-hidden" :style="themeStore.isDark ? 'background:#111827' : 'background:#f0f2f5'">
 
         <div class="flex h-screen">
+            <!-- Overlay (mobile) -->
+            <Transition enter-active-class="transition-opacity duration-300" enter-from-class="opacity-0"
+                leave-active-class="transition-opacity duration-300" leave-to-class="opacity-0">
+                <div v-if="isSidebarOpen"
+                    class="fixed inset-0 z-40 lg:hidden"
+                    style="background:rgba(0,0,0,0.5);"
+                    @click="isSidebarOpen = false">
+                </div>
+            </Transition>
+
             <!-- Sidebar -->
             <aside :class="[
-                'fixed lg:relative h-full z-50 flex flex-col shadow-2xl transition-all duration-300 ease-in-out',
-                isSidebarOpen ? 'w-60 translate-x-0' : 'hidden'
-            ]"
-                :style="{ background: themeStore.isDark ? 'linear-gradient(180deg, #0d1b3e 0%, #162766 100%)' : 'linear-gradient(180deg, #122b91 0%, #1a44f0 100%)' }">
+                'fixed lg:relative h-full z-50 flex flex-col transition-all duration-300 ease-in-out w-60',
+                isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+            ]" style="background:#1e3a5f; border-right:1px solid #162d4a;">
 
                 <!-- Sidebar Header -->
-                <div v-if="isSidebarOpen" class="h-16 px-5 flex items-center justify-between border-b border-white/10">
-                    <div class="flex items-center gap-3">
-                        <!-- <div class="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                                stroke="currentColor" class="w-4 h-4 text-white">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 3v1m0 16v1m8-9h1M3 12H2m15.364-6.364l.707.707M5.636 18.364l-.707.707M18.364 18.364l.707-.707M5.636 5.636l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
+                <div class="h-14 px-4 flex items-center justify-between" style="border-bottom:1px solid rgba(255,255,255,0.1);">
+                    <div class="flex items-center gap-2.5">
+                        <img src="/logo.png" alt="Logo" width="34" />
+                        <div class="h-7 w-px" style="background:rgba(255,255,255,0.2);"></div>
+                        <div>
+                            <p class="font-bold text-sm leading-tight text-white">Yuridik</p>
+                            <p class="text-xs leading-tight" style="color:rgba(255,255,255,0.6);">
+                                Maslahat <span style="color:#fc8181; font-weight:700;">24</span>
+                            </p>
                         </div>
-                        -->
-                        <img src="../../public/logo.png" alt="" width="50">
-                        <span class="border-r-2 border-white -mx-1 h-10 w-0"></span>
-                        <span class="text-white font-semibold text-sm tracking-wide "><span
-                                class="text-white text-xl">Yuridik </span>maslahat <span
-                                class="text-red-500">24</span></span>
                     </div>
-
                     <button @click="toggleSidebar"
-                        class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-white/10 text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                            stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6h12v12" />
+                        class="lg:hidden w-7 h-7 flex items-center justify-center rounded transition-all text-white"
+                        style="background:rgba(255,255,255,0.1);">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
 
                 <!-- Navigation -->
-                <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
-                    <router-link v-for="route in routerList" :key="route.path" :to="route.path"
-                        :class="route.permission ? '' : 'hidden'"
-                        class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all"
-                        active-class="nav-link-active">
+                <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto pt-4">
+                    <router-link v-for="r in routerList" :key="r.path" :to="r.path"
+                        :class="[r.permission ? '' : 'hidden']"
+                        class="nav-link flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium transition-all"
+                        style="color:rgba(255,255,255,0.7);"
+                        exact-active-class="nav-link-active">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
                             stroke="currentColor" class="w-4 h-4 shrink-0">
-                            <path stroke-linecap="round" stroke-linejoin="round" :d="route.icon" />
+                            <path stroke-linecap="round" stroke-linejoin="round" :d="r.icon" />
                         </svg>
-                        <span>{{ route.name }}</span>
+                        <span>{{ r.name }}</span>
                     </router-link>
                 </nav>
 
                 <!-- Profile & Logout -->
-                <div v-if="isSidebarOpen" class="p-3 border-t border-white/10 space-y-1">
+                <div class="p-3 space-y-0.5" style="border-top:1px solid rgba(255,255,255,0.1);">
                     <router-link to="/profile"
-                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-all group">
-                        <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 shrink-0">
-                            <img v-if="authStore.user?.img" :src="`${BASE_URL}${authStore.user.img}`"
-                                class="w-full h-full object-cover" />
-                            <img v-else src="../../public/User-avatar.svg.png" class="w-full h-full object-cover" />
+                        class="flex items-center gap-2.5 px-3 py-2.5 rounded transition-all"
+                        style="color:rgba(255,255,255,0.7);"
+                        @mouseover="$event.currentTarget.style.background='rgba(255,255,255,0.1)'"
+                        @mouseleave="$event.currentTarget.style.background=''">
+                        <div class="w-7 h-7 rounded overflow-hidden shrink-0" style="border:1px solid rgba(255,255,255,0.2);">
+                            <img v-if="authStore.user?.img" :src="`${BASE_URL}${authStore.user.img}`" class="w-full h-full object-cover" />
+                            <img v-else src="/User-avatar.svg.png" class="w-full h-full object-cover" />
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-white text-xs font-medium truncate">{{ authStore.user?.name ||
-                                authStore.user?.username }}</p>
-                            <p class="text-white/50 text-[10px] truncate">{{ authStore.userRole }}</p>
+                            <p class="text-xs font-semibold truncate text-white">{{ authStore.user?.name || authStore.user?.username }}</p>
+                            <p class="text-[10px] truncate" style="color:rgba(255,255,255,0.45);">{{ authStore.userRole }}</p>
                         </div>
                     </router-link>
 
                     <button @click="handleLogout"
-                        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-300 hover:bg-red-500/10 hover:text-red-200 transition-all text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
-                            stroke="currentColor" class="w-4 h-4 shrink-0">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                        class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded transition-all text-sm font-medium"
+                        style="color:rgba(252,129,129,0.85);"
+                        @mouseover="$event.currentTarget.style.background='rgba(252,129,129,0.1)'"
+                        @mouseleave="$event.currentTarget.style.background=''">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                         </svg>
                         {{ langStore.t('Chiqish') }}
                     </button>
@@ -150,74 +145,71 @@ const handleLogout = () => {
             </aside>
 
             <!-- Main Content Area -->
-            <div class="flex-1 flex flex-col min-w-0">
+            <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
                 <!-- Top Header -->
-                <header
-                    class="h-16 bg-white/80 backdrop-blur dark:bg-slate-800 border-b border-indigo-100 dark:border-slate-700 px-6 flex items-center justify-between sticky top-0 z-40">
+                <header class="h-14 px-5 flex items-center justify-between sticky top-0 z-40 shrink-0"
+                    :style="themeStore.isDark
+                        ? 'background:#1f2937; border-bottom:1px solid #374151;'
+                        : 'background:#ffffff; border-bottom:1px solid #d8dde6;'">
 
-                    <!-- Hamburger + Logo (faqat sidebar yopiq bo'lganda ko'rinadi) -->
-                    <div class="flex items-center" :class="{ 'hidden': isSidebarOpen }">
-                        <button @click="toggleSidebar"
-                            class="w-9 h-9  dark:bg-slate-700 -ml-3 flex items-center justify-center rounded-xl hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                                stroke="currentColor" class="w-6 h-6 text-[#1a2e7a] dark:text-slate-400">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    <div class="flex items-center gap-3">
+                        <!-- Mobile hamburger -->
+                        <button @click="toggleSidebar" class="lg:hidden w-8 h-8 flex items-center justify-center rounded transition-all"
+                            :style="themeStore.isDark ? 'color:#9ca3af;' : 'color:#4a5568;'">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                             </svg>
                         </button>
-
-                        <h1 class="text-black dark:text-white ml-4 text-lg font-semibold">
+                        <h1 class="font-semibold text-base" :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">
                             {{ currentPageTitle }}
                         </h1>
                     </div>
 
-                    <!-- Right side -->
-                    <div class="flex items-center gap-4 ml-auto">
-                        <div class="flex w-50 -mr-[50px] items-center ml-3 gap-3">
-                            <img src="../../public/logo.png" alt="" width="50">
-                            <span class="border-r-2 border-black dark:border-white font-bold -mx-1 h-10 w-0"></span>
-                            <span class="text-black dark:text-white font-semibold text-sm tracking-wide ">
-                                <span class="text-black dark:text-white font-bold text-xl">Yuridik </span>
-                                maslahat <span class="text-red-500 font-bold">24</span></span>
-                        </div>
-
-                        <!-- Lang toggle (Lotin / Kiril) -->
+                    <!-- Right actions -->
+                    <div class="flex items-center gap-2">
+                        <!-- Lang toggle -->
                         <button @click="langStore.toggleLang()"
-                            :title="langStore.isKiril ? 'Lotinga o\'tish' : 'Kirilga o\'tish'"
-                            class="relative flex items-center gap-1.5 px-3 h-9 rounded-xl border border-indigo-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-all duration-200 shadow-sm group">
-                            <!-- Globe icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.8" stroke="currentColor"
-                                class="w-4 h-4 text-indigo-500 dark:text-indigo-400 group-hover:rotate-12 transition-transform duration-200">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+                            class="flex items-center gap-1.5 px-3 h-8 rounded text-xs font-bold transition-all"
+                            :style="themeStore.isDark
+                                ? 'color:#9ca3af; background:#374151; border:1px solid #4b5563;'
+                                : 'color:#4a5568; background:#f0f2f5; border:1px solid #d8dde6;'">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-3.5 h-3.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
                             </svg>
-                            <span class="text-xs font-semibold text-[#1a2e7a] dark:text-slate-300 uppercase tracking-wider leading-none">
-                                {{ langStore.isKiril ? 'UZ' : 'КР' }}
-                            </span>
+                            <span class="uppercase tracking-wider">{{ langStore.isKiril ? 'UZ' : 'КР' }}</span>
                         </button>
 
                         <!-- Dark mode toggle -->
                         <button @click="themeStore.toggleTheme()"
-                            class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors text-[#1a2e7a] dark:text-slate-400">
-                            <!-- Sun icon -->
-                            <svg v-if="themeStore.isDark" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                            class="w-8 h-8 flex items-center justify-center rounded transition-all"
+                            :style="themeStore.isDark
+                                ? 'color:#9ca3af; background:#374151; border:1px solid #4b5563;'
+                                : 'color:#4a5568; background:#f0f2f5; border:1px solid #d8dde6;'">
+                            <svg v-if="themeStore.isDark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
                             </svg>
-                            <!-- Moon icon -->
-                            <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
                             </svg>
                         </button>
+
+                        <!-- User avatar -->
+                        <router-link to="/profile"
+                            class="flex items-center gap-2 px-2 h-8 rounded transition-all"
+                            :style="themeStore.isDark ? 'color:#9ca3af;' : 'color:#4a5568;'">
+                            <div class="w-6 h-6 rounded overflow-hidden" style="border:1px solid #d8dde6;">
+                                <img v-if="authStore.user?.img" :src="`${BASE_URL}${authStore.user.img}`" class="w-full h-full object-cover" />
+                                <img v-else src="/User-avatar.svg.png" class="w-full h-full object-cover" />
+                            </div>
+                            <span class="text-xs font-medium hidden sm:block">
+                                {{ authStore.user?.name || authStore.user?.username }}
+                            </span>
+                        </router-link>
                     </div>
                 </header>
 
                 <!-- Page Content -->
-                <div class="flex-1 overflow-auto p-6">
+                <div class="flex-1 overflow-auto p-5 lg:p-6">
                     <router-view />
                 </div>
             </div>
@@ -226,8 +218,14 @@ const handleLogout = () => {
 </template>
 
 <style scoped>
+.nav-link:hover {
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+}
 .nav-link-active {
-    background: rgba(255, 255, 255, 0.15) !important;
-    color: white !important;
+    background: rgba(255,255,255,0.15) !important;
+    color: #ffffff !important;
+    border-left: 3px solid #ffffff;
+    padding-left: calc(0.75rem - 3px);
 }
 </style>

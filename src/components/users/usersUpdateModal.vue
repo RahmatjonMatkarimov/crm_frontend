@@ -67,6 +67,16 @@ const handleImgChange = (e) => {
     }
 }
 
+const autoCapFirst = (fieldRef) => {
+    if (fieldRef.value && fieldRef.value[0] !== fieldRef.value[0].toUpperCase()) {
+        fieldRef.value = fieldRef.value.charAt(0).toUpperCase() + fieldRef.value.slice(1)
+    }
+}
+
+watch(newUserName, () => autoCapFirst(newUserName))
+watch(newUserSurname, () => autoCapFirst(newUserSurname))
+watch(newUserFatherName, () => autoCapFirst(newUserFatherName))
+
 const handleInput = () => {
   let val = newUserTelegram.value
 
@@ -133,7 +143,7 @@ const handlePhoneInput2 = (e) => {
     newUserPhone2.value = formatted;
 };
 
-// Passport seriya
+// Pasport seriya
 const handlePassportInput = (e) => {
     let value = e.target.value.toUpperCase();
     let letters = '';
@@ -199,7 +209,7 @@ const saveUser = async () => {
     }
 
     if (newUserUniqueCode.value.length !== 14) {
-        userCreateError.value = "JShSHIR 14 ta raqamdan iborat bo'lishi kerak"
+        userCreateError.value = proxy.$t("JSHSHIR 14 ta raqamdan iborat bo'lishi kerak")
         return
     }
 
@@ -259,28 +269,32 @@ watch(
     <Teleport to="body">
         <Transition name="modal">
             <div v-if="userModalStore.isUserEditingModalVisible" @click.self="closeModal"
-                class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+                class="fixed inset-0 z-50 flex"
+                :class="themeStore.isDark ? 'bg-black/70' : 'bg-black/40'"
+                style="backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
 
-                <div
-                    class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+                <div class="relative w-full h-full flex flex-col overflow-hidden shadow-2xl"
+                    :style="themeStore.isDark ? 'background:#1f2937;' : 'background:#ffffff;'">
 
                     <!-- Header -->
-                    <div class="px-6 py-5 flex items-center justify-between relative overflow-hidden"
-                        :style="{ background: themeStore.isDark ? 'linear-gradient(150deg, #0d1b3e 0%, #162766 55%, #1535c4 100%)' : 'linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%)' }">
+                    <div class="px-6 py-5 flex items-center justify-between shrink-0" style="background:#1e3a5f;">
                         <div>
-                            <h2 class="text-white text-base font-semibold">
+                            <h2 class="text-white text-base font-bold">
                                 {{ isEditing ? $t('Xodimni tahrirlash') : $t("Yangi xodim qo'shish") }}
                             </h2>
-                            <p class="text-white/50 text-xs mt-0.5">{{ $t("Barcha majburiy maydonlarni to'ldiring") }}</p>
+                            <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.55);">{{ $t("Barcha majburiy maydonlarni to'ldiring") }}</p>
                         </div>
                         <button @click="closeModal"
-                            class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
-                            ✕
+                            class="w-8 h-8 rounded flex items-center justify-center text-white transition-all"
+                            style="background:rgba(255,255,255,0.12);">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                         </button>
                     </div>
 
                     <!-- Body -->
-                    <div class="flex-1 overflow-y-auto p-6 space-y-5">
+                    <div class="flex-1 overflow-y-auto p-6 sm:p-8 space-y-5">
                         <!-- Alerts -->
                         <div v-if="userCreateSuccess"
                             class="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 text-xs flex items-center gap-2">
@@ -362,7 +376,7 @@ watch(
                                     </span>
                                     <input v-model="newUserPassword" :type="showPassword ? 'text' : 'password'" required
                                         :placeholder="$t('Parolni kiriting')"
-                                        class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                        class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                                     <button type="button" @click="showPassword = !showPassword"
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
                                         <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -412,7 +426,7 @@ watch(
                                     </span>
                                     <input v-model="newUserTelegram" @input="handleInput" type="text"
                                         :placeholder="$t('@username yoki +998 XX XXX XX XX')"
-                                        class="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20" />
+                                        class="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
                                 </div>
                             </div>
 
@@ -425,7 +439,7 @@ watch(
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Passport seriya') }}</label>
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Pasport seriya') }}</label>
                                 <input v-model="newUserUserCode" @input="handlePassportInput" type="text"
                                     :placeholder="$t('AA1234567')"
                                     class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
@@ -433,7 +447,7 @@ watch(
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('JShSHIR') }}
+                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('JSHSHIR') }}
                                 </label>
                                 <input v-model="newUserUniqueCode" type="text" maxlength="14" :placeholder="$t('14 raqam')"
                                     @input="newUserUniqueCode = $event.target.value.replace(/\D/g, '').slice(0, 14)"
@@ -455,14 +469,16 @@ watch(
                     </div>
 
                     <!-- Footer -->
-                    <div
-                        class="px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3 bg-slate-50 dark:bg-slate-800/50">
+                    <div class="px-6 py-4 flex justify-end gap-3 shrink-0"
+                        :style="themeStore.isDark ? 'border-top:1px solid #374151; background:#111827;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
                         <button @click="closeModal"
-                            class="px-5 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-sm font-medium">
+                            class="px-5 py-2 rounded text-sm font-medium transition-all"
+                            :style="themeStore.isDark ? 'color:#9ca3af;' : 'color:#4a5568;'">
                             {{ $t('Bekor qilish') }}
                         </button>
                         <button @click="saveUser" :disabled="authStore.loading"
-                            class="btn-primary px-5 py-2.5 rounded-lg text-white flex items-center gap-2">
+                            class="px-5 py-2 rounded text-white text-sm font-semibold flex items-center gap-2 active:scale-[0.97] transition-all disabled:opacity-60"
+                            style="background:#1e3a5f;">
                             <span v-if="authStore.loading"
                                 class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                             {{ authStore.loading ? $t('Saqlanmoqda...') : (isEditing ? $t('Saqlash') : $t('Yaratish')) }}
@@ -475,19 +491,4 @@ watch(
 </template>
 
 <style scoped>
-.modal-header {
-    background: linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%);
-}
-
-:global(.dark) .modal-header {
-    background: linear-gradient(150deg, #0a1a5c 0%, #0f2a9e 55%, #1535c4 100%);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #0a1850, #1a2e7a);
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, #1a2e7a, #2a3e9a);
-}
 </style>

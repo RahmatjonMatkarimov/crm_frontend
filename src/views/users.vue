@@ -2,6 +2,7 @@
 import { ref, onMounted, computed, getCurrentInstance } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useUserModalStore } from '@/stores/users.modal'
+import { useThemeStore } from '@/stores/theme'
 import UsersModal from '@/components/users/users.modal.vue'
 import UsersModalUpdate from '@/components/users/usersUpdateModal.vue'
 import AppCheckbox from '@/components/ui/AppCheckbox.vue'
@@ -11,6 +12,7 @@ import translateText from '@/utils/translete.js'
 const { proxy } = getCurrentInstance()
 const authStore = useAuthStore()
 const userModalStore = useUserModalStore()
+const themeStore = useThemeStore()
 
 const users = ref([])
 const searchQuery = ref('')
@@ -101,6 +103,19 @@ const roleBadgeClass = (role) => ({
     YURIST: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
     KASSIR: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
 }[role] || '')
+
+const fields = computed(() => {
+    return [
+                { label: 'Login', value: detailUser.value.username },
+                { label: 'Telefon', value: detailUser.value.phone },
+                { label: proxy.$t("Qo'shimcha tel."), value: detailUser.value.phone2 },
+                { label: 'Telegram', value: detailUser.value.telegram },
+                { label: "Tug'ilgan sana", value: detailUser.value.birthDate ? detailUser.value.birthDate.split('T')[0] : null },
+                { label: 'Passport', value: detailUser.value.userCode },
+                { label: 'JSHSHIR', value: detailUser.value.uniqueCode },
+                { label: proxy.$t("Qo'shilgan"), value: detailUser.value.createdAt ? new Date(detailUser.value.createdAt).toLocaleDateString('uz-UZ') : null },
+            ]
+})
 </script>
 
 <template>
@@ -108,14 +123,13 @@ const roleBadgeClass = (role) => ({
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-[#0a1850] dark:text-white">{{ $t('Ishchilar') }}</h1>
-                <p class="text-slate-500 dark:text-slate-400 text-sm mt-0.5">{{ $t("Barcha xodimlar ro'yxati") }}</p>
+                <h1 class="text-2xl font-bold" :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">{{ $t('Ishchilar') }}</h1>
+                <p class="text-sm mt-0.5" :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">{{ $t("Barcha xodimlar ro'yxati") }}</p>
             </div>
-            <button @click="userModalStore.openUserModal()"
-            v-if="authStore.permission.add_users"
-                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-medium btn-primary transition-all active:scale-[0.98] shadow-lg shadow-blue-900/20">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                    stroke="currentColor" class="w-4 h-4">
+            <button @click="userModalStore.openUserModal()" v-if="authStore.permission.add_users"
+                class="flex items-center gap-2 px-4 py-2.5 rounded text-white text-sm font-semibold active:scale-[0.98] transition-all"
+                style="background:#1e3a5f;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
                 {{ $t('Yangi xodim') }}
@@ -123,21 +137,24 @@ const roleBadgeClass = (role) => ({
         </div>
 
         <!-- Filters -->
-        <div
-            class="bg-white dark:bg-slate-800/60 dark:backdrop-blur rounded-2xl shadow-sm border border-indigo-100 dark:border-slate-700/60 p-4 flex flex-col md:flex-row gap-3">
+        <div class="flex flex-col md:flex-row gap-3">
             <div class="flex-1 relative">
-                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 dark:text-slate-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 01-14 0 7 7 0 0114 0z" />
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="color:#8892a4;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 01-14 0 7 7 0 0114 0z" />
                     </svg>
                 </span>
                 <input v-model="searchQuery" type="text" :placeholder="$t('Ism, familiya yoki login...')"
-                    class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-700/50 dark:text-slate-100 dark:placeholder-slate-500 border border-slate-200 dark:border-slate-600/50 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 dark:focus:border-blue-500 transition-all" />
+                    class="w-full pl-10 pr-4 py-2.5 rounded text-sm transition-all focus:outline-none"
+                    :style="themeStore.isDark
+                        ? 'background:#1f2937; border:1px solid #374151; color:#f3f4f6;'
+                        : 'background:#ffffff; border:1px solid #d8dde6; color:#1a1f36;'" />
             </div>
             <select v-model="selectedRole"
-                class="md:w-44 px-4 py-2.5 bg-white dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 dark:border-slate-600/50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all cursor-pointer">
+                class="md:w-44 px-3 py-2.5 rounded text-sm transition-all focus:outline-none cursor-pointer"
+                :style="themeStore.isDark
+                    ? 'background:#1f2937; border:1px solid #374151; color:#f3f4f6;'
+                    : 'background:#ffffff; border:1px solid #d8dde6; color:#1a1f36;'">
                 <option v-for="role in roles" :key="role.value" :value="role.value">{{ $t(role.label) }}</option>
             </select>
         </div>
@@ -146,19 +163,14 @@ const roleBadgeClass = (role) => ({
         <Transition enter-active-class="transition-all duration-200" enter-from-class="opacity-0 -translate-y-2"
             leave-active-class="transition-all duration-150" leave-to-class="opacity-0 -translate-y-2">
             <div v-if="selected.length > 0"
-                class="flex items-center justify-between px-5 py-3 bg-blue-950 dark:bg-blue-900/40 border border-blue-800/40 dark:border-blue-700/40 rounded-2xl shadow-lg">
-                <span class="text-blue-200 text-sm font-medium">{{ selected.length }} {{ $t('ta tanlandi') }}</span>
+                class="flex items-center justify-between px-5 py-3 rounded"
+                :style="themeStore.isDark ? 'background:#1f2937; border:1px solid #374151;' : 'background:#eef2f7; border:1px solid #d8dde6;'">
+                <span class="text-sm font-semibold" :style="themeStore.isDark ? 'color:#9ca3af' : 'color:#1a1f36'">{{ selected.length }} {{ $t('ta tanlandi') }}</span>
                 <div class="flex gap-2">
-                    <button @click="selected = []"
-                        class="px-4 py-1.5 rounded-lg text-sm text-blue-300 hover:text-white hover:bg-white/10 transition-colors">
-                        {{ $t('Bekor qilish') }}
-                    </button>
-                    <button @click="archiveSelected"
-                        class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/30 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    <button @click="selected = []" class="px-4 py-1.5 rounded text-sm transition-colors" :style="themeStore.isDark ? 'color:#9ca3af' : 'color:#4a5568'">{{ $t('Bekor qilish') }}</button>
+                    <button @click="archiveSelected" class="flex items-center gap-1.5 px-4 py-1.5 rounded text-sm transition-colors" style="background:#fff5f5; color:#c53030; border:1px solid #fed7d7;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                         </svg>
                         {{ $t("O'chirish") }}
                     </button>
@@ -166,121 +178,93 @@ const roleBadgeClass = (role) => ({
             </div>
         </Transition>
 
-        <!-- Table -->
-        <div
-            class="bg-white dark:bg-slate-800/60 dark:backdrop-blur rounded-2xl shadow-sm border border-indigo-100 dark:border-slate-700/60 overflow-hidden">
-            <div v-if="loading" class="p-12 flex items-center justify-center gap-3 text-slate-400 dark:text-slate-500">
-                <div
-                    class="w-5 h-5 border-2 border-slate-300 dark:border-slate-600 border-t-blue-500 rounded-full animate-spin">
+        <!-- Loading -->
+        <div v-if="loading" class="flex items-center justify-center py-16 gap-3" :style="themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4'">
+            <div class="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin opacity-60"></div>
+            <span class="text-sm">{{ $t('Yuklanmoqda...') }}</span>
+        </div>
+
+        <!-- Cards grid -->
+        <div v-else-if="filteredUsers.length > 0" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div v-for="user in filteredUsers" :key="user.id"
+                class="relative rounded p-5 cursor-pointer group transition-all"
+                :style="themeStore.isDark
+                    ? 'background:#1f2937; border:1px solid ' + (selected.includes(user.id) ? '#1e3a5f' : '#374151') + ';'
+                    : 'background:#ffffff; border:1px solid ' + (selected.includes(user.id) ? '#1e3a5f' : '#d8dde6') + ';'"
+                @click="openDetail(user)">
+
+                <!-- Checkbox -->
+                <div v-if="authStore.permission.delete_users" class="absolute top-3 right-3 z-10" @click.stop>
+                    <AppCheckbox :checked="selected.includes(user.id)" @change="toggleOne(user.id)" />
                 </div>
-                {{ $t('Yuklanmoqda...') }}
+
+                <!-- Avatar + Name -->
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-11 h-11 rounded overflow-hidden shrink-0" style="border:1px solid #d8dde6;">
+                        <img v-if="user.img" :src="`${BASE_URL}${user.img}`" class="w-full h-full object-cover" />
+                        <img v-else src="/User-avatar.svg.png" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="flex-1 min-w-0 pr-6">
+                        <p class="font-bold text-sm truncate" :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">{{ $t(user.surname) }} {{ $t(user.name) }}</p>
+                        <p class="text-xs truncate" :style="themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4'">{{ $t(user.father_name) || '' }}</p>
+                    </div>
+                </div>
+
+                <!-- Role badge -->
+                <div class="mb-3">
+                    <span class="inline-flex px-2.5 py-1 rounded text-xs font-semibold" :style="{
+                        'background:#f3e8ff; color:#6b21a8;': user.role === 'ADMIN',
+                        'background:#eef2f7; color:#1e3a5f;': user.role === 'RAHBAR',
+                        'background:#f0fdf4; color:#276749;': user.role === 'YURIST',
+                        'background:#fffbeb; color:#b45309;': user.role === 'KASSIR',
+                    }" :class="{
+                        'bg-purple-100 text-purple-700': user.role === 'ADMIN',
+                        'bg-[#eef2f7] text-[#1e3a5f]': user.role === 'RAHBAR',
+                        'bg-green-50 text-green-800': user.role === 'YURIST',
+                        'bg-amber-50 text-amber-700': user.role === 'KASSIR',
+                    }">{{ $t(user.role === 'ADMIN' ? 'Administrator' : user.role === 'RAHBAR' ? 'Rahbar' : user.role === 'YURIST' ? 'Yurist' : 'Kassir') }}</span>
+                </div>
+
+                <!-- Contact info -->
+                <div class="space-y-1.5 mb-4">
+                    <div v-if="user.phone" class="flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5 shrink-0" style="color:#8892a4;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                        </svg>
+                        <span class="text-xs" :style="themeStore.isDark ? 'color:#9ca3af' : 'color:#4a5568'">{{ user.phone }}</span>
+                    </div>
+                    <div v-if="user.username" class="flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5 shrink-0" style="color:#8892a4;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                        </svg>
+                        <span class="text-xs font-mono" :style="themeStore.isDark ? 'color:#9ca3af' : 'color:#4a5568'">{{ user.username }}</span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity" @click.stop>
+                    <button @click="userModalStore.openEditModal(user)" v-if="authStore.permission.edit_users"
+                        class="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded text-xs font-medium transition-all"
+                        :style="themeStore.isDark ? 'background:#374151; color:#9ca3af;' : 'background:#eef2f7; color:#1e3a5f;'">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 5.232z" /></svg>
+                        {{ $t('Tahrirlash') }}
+                    </button>
+                    <button @click="archiveUser(user)" v-if="authStore.permission.delete_users"
+                        class="p-1.5 rounded transition-all" style="color:#c53030;">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+                    </button>
+                </div>
             </div>
-            <div v-else class="overflow-x-auto">
-                <table class="w-full min-w-[820px]">
-                    <thead>
-                        <tr
-                            class="border-b border-indigo-100 dark:border-slate-700/60 bg-indigo-50/60 dark:bg-slate-700/30">
-                            <th class="px-4 py-3.5 w-10"
-                            v-if="authStore.permission.delete_users"
-                            >
-                                <AppCheckbox :checked="allChecked" :indeterminate="indeterminate" @change="toggleAll" />
-                            </th>
-                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Xodim') }}</th>
-                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Lavozim') }}</th>
-                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Telefon') }}</th>
-                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Qo\'shimcha telefon') }}</th>
-                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Telegram') }}</th>
-                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Login') }}</th>
-                            <th class="px-4 py-3.5 text-left text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('JShSHIR') }}</th>
-                            <th class="px-4 py-3.5 text-center text-[11px] font-semibold text-indigo-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Amallar') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-indigo-100/70 dark:divide-slate-700/50">
-                        <tr v-for="user in filteredUsers" :key="user.id"
-                            :class="selected.includes(user.id) ? 'bg-indigo-50 dark:bg-blue-900/10' : 'hover:bg-indigo-50/60 dark:hover:bg-slate-700/20'"
-                            class="transition-colors group cursor-pointer" @click="openDetail(user)">
-                            <td class="px-4 py-3.5" @click.stop
-                            v-if="authStore.permission.delete_users"
-                            >
-                                <AppCheckbox :checked="selected.includes(user.id)" @change="toggleOne(user.id)" />
-                            </td>
-                            <td class="px-4 py-3.5">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-9 h-9 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600/50 shrink-0 bg-slate-100 dark:bg-slate-700">
-                                        <img v-if="user.img" :src="`${BASE_URL}${user.img}`"
-                                            class="w-full h-full object-cover" />
-                                        <img v-else src="../../public/User-avatar.svg.png"
-                                            class="w-full h-full object-cover opacity-60" />
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-slate-800 dark:text-slate-100 text-sm">{{
-                                            $t(user.surname) }} {{ $t(user.name) }} {{ $t(user.father_name) }}</p>
-                                        <p class="text-xs text-slate-400 dark:text-slate-500">{{ user.userCode }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3.5">
-                                <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium" :class="{
-                                    'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300': user.role === 'ADMIN',
-                                    'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300': user.role === 'RAHBAR',
-                                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300': user.role === 'YURIST',
-                                    'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300': user.role === 'KASSIR',
-                                }">
-                                    {{ $t(user.role === 'ADMIN' ? 'Administrator' : user.role === 'RAHBAR' ? 'Rahbar' :
-                                        user.role === 'YURIST' ? 'Yurist' : 'Kassir') }}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3.5 text-sm text-slate-600 dark:text-slate-400">{{ user.phone || '—' }}
-                            </td>
-                            <td class="px-4 py-3.5 text-sm text-slate-600 dark:text-slate-400">{{ user.phone2 || '—' }}
-                            </td>
-                            <td class="px-4 py-3.5 text-sm text-slate-600 dark:text-slate-400">{{ user.telegram || '—' }}
-                            </td>
-                            <td class="px-4 py-3.5 text-sm font-mono text-slate-700 dark:text-slate-300">{{
-                                user.username }}</td>
-                            <td class="px-4 py-3.5 text-sm text-slate-500 dark:text-slate-400">{{ user.uniqueCode || '—'
-                            }}</td>
-                            <td class="px-4 py-3.5" @click.stop>
-                                <div
-                                    class="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button @click="userModalStore.openEditModal(user)"
-                                        v-if="authStore.permission.edit_users"
-                                        class="p-1.5 text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"
-                                        title="Tahrirlash">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 5.232z" />
-                                        </svg>
-                                    </button>
-                                    <button @click="archiveUser(user)" v-if="authStore.permission.delete_users"
-                                        class="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all"
-                                        title="O'chirish">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr v-if="filteredUsers.length === 0">
-                            <td colspan="7" class="px-6 py-14 text-center">
-                                <div class="flex flex-col items-center gap-2 text-slate-400 dark:text-slate-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 opacity-40" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <p class="text-sm">{{ $t('Xodim topilmadi') }}</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        </div>
+
+        <!-- Empty state -->
+        <div v-else-if="!loading" class="flex flex-col items-center justify-center py-20 gap-4">
+            <div class="w-20 h-20 rounded flex items-center justify-center" :style="themeStore.isDark ? 'background:#374151' : 'background:#eaecf0'">
+                <svg class="w-10 h-10" :style="themeStore.isDark ? 'color:#4b5563' : 'color:#c1c9d6'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
             </div>
+            <p class="text-sm" :style="themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4'">{{ $t('Xodim topilmadi') }}</p>
         </div>
     </div>
 
@@ -290,145 +274,87 @@ const roleBadgeClass = (role) => ({
     <!-- User Detail Drawer -->
     <Teleport to="body">
         <Transition name="drawer-backdrop">
-            <div v-if="detailUser" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" @click="closeDetail"></div>
+            <div v-if="detailUser" class="fixed inset-0 z-50" style="background:rgba(0,0,0,0.5);" @click="closeDetail"></div>
         </Transition>
         <Transition name="drawer">
             <div v-if="detailUser"
-                class="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white dark:bg-slate-800 shadow-2xl flex flex-col overflow-hidden">
+                class="fixed top-0 right-0 z-50 h-full w-full max-w-md flex flex-col overflow-hidden shadow-2xl"
+                :style="themeStore.isDark ? 'background:#1f2937;' : 'background:#ffffff;'">
 
                 <!-- Header -->
-                <div class="px-6 py-5 flex items-center justify-between shrink-0"
-                    style="background: linear-gradient(150deg, #0a1850 0%, #1a2e7a 55%, #1535c4 100%)">
-                    <div>
-                        <h2 class="text-white text-base font-semibold">{{ $t("Xodim ma'lumotlari") }}</h2>
-                        <p class="text-white/50 text-xs mt-0.5">{{ $t("To'liq profil") }}</p>
+                <div class="shrink-0" style="background:#1e3a5f;">
+                    <div class="px-5 pt-5 pb-5">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h2 class="text-white text-base font-bold">{{ $t("Xodim ma'lumotlari") }}</h2>
+                                <p class="text-xs mt-0.5" style="color:rgba(255,255,255,0.55);">{{ $t("To'liq profil") }}</p>
+                            </div>
+                            <button @click="closeDetail"
+                                class="w-8 h-8 rounded flex items-center justify-center text-white transition-all shrink-0"
+                                style="background:rgba(255,255,255,0.12);">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded overflow-hidden shrink-0" style="border:2px solid rgba(255,255,255,0.2);">
+                                <img v-if="detailUser.img" :src="`${BASE_URL}${detailUser.img}`" class="w-full h-full object-cover" />
+                                <img v-else src="../../public/User-avatar.svg.png" class="w-full h-full object-cover opacity-70" />
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-bold text-white text-sm leading-tight truncate">
+                                    {{ detailUser.surname }} {{ detailUser.name }} {{ detailUser.father_name }}
+                                </p>
+                                <span class="inline-flex mt-1.5 px-2 py-0.5 rounded text-xs font-semibold" style="background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.9);">
+                                    {{ $t(roleLabel(detailUser.role)) }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                    <button @click="closeDetail"
-                        class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="w-4 h-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
                 </div>
 
                 <!-- Body -->
-                <div class="flex-1 overflow-y-auto p-6 space-y-5">
-
-                    <!-- Avatar + name -->
-                    <div class="flex items-center gap-4">
-                        <div
-                            class="w-16 h-16 rounded-2xl overflow-hidden border-2 border-slate-200 dark:border-slate-600 shrink-0 bg-slate-100 dark:bg-slate-700">
-                            <img v-if="detailUser.img" :src="`${BASE_URL}${detailUser.img}`"
-                                class="w-full h-full object-cover" />
-                            <img v-else src="../../public/User-avatar.svg.png"
-                                class="w-full h-full object-cover opacity-60" />
+                <div class="flex-1 overflow-y-auto p-4 space-y-3">
+                    <div class="rounded overflow-hidden" :style="themeStore.isDark ? 'background:#111827; border:1px solid #374151;' : 'background:#ffffff; border:1px solid #d8dde6;'">
+                        <div class="px-4 py-2.5 border-b" :style="themeStore.isDark ? 'border-color:#374151; background:#1f2937;' : 'border-color:#eaecf0; background:#f7f8fa;'">
+                            <p class="text-[10px] font-bold uppercase tracking-widest" :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">{{ $t("Shaxsiy ma'lumotlar") }}</p>
                         </div>
-                        <div>
-                            <p class="font-semibold text-slate-800 dark:text-slate-100 text-base leading-tight">
-                                {{ $t(detailUser.surname) }} {{ $t(detailUser.name) }} {{ $t(detailUser.father_name) }}
-                            </p>
-                            <span class="inline-flex mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium"
-                                :class="roleBadgeClass(detailUser.role)">
-                                {{ $t(roleLabel(detailUser.role)) }}
-                            </span>
+                        <div class="divide-y" :style="themeStore.isDark ? 'border-color:#374151' : 'border-color:#eaecf0'">
+                            <div v-for="item in fields" :key="item.label" class="flex items-center justify-between px-4 py-3">
+                                <span class="text-xs" :style="themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4'">{{ $t(item.label) }}</span>
+                                <span class="text-xs font-semibold font-mono" :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">{{ item.value || '—' }}</span>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="h-px bg-slate-100 dark:bg-slate-700"></div>
-
-                    <!-- Fields -->
-                    <div class="space-y-3">
-
-                        <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
-                            <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Login') }}</span>
-                            <span class="text-sm font-mono text-slate-800 dark:text-slate-200">{{ detailUser.username
-                            }}</span>
-                        </div>
-
-                        <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
-                            <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Telefon') }}</span>
-                            <span class="text-sm text-slate-800 dark:text-slate-200">{{ detailUser.phone || '—'
-                            }}</span>
-                        </div>
-
-                        <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
-                            <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Qo\'shimcha tel.') }}</span>
-                            <span class="text-sm text-slate-800 dark:text-slate-200">{{ detailUser.phone2 || '—'
-                            }}</span>
-                        </div>
-
-                        <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
-                            <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Telegram') }}</span>
-                            <span class="text-sm text-slate-800 dark:text-slate-200">{{ detailUser.telegram || '—'
-                            }}</span>
-                        </div>
-
-                        <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
-                            <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Tug\'ilgan sana') }}</span>
-                            <span class="text-sm text-slate-800 dark:text-slate-200">{{ detailUser.birthDate ?
-                                detailUser.birthDate.split('T')[0] : '—' }}</span>
-                        </div>
-
-                        <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
-                            <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Passport') }}</span>
-                            <span class="text-sm font-mono text-slate-800 dark:text-slate-200">{{ detailUser.userCode ||
-                                '—' }}</span>
-                        </div>
-
-                        <div class="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-slate-700/60">
-                            <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('JShSHIR') }}</span>
-                            <span class="text-sm font-mono text-slate-800 dark:text-slate-200">{{ detailUser.uniqueCode
-                                || '—' }}</span>
-                        </div>
-
-                        <div class="flex items-start gap-3 py-2">
-                            <span
-                                class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-32 shrink-0 pt-0.5">{{ $t('Qo\'shilgan') }}</span>
-                            <span class="text-sm text-slate-800 dark:text-slate-200">{{ detailUser.createdAt ? new
-                                Date(detailUser.createdAt).toLocaleDateString('uz-UZ') : '—' }}</span>
-                        </div>
-
                     </div>
                 </div>
 
                 <!-- Footer actions -->
-                <div
-                    class="px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex gap-3 shrink-0 bg-slate-50 dark:bg-slate-800/50">
+                <div class="px-4 py-4 flex gap-2.5 shrink-0"
+                    :style="themeStore.isDark ? 'border-top:1px solid #374151; background:#111827;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
                     <button @click="userModalStore.openEditModal(detailUser); closeDetail()"
                         v-if="authStore.permission.edit_users"
-                        class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-white text-sm font-medium transition-all"
-                        style="background: linear-gradient(135deg, #0a1850, #1a2e7a)">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 5.232z" />
+                        class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded text-white text-sm font-semibold transition-all"
+                        style="background:#1e3a5f;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 5.232z" />
                         </svg>
                         {{ $t('Tahrirlash') }}
                     </button>
                     <button @click="archiveUser(detailUser); closeDetail()" v-if="authStore.permission.delete_users"
-                        class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-sm font-medium transition-all border border-red-200 dark:border-red-800/50">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        class="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded text-sm font-semibold transition-all"
+                        style="background:#fff5f5; color:#c53030; border:1px solid #fed7d7;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                         </svg>
                         {{ $t("O'chirish") }}
                     </button>
                     <button @click="$router.push(`/permissions/${detailUser.id}`); closeDetail()"
                         v-if="authStore.permission.permisisons"
-                        class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 text-sm font-medium transition-all border border-yellow-200 dark:border-yellow-800/50">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        class="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded text-sm font-semibold transition-all"
+                        style="background:#fffbeb; color:#b45309; border:1px solid #fde68a;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                         {{ $t('Ruxsatlar') }}
                     </button>
@@ -440,13 +366,8 @@ const roleBadgeClass = (role) => ({
 </template>
 
 <style scoped>
-.btn-primary {
-    background: linear-gradient(135deg, #0a1850, #1a2e7a);
-}
+/* no overrides needed */
 
-.btn-primary:hover {
-    background: linear-gradient(135deg, #1a2e7a, #2a3e9a);
-}
 
 .drawer-enter-active,
 .drawer-leave-active {

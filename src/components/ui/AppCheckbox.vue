@@ -8,10 +8,10 @@ defineEmits(['change'])
 
 <template>
     <button type="button" @click="$emit('change')"
-        class="relative w-5 h-5 rounded-md flex items-center justify-center shrink-0 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50"
-        :class="checked || indeterminate
-            ? 'bg-[#1a2e7a] dark:bg-blue-500 border-2 border-[#1a2e7a] dark:border-blue-500 shadow-sm shadow-blue-900/30'
-            : 'bg-white dark:bg-slate-700/80 border-2 border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500'
+        class="relative w-5 h-5 rounded flex items-center justify-center shrink-0 transition-all duration-150 focus:outline-none"
+        :style="(checked || indeterminate)
+            ? 'background:#1e3a5f; border:2px solid #1e3a5f;'
+            : 'background:#ffffff; border:2px solid #d8dde6;'
         ">
         <!-- Checkmark -->
         <svg v-if="checked && !indeterminate" xmlns="http://www.w3.org/2000/svg"

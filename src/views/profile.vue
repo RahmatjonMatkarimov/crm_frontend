@@ -147,15 +147,15 @@ const removeImage = () => {
 }
 
 const fields = computed(() => [
-    { label: 'Ism', key: 'name', type: 'text', placeholder: 'Ismingizni kiriting' },
-    { label: 'Familiya', key: 'surname', type: 'text', placeholder: 'Familiyangizni kiriting' },
-    { label: 'Otasining ismi', key: 'father_name', type: 'text', placeholder: 'Otangizning ismini kiriting' },
-    { label: 'Login', key: 'username', type: 'text', placeholder: '', readonly: true },
-    { label: 'Telefon', key: 'phone', type: 'tel', placeholder: '+998 XX XXX XX XX' },
-    { label: "Qo'shimcha telefon", key: 'phone2', type: 'tel', placeholder: '+998 XX XXX XX XX' },
-    { label: "Tug'ilgan sana", key: 'birthDate', type: 'date', placeholder: '' },
-    { label: 'Passport seriya raqami', key: 'userCode', type: 'text', placeholder: 'AA1234567' },
-    { label: 'JShSHIR', key: 'uniqueCode', type: 'text', placeholder: '14 raqam' },
+    { label: proxy.$t('Ism'), key: 'name', type: 'text', placeholder: proxy.$t('Ismingizni kiriting') },
+    { label: proxy.$t('Familiya'), key: 'surname', type: 'text', placeholder: proxy.$t('Familiyangizni kiriting') },
+    { label: proxy.$t('Otasining ismi'), key: 'father_name', type: 'text', placeholder: proxy.$t('Otangizning ismini kiriting') },
+    { label: proxy.$t('Login'), key: 'username', type: 'text', placeholder: '', readonly: true },
+    { label: proxy.$t('Telefon'), key: 'phone', type: 'tel', placeholder: '+998 XX XXX XX XX' },
+    { label: proxy.$t("Qo'shimcha telefon"), key: 'phone2', type: 'tel', placeholder: '+998 XX XXX XX XX' },
+    { label: proxy.$t("Tug'ilgan sana"), key: 'birthDate', type: 'date', placeholder: '' },
+    { label: proxy.$t('Pasport seriya raqami'), key: 'userCode', type: 'text', placeholder: 'AA1234567' },
+    { label: proxy.$t('JSHSHIR'), key: 'uniqueCode', type: 'text', placeholder: proxy.$t('14 raqam') },
 ])
 const formatField = (field, e) => {
     let value = e.target.value;
@@ -180,7 +180,7 @@ const formatField = (field, e) => {
         form[field] = formatted;
     }
 
-    // Passport seriya
+    // Pasport seriya
     else if (field === 'userCode') {
         value = value.toUpperCase();
 
@@ -202,7 +202,7 @@ const formatField = (field, e) => {
         form[field] = digits ? `${letters} ${digits}` : letters;
     }
 
-    // JShSHIR
+    // JSHSHIR
     else if (field === 'uniqueCode') {
         form[field] = value.replace(/\D/g, '').slice(0, 14);
     }
@@ -214,11 +214,9 @@ const formatField = (field, e) => {
 
         <!-- Profile header card -->
         <div
-            class="rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start gap-5 relative overflow-hidden"
-            :style="{ background: themeStore.isDark ? 'linear-gradient(150deg, #0d1b3e 0%, #162766 55%, #1535c4 100%)' : 'linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%)' }">
-            <div
-                class="absolute top-[-40px] right-[-40px] w-48 h-48 rounded-full border border-white/5 pointer-events-none">
-            </div>
+            class="rounded p-6 flex flex-col sm:flex-row items-center sm:items-start gap-5 relative overflow-hidden"
+            style="background:#1e3a5f;">
+            <div class="absolute top-0 right-0 w-0 h-0 pointer-events-none"></div>
 
             <!-- Avatar -->
             <div class="relative shrink-0">
@@ -314,30 +312,46 @@ const formatField = (field, e) => {
         </div>
 
         <!-- Info fields card -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
-                    stroke="currentColor" class="w-4 h-4 text-[#1a2e7a] dark:text-slate-400">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                </svg>
-                <h3 class="text-sm font-semibold text-[#0a1850] dark:text-slate-100">{{ $t("Shaxsiy ma'lumotlar") }}</h3>
+        <div class="rounded overflow-hidden shadow-sm"
+            :style="themeStore.isDark ? 'background:#1f2937; border:1px solid #374151;' : 'background:#ffffff; border:1px solid #d8dde6;'">
+            <div class="px-6 py-4 border-b flex items-center gap-3"
+                :style="themeStore.isDark ? 'border-color:#374151; background:#111827;' : 'border-color:#eaecf0; background:#f7f8fa;'">
+                <div class="w-7 h-7 rounded-xl flex items-center justify-center"
+                    :class="themeStore.isDark ? 'bg-blue-500/15' : 'bg-blue-50'">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="w-3.5 h-3.5 text-blue-500">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                </div>
+                <h3 class="text-sm font-bold"
+                    :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">
+                    {{ $t("Shaxsiy ma'lumotlar") }}
+                </h3>
             </div>
 
-            <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div v-for="field in fields" :key="field.key" class="space-y-1">
-                    <label class="block text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                        {{ field.label }}
+            <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div v-for="field in fields" :key="field.key" class="space-y-1.5">
+                    <label class="block text-[11px] font-semibold uppercase tracking-widest"
+                        :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">
+                        {{ $t(field.label) }}
                     </label>
                     <template v-if="isEditing && !field.readonly">
-                        <input v-model="form[field.key]" :type="field.key === 'uniqueCode' ? 'text' : field.type"
-                            :placeholder="field.placeholder" @input="formatField(field.key, $event)"
-                            class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500 dark:border-slate-600 border border-slate-200 rounded-lg text-slate-900 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20 placeholder-slate-400" />
+                        <input v-model="form[field.key]"
+                            :type="field.key === 'uniqueCode' ? 'text' : field.type"
+                            :placeholder="field.placeholder"
+                            @input="formatField(field.key, $event)"
+                            class="w-full px-3.5 py-2.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#1a2e7a]/25"
+                            :class="themeStore.isDark
+                                ? 'bg-white/5 border border-white/10 text-slate-100 placeholder-slate-600 focus:border-blue-500/50 focus:bg-white/8'
+                                : 'bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#1a2e7a] focus:bg-white'" />
                     </template>
                     <template v-else>
-                        <div class="px-3 py-2.5 rounded-lg text-sm"
-                            :class="form[field.key] ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500 italic'">
-                            {{ form[field.key] || "Ko'rsatilmagan" }}
+                        <div class="px-3.5 py-2.5 rounded-xl text-sm font-medium"
+                            :class="form[field.key]
+                                ? themeStore.isDark ? 'text-slate-200 bg-white/4' : 'text-slate-800 bg-slate-50'
+                                : themeStore.isDark ? 'text-slate-600 italic' : 'text-slate-400 italic'">
+                            {{ form[field.key] || $t("Ko'rsatilmagan") }}
                         </div>
                     </template>
                 </div>
@@ -345,80 +359,110 @@ const formatField = (field, e) => {
         </div>
 
         <!-- Password change card -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+        <div class="rounded overflow-hidden shadow-sm"
+            :style="themeStore.isDark ? 'background:#1f2937; border:1px solid #374151;' : 'background:#ffffff; border:1px solid #d8dde6;'">
             <button @click="showPasswordSection = !showPasswordSection"
-                class="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                <div class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
-                        stroke="currentColor" class="w-4 h-4 text-[#1a2e7a] dark:text-slate-400">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                    <h3 class="text-sm font-semibold text-[#0a1850] dark:text-slate-100">{{ $t("Parolni o'zgartirish") }}</h3>
+                class="w-full px-6 py-4 flex items-center justify-between transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-7 h-7 rounded-xl flex items-center justify-center"
+                        :class="themeStore.isDark ? 'bg-violet-500/15' : 'bg-violet-50'">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" class="w-3.5 h-3.5 text-violet-500">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-sm font-bold"
+                        :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">
+                        {{ $t("Parolni o'zgartirish") }}
+                    </h3>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" class="w-4 h-4 text-slate-400 transition-transform"
-                    :class="showPasswordSection ? 'rotate-180' : ''">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                </svg>
+                <div class="w-7 h-7 rounded-xl flex items-center justify-center transition-colors"
+                    :class="themeStore.isDark ? 'bg-white/5' : 'bg-slate-100'">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                        stroke="currentColor" class="w-3.5 h-3.5 text-slate-400 transition-transform"
+                        :class="showPasswordSection ? 'rotate-180' : ''">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                </div>
             </button>
 
-            <div v-if="showPasswordSection" class="px-6 pb-6 space-y-4 border-t border-slate-100 dark:border-slate-700 pt-5">
-                <div v-if="passwordError" class="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 text-xs">
-                    {{ passwordError }}
-                </div>
+            <Transition
+                enter-active-class="transition-all duration-200 ease-out"
+                enter-from-class="opacity-0 -translate-y-2"
+                leave-active-class="transition-all duration-150 ease-in"
+                leave-to-class="opacity-0 -translate-y-2">
+                <div v-if="showPasswordSection" class="px-6 pb-6 space-y-4 border-t pt-5"
+                    :style="themeStore.isDark ? 'border-color:#374151' : 'border-color:#eaecf0'">
 
-                <div class="space-y-1">
-                    <label class="block text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Joriy
-                        parol</label>
-                    <input v-model="passwords.current" type="password" placeholder="Joriy parolni kiriting"
-                        class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500 dark:border-slate-600 border border-slate-200 rounded-lg text-slate-900 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20 placeholder-slate-400" />
-                </div>
-                <div class="grid sm:grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="block text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Yangi
-                            parol</label>
-                        <input v-model="passwords.new" type="password" placeholder="Yangi parol (min. 6)"
-                            class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500 dark:border-slate-600 border border-slate-200 rounded-lg text-slate-900 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20 placeholder-slate-400" />
+                    <div v-if="passwordError"
+                        class="p-3.5 rounded-xl text-xs flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 shrink-0">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        {{ passwordError }}
                     </div>
-                    <div class="space-y-1">
-                        <label
-                            class="block text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tasdiqlash</label>
-                        <input v-model="passwords.confirm" type="password" placeholder="Parolni qayta kiriting"
-                            class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500 dark:border-slate-600 border border-slate-200 rounded-lg text-slate-900 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a] focus:ring-1 focus:ring-[#1a2e7a]/20 placeholder-slate-400" />
-                    </div>
-                </div>
 
-                <button @click="saveProfile" :disabled="isSaving"
-                    class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-white text-sm font-medium btn-primary transition-all active:scale-[0.98] disabled:opacity-60">
-                    <span v-if="isSaving"
-                        class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                    <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                    </svg>
-                    {{ isSaving ? 'Saqlanmoqda...' : 'Parolni o\'zgartirish' }}
-                </button>
-            </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-semibold uppercase tracking-widest"
+                            :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">
+                            {{ $t('Joriy parol') }}
+                        </label>
+                        <input v-model="passwords.current" type="password" :placeholder="$t('Joriy parolni kiriting')"
+                            class="w-full px-3.5 py-2.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#1a2e7a]/25"
+                            :class="themeStore.isDark
+                                ? 'bg-white/5 border border-white/10 text-slate-100 placeholder-slate-600 focus:border-blue-500/50'
+                                : 'bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#1a2e7a] focus:bg-white'" />
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-[11px] font-semibold uppercase tracking-widest"
+                                :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">
+                                {{ $t('Yangi parol') }}
+                            </label>
+                            <input v-model="passwords.new" type="password" :placeholder="$t('Yangi parol (min. 6)')"
+                                class="w-full px-3.5 py-2.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#1a2e7a]/25"
+                                :class="themeStore.isDark
+                                    ? 'bg-white/5 border border-white/10 text-slate-100 placeholder-slate-600 focus:border-blue-500/50'
+                                    : 'bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#1a2e7a] focus:bg-white'" />
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-[11px] font-semibold uppercase tracking-widest"
+                                :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">
+                                {{ $t('Tasdiqlash') }}
+                            </label>
+                            <input v-model="passwords.confirm" type="password" :placeholder="$t('Parolni qayta kiriting')"
+                                class="w-full px-3.5 py-2.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#1a2e7a]/25"
+                                :class="themeStore.isDark
+                                    ? 'bg-white/5 border border-white/10 text-slate-100 placeholder-slate-600 focus:border-blue-500/50'
+                                    : 'bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#1a2e7a] focus:bg-white'" />
+                        </div>
+                    </div>
+
+                    <button @click="saveProfile" :disabled="isSaving"
+                        class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97] disabled:opacity-60"
+                        style="background:#1e3a5f;">
+                        <span v-if="isSaving"
+                            class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2"
+                            stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                        {{ isSaving ? $t('Saqlanmoqda...') : $t("Parolni o'zgartirish") }}
+                    </button>
+                </div>
+            </Transition>
         </div>
 
     </div>
 </template>
 
 <style scoped>
-.profile-header {
-    background: linear-gradient(150deg, #0c2ba6 0%, #1a3fe1 55%, #2439f0 100%);
-}
-
-:global(.dark) .profile-header {
-    background: linear-gradient(150deg, #0a1a5c 0%, #0f2a9e 55%, #1535c4 100%);
-}
-
 .btn-primary {
-    background: linear-gradient(135deg, #0a1850, #1a2e7a);
+    background: #1e3a5f;
 }
-
 .btn-primary:hover {
-    background: linear-gradient(135deg, #1a2e7a, #2a3e9a);
+    background: #162d4a;
 }
 </style>

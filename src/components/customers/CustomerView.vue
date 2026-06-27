@@ -1,174 +1,319 @@
 <template>
-    <div class="customer-detail p-6 max-w-6xl mx-auto">
-        <!-- Yuklanmoqda -->
-        <div v-if="loading" class="text-center py-20">
-            <p class="text-xl text-gray-600 dark:text-gray-400">{{ $t("Ma'lumotlar yuklanmoqda...") }}</p>
-        </div>
+    <div class="min-h-screen py-8 px-4">
+        <div class="max-w-5xl mx-auto">
 
-        <!-- Mijoz topilmadi -->
-        <div v-else-if="!customer" class="text-center py-20">
-            <p class="text-red-500 text-xl">{{ $t('Mijoz topilmadi') }}</p>
-        </div>
-
-        <!-- Asosiy kontent -->
-        <div v-else>
-            <!-- Sarlavha -->
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-800 dark:text-white">
-                    {{ $t(customer.fullName || customer.name || 'Noma\'lum mijoz') }}
-                </h1>
-                <button @click="goBack" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 
-                 text-gray-700 dark:text-gray-200 rounded-xl flex items-center gap-2 transition-colors">
-                    ← {{ $t('Orqaga') }}
-                </button>
+            <!-- Loading -->
+            <div v-if="loading" class="flex flex-col items-center justify-center py-32 gap-3">
+                <div class="w-8 h-8 border-2 rounded-full animate-spin" style="border-color:#d8dde6; border-top-color:#1e3a5f;"></div>
+                <p class="text-slate-400 text-sm">{{ $t("Ma'lumotlar yuklanmoqda...") }}</p>
             </div>
 
-            <!-- Mijoz ma'lumotlari -->
-            <div
-                class="bg-white dark:bg-gray-800 shadow rounded-2xl p-8 mb-10 border border-gray-100 dark:border-gray-700">
-                <h2 class="text-2xl font-semibold mb-6 text-gray-800 dark:text-white">{{ $t('Mijoz haqida') }}</h2>
+            <!-- Not found -->
+            <div v-else-if="!customer"
+                class="p-8 rounded-3xl text-center bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/30">
+                <p class="text-red-500 text-lg font-medium">{{ $t('Mijoz topilmadi') }}</p>
+            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 text-lg">
-                    <!-- Asosiy ma'lumotlar -->
-                    <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('F.I.Sh') }}:</span>
-                        <span class="font-semibold text-gray-800 dark:text-white">
-                            {{ $t(customer.surname) }} {{ $t(customer.name) }} {{ $t(customer.father_name || '') }}
-                        </span>
+            <div v-else class="space-y-5">
+
+                <!-- Hero Header -->
+                <div class="overflow-hidden rounded shadow-sm" style="background:#1e3a5f;">
+                    <div class="px-6 py-5 flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-5">
+                            <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center shrink-0 text-2xl font-bold text-white">
+                                {{ (customer.surname || customer.name || '?').charAt(0).toUpperCase() }}
+                            </div>
+                            <div>
+                                <h1 class="text-white text-xl font-bold leading-tight">
+                                    {{ $t(customer.surname) }} {{ $t(customer.name) }} {{ $t(customer.father_name || '') }}
+                                </h1>
+                                <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                    <span class="inline-flex items-center gap-1 text-xs text-white/60">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.8" stroke="currentColor" class="w-3.5 h-3.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                                        </svg>
+                                        {{ customer.phone || '-' }}
+                                    </span>
+                                    <span v-if="customer.customer_id" class="text-white/40 text-xs">•</span>
+                                    <span v-if="customer.customer_id" class="inline-flex items-center gap-1 text-xs font-semibold bg-white/15 text-white px-2 py-0.5 rounded-lg">
+                                        ID: MJZ-{{ customer.customer_id }}
+                                    </span>
+                                    <span v-if="customer.queueNumber" class="inline-flex items-center gap-1 text-xs font-semibold bg-white/15 text-white px-2 py-0.5 rounded-lg">
+                                        {{ $t("Navbat") }}: A-{{ String(customer.queueNumber).padStart(2, '0') }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <button @click="goBack"
+                            class="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                            </svg>
+                            {{ $t('Orqaga') }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Info Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+                    <!-- Main Info Card -->
+                    <div class="lg:col-span-2 rounded-3xl border shadow-sm overflow-hidden"
+                        :class="themeStore.isDark ? 'bg-[#1f2937] border-[#374151]' : 'bg-white border-slate-200'">
+                        <div class="px-6 py-4 border-b"
+                            :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
+                            <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                                {{ $t('Mijoz haqida') }}
+                            </p>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <InfoRow :label="$t('F.I.Sh')"
+                                :value="`${$t(customer.surname || '')} ${$t(customer.name || '')} ${$t(customer.father_name || '')}`" icon="user" />
+                            <InfoRow :label="$t('Telefon raqam')" :value="customer.phone || '-'" icon="phone" />
+                            <InfoRow :label="$t('Qo\'shimcha telefon raqam')" :value="customer.phone2 || '-'" icon="phone" />
+                            <InfoRow :label="$t('Telegram')" :value="customer.telegram || '-'" icon="telegram" />
+                            <InfoRow :label="$t('Manzil')"
+                                :value="`${$t(customer.address || '')} ${customer.region || customer.district ? `(${$t(customer.region)} ${$t(customer.district)})` : ''}`"
+                                icon="location" />
+                            <InfoRow :label="$t('Maslahat narxi')"
+                                :value="`${Number(customer.price || 0).toLocaleString()} ${$t('so\'m')}`"
+                                icon="money" highlight />
+                        </div>
+
+                        <!-- Description -->
+                        <div v-if="authStore.userRole === 'YURIST' || authStore.userRole === 'RAHBAR'"
+                            class="px-6 pb-6">
+                            <div class="rounded-2xl p-4"
+                                :class="themeStore.isDark ? 'bg-white/3 border border-white/5' : 'bg-slate-50 border border-slate-100'">
+                                <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
+                                    {{ $t('Izoh / Tavsif') }}
+                                </p>
+                                <p class="text-sm whitespace-pre-wrap"
+                                    :class="themeStore.isDark ? 'text-slate-300' : 'text-slate-700'">
+                                    {{ $t(customer.description) || $t("Izoh yo'q") }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('Telefon 1') }}:</span>
-                        <span class="font-semibold text-gray-800 dark:text-white">{{ customer.phone || '-' }}</span>
-                    </div>
+                    <!-- Meta Card -->
+                    <div class="rounded-3xl border shadow-sm overflow-hidden"
+                        :class="themeStore.isDark ? 'bg-[#1f2937] border-[#374151]' : 'bg-white border-slate-200'">
+                        <div class="px-6 py-4 border-b"
+                            :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
+                            <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                                {{ $t("Qo'shimcha") }}
+                            </p>
+                        </div>
+                        <div class="p-6 space-y-5">
+                            <!-- Status -->
+                            <div>
+                                <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
+                                    {{ $t('Status') }}
+                                </p>
+                                <div class="relative">
+                                    <select
+                                        :value="customer.status || 'NAVBATDA'"
+                                        @change="changeStatus($event.target.value)"
+                                        :disabled="statusSaving"
+                                        class="w-full pl-3 pr-8 py-2 rounded-xl text-sm font-semibold transition-all focus:outline-none appearance-none cursor-pointer disabled:opacity-60"
+                                        :style="`background:${statusInlineColors[customer.status || 'NAVBATDA']?.bg}; color:${statusInlineColors[customer.status || 'NAVBATDA']?.color}; border:1.5px solid ${statusInlineColors[customer.status || 'NAVBATDA']?.color}40;`"
+                                    >
+                                        <option v-for="(label, key) in statusLabels" :key="key" :value="key">{{ label }}</option>
+                                    </select>
+                                    <svg v-if="!statusSaving" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                        :style="`color:${statusInlineColors[customer.status || 'NAVBATDA']?.color}`">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                    <div v-else class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin"
+                                        :style="`color:${statusInlineColors[customer.status || 'NAVBATDA']?.color}`"></div>
+                                </div>
+                            </div>
 
-                    <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('Telefon 2') }}:</span>
-                        <span class="font-semibold text-gray-800 dark:text-white">{{ customer.phone2 || '-' }}</span>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('Telegram') }}:</span>
-                        <span class="font-semibold text-gray-800 dark:text-white">{{ customer.telegram || '-' }}</span>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('Manzil') }}:</span>
-                        <span class="font-semibold text-gray-800 dark:text-white">
-                            {{ $t(customer.address || '') }}
-                            <span v-if="customer.region || customer.district" class="text-sm text-gray-500">
-                                ({{ $t(customer.region) }} {{ $t(customer.district) }})
-                            </span>
-                        </span>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <span class="w-40 text-gray-600 dark:text-gray-400 font-medium">{{ $t('Maslahat narxi') }}:</span>
-                        <span class="font-semibold text-gray-800 dark:text-white">
-                            {{ Number(customer.price || 0) }} {{ $t('so\'m') }}
-                        </span>
-                    </div>
-
-                    <!-- Tavsif -->
-                    <div class="md:col-span-2" v-if="authStore.userRole ==='YURIST'||authStore.userRole==='RAHBAR'">
-                        <span class="block text-gray-600 dark:text-gray-400 font-medium mb-1">{{ $t('Izoh / Tavsif') }}:</span>
-                        <p
-                            class="text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-4 rounded-xl whitespace-pre-wrap">
-                            {{ $t(customer.description) || $t("Izoh yo'q") }}
-                        </p>
-                    </div>
-
-                    <!-- Qo'shimcha ma'lumotlar -->
-                    <div class="md:col-span-2 pt-4 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-500">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>{{ $t('Yaratilgan sana') }}: <span class="font-medium text-gray-700 dark:text-gray-300">{{
-                                    formatDate(customer.createdAt) }}</span></div>
+                            <div>
+                                <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                                    {{ $t('Yaratilgan sana') }}
+                                </p>
+                                <p class="text-sm font-semibold"
+                                    :class="themeStore.isDark ? 'text-slate-200' : 'text-slate-700'">
+                                    {{ formatDate(customer.createdAt) }}
+                                </p>
+                            </div>
                             <div v-if="customer.assignedTo">
-                                {{ $t("Mas'ul") }}:
-                                <span class="font-medium text-gray-700 dark:text-gray-300">
-                                    {{ $t(customer.assignedTo.name) }} {{ $t(customer.assignedTo.surname) }}
-                                </span>
+                                <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                                    {{ $t("Mas'ul") }}
+                                </p>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded flex items-center justify-center text-xs font-bold text-white"
+                                        style="background:#1e3a5f;">
+                                        {{ (customer.assignedTo.name || '?').charAt(0).toUpperCase() }}
+                                    </div>
+                                    <p class="text-sm font-semibold"
+                                        :class="themeStore.isDark ? 'text-slate-200' : 'text-slate-700'">
+                                        {{ $t(customer.assignedTo.name) }} {{ $t(customer.assignedTo.surname) }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Payment summary -->
+                            <div class="pt-4 border-t"
+                                :class="themeStore.isDark ? 'border-white/5' : 'border-slate-100'">
+                                <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">
+                                    {{ $t("To'lovlar") }}
+                                </p>
+                                <div class="rounded-xl px-4 py-3 flex items-center justify-between"
+                                    :class="themeStore.isDark ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-200'">
+                                    <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                        {{ $t('Jami to\'langan') }}
+                                    </span>
+                                    <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                                        {{ totalPaid.toLocaleString() }} {{ $t("so'm") }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- To'lov Tarixi -->
-            <div class="mb-10">
-                <h2 class="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">{{ $t("To'lov Tarixi") }}</h2>
-                <div
-                    class="bg-white dark:bg-gray-800 shadow rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700">
-                    <table class="w-full">
-                        <thead class="bg-gray-50 dark:bg-gray-900">
-                            <tr>
-                                <th class="px-6 py-4 text-left text-gray-600 dark:text-gray-400">{{ $t('Sana') }}</th>
-                                <th class="px-6 py-4 text-left text-gray-600 dark:text-gray-400">{{ $t('Summa') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                            <tr v-for="payment in payments" :key="payment.id"
-                                class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                <td class="px-6 py-5 whitespace-nowrap text-gray-700 dark:text-gray-300">
-                                    {{ formatDate(payment.createdAt) }}
-                                </td>
-                                <td class="px-6 py-5 font-semibold text-emerald-600 dark:text-emerald-500">
-                                    +{{ payment.amount }} {{ $t("so'm") }}
-                                </td>
-                            </tr>
-                            <tr v-if="payments.length === 0">
-                                <td colspan="4" class="px-6 py-16 text-center text-gray-500 dark:text-gray-400">
-                                    {{ $t("Hali hech qanday to'lov yo'q") }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Payment History -->
+                <div class="rounded-3xl border shadow-sm overflow-hidden"
+                    :class="themeStore.isDark ? 'bg-[#1f2937] border-[#374151]' : 'bg-white border-slate-200'">
+                    <div class="px-6 py-4 border-b flex items-center justify-between"
+                        :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
+                        <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                            {{ $t("To'lov Tarixi") }}
+                        </p>
+                        <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
+                            :class="themeStore.isDark ? 'bg-white/5 text-slate-400' : 'bg-slate-100 text-slate-500'">
+                            {{ payments.length }} {{ $t('ta') }}
+                        </span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr :class="themeStore.isDark ? 'border-b border-white/5' : 'border-b border-slate-100'">
+                                    <th class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                                        {{ $t('Sana') }}
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                                        {{ $t('Summa') }}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y"
+                                :class="themeStore.isDark ? 'divide-white/5' : 'divide-slate-100'">
+                                <tr v-for="payment in payments" :key="payment.id"
+                                    class="transition-colors"
+                                    :class="themeStore.isDark ? 'hover:bg-white/3' : 'hover:bg-slate-50/80'">
+                                    <td class="px-6 py-4 text-sm"
+                                        :class="themeStore.isDark ? 'text-slate-300' : 'text-slate-600'">
+                                        {{ formatDate(payment.createdAt) }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span
+                                            class="inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 4.5v15m7.5-7.5h-15" />
+                                            </svg>
+                                            {{ Number(payment.amount).toLocaleString() }} {{ $t("so'm") }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr v-if="payments.length === 0">
+                                    <td colspan="2" class="px-6 py-16 text-center">
+                                        <div class="flex flex-col items-center gap-3">
+                                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center"
+                                                :class="themeStore.isDark ? 'bg-white/5' : 'bg-slate-100'">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="1.5" stroke="currentColor"
+                                                    class="w-6 h-6 text-slate-400">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                                                </svg>
+                                            </div>
+                                            <p class="text-sm text-slate-400 dark:text-slate-500">
+                                                {{ $t("Hali hech qanday to'lov yo'q") }}
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Checklar -->
-            <div>
-                <h2 class="text-2xl font-semibold mb-5 text-gray-800 dark:text-white">{{ $t('Checklar') }}</h2>
+                <!-- Checks -->
+                <div class="rounded-3xl border shadow-sm overflow-hidden"
+                    :class="themeStore.isDark ? 'bg-[#1f2937] border-[#374151]' : 'bg-white border-slate-200'">
+                    <div class="px-6 py-4 border-b flex items-center justify-between"
+                        :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
+                        <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                            {{ $t('Cheklar') }}
+                        </p>
+                        <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
+                            :class="themeStore.isDark ? 'bg-white/5 text-slate-400' : 'bg-slate-100 text-slate-500'">
+                            {{ checks.length }} {{ $t('ta') }}
+                        </span>
+                    </div>
 
-                <div v-if="checks.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <div v-for="check in checks" :key="check.id" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-                      rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-200">
-
-                        <div @click="openCheck(check)"
-                            class="aspect-video bg-gray-100 dark:bg-gray-900 flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition">
-
-                            <!-- Rasm -->
-                            <img v-if="isImage(check.checkUrl)" :src="check.checkUrl" class="w-full h-full object-cover"
-                                alt="Check">
-
-                            <!-- PDF -->
-                            <div v-else-if="isPDF(check.checkUrl)"
-                                class="flex flex-col items-center justify-center text-6xl">
-                                <span class="text-red-500 dark:text-red-400">📕</span>
-                                <span class="text-sm mt-3 text-gray-600 dark:text-gray-400 font-medium">{{ $t("PDF")
-                                    }}</span>
+                    <div v-if="checks.length > 0" class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div v-for="check in checks" :key="check.id"
+                            @click="openCheck(check)"
+                            class="group cursor-pointer rounded-2xl overflow-hidden border transition-all hover:shadow-lg hover:-translate-y-0.5"
+                            :class="themeStore.isDark
+                                ? 'bg-white/5 border-white/8 hover:border-white/15'
+                                : 'bg-slate-50 border-slate-200 hover:border-slate-300'">
+                            <div class="aspect-video flex items-center justify-center overflow-hidden"
+                                :class="themeStore.isDark ? 'bg-white/3' : 'bg-slate-100'">
+                                <img v-if="isImage(check.checkUrl)" :src="check.checkUrl"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                    alt="Check" />
+                                <div v-else-if="isPDF(check.checkUrl)"
+                                    class="flex flex-col items-center justify-center gap-2">
+                                    <span class="text-4xl">📕</span>
+                                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400">PDF</span>
+                                </div>
+                                <span v-else class="text-5xl opacity-50">📄</span>
                             </div>
-
-                            <!-- Boshqa -->
-                            <span v-else class="text-7xl opacity-70 text-gray-400 dark:text-gray-600">📄</span>
+                            <div class="p-3">
+                                <p class="text-xs text-slate-500 dark:text-slate-400">
+                                    {{ formatDate(check.createdAt) }}
+                                </p>
+                                <p class="text-xs font-medium mt-1.5 flex items-center gap-1" style="color:#1e3a5f;">
+                                    {{ $t('Ochish') }}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="w-3 h-3">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                    </svg>
+                                </p>
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="p-4">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ formatDate(check.createdAt) }}
+                    <div v-else class="p-16 text-center">
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center"
+                                :class="themeStore.isDark ? 'bg-white/5' : 'bg-slate-100'">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-slate-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                </svg>
                             </div>
-                            <button @click="openCheck(check)"
-                                class="mt-3 text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 text-sm font-medium flex items-center gap-1 transition">
-                                {{ $t('Ochish') }} →
-                            </button>
+                            <p class="text-sm text-slate-400 dark:text-slate-500">
+                                {{ $t('Bu mijoz uchun hali check yuklanmagan') }}
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <div v-else class="bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 
-                          rounded-2xl p-16 text-center">
-                    <p class="text-gray-500 dark:text-gray-400">{{ $t('Bu mijoz uchun hali check yuklanmagan') }}</p>
-                </div>
             </div>
         </div>
     </div>
@@ -176,26 +321,60 @@
 
 <script setup>
 import { useAuthStore } from '@/stores/auth'
-import { ref, onMounted, getCurrentInstance } from 'vue'
+import { useThemeStore } from '@/stores/theme'
+import { useLangStore } from '@/stores/lang'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api, { ENDPOINTS, BASE_URL } from '@/api'
 
-const { proxy } = getCurrentInstance()
-
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
+const themeStore = useThemeStore()
+const langStore = useLangStore()
 
 const customer = ref(null)
 const payments = ref([])
 const checks = ref([])
 const loading = ref(false)
+const statusSaving = ref(false)
 
-const authStore = useAuthStore()
+const statusLabels = computed(() => ({
+  NAVBATDA: langStore.t('Navbatda'),
+//   YURISTDA: langStore.t('Yuristda'),
+  KORIB_CHIQILDI: langStore.t("Ko'rib chiqildi"),
+  JARAYONDA: langStore.t('Maslahat berildi'),
+  YAKUNLANDI: langStore.t('Shartnoma tushuldi'),
+//   BEKOR_QILINDI: langStore.t('Bekor qilindi'),
+}))
+
+const statusInlineColors = {
+  NAVBATDA: { bg: '#dbeafe', color: '#1d4ed8' },
+  YURISTDA: { bg: '#ede9fe', color: '#7c3aed' },
+  KORIB_CHIQILDI: { bg: '#fef3c7', color: '#d97706' },
+  JARAYONDA: { bg: '#ffedd5', color: '#ea580c' },
+  YAKUNLANDI: { bg: '#d1fae5', color: '#059669' },
+  BEKOR_QILINDI: { bg: '#fee2e2', color: '#dc2626' },
+}
+
+const changeStatus = async (newStatus) => {
+  if (!customer.value || statusSaving.value) return
+  statusSaving.value = true
+  try {
+    const { data } = await api.put(ENDPOINTS.CUSTOMER(customer.value.id), { status: newStatus })
+    customer.value = { ...customer.value, status: data.status }
+  } finally {
+    statusSaving.value = false
+  }
+}
+
+const totalPaid = computed(() =>
+    payments.value.reduce((sum, p) => sum + Number(p.amount || 0), 0)
+)
 
 const fetchCustomerData = async () => {
     const id = route.params.id
     if (!id) return
-
     loading.value = true
     try {
         const [{ data: cust }, { data: ch }] = await Promise.all([
@@ -213,43 +392,56 @@ const fetchCustomerData = async () => {
     }
 }
 
-onMounted(() => {
-    fetchCustomerData()
-})
+onMounted(fetchCustomerData)
 
-// === Yordamchi funksiyalar ===
 const formatDate = (dateString) => {
     if (!dateString) return '-'
-    const year = new Date(dateString).getFullYear()
-    const month = new Date(dateString).getMonth() + 1
-    const day = new Date(dateString).getDate()
-    const hour = new Date(dateString).getHours()
-    const minute = new Date(dateString).getMinutes()
-    return `${day}.${month}.${year} ${hour}:${minute}`
+    const d = new Date(dateString)
+    const pad = n => String(n).padStart(2, '0')
+    return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-const isImage = (url) => {
-    return /\.(jpg|jpeg|png|webp|gif)$/i.test(url)
-}
-
-const isPDF = (url) => {
-    return /\.pdf$/i.test(url)
-}
+const isImage = (url) => /\.(jpg|jpeg|png|webp|gif)$/i.test(url)
+const isPDF = (url) => /\.pdf$/i.test(url)
 
 const openCheck = (check) => {
     const filterUrl = (url) => {
-        if (!url) return url;
-
-        // "/uploads/" yoki "uploads/" ni boshidan olib tashlaydi
-        return url
-            .replace(/^\/*uploads\//i, '/')           // /uploads/ ni / ga aylantiradi
-            .replace(/^uploads\//i, '/');             // uploads/ ni / ga aylantiradi
-    };
-    console.log(filterUrl(check.check_url));
+        if (!url) return url
+        return url.replace(/^\/*uploads\//i, '/').replace(/^uploads\//i, '/')
+    }
     window.location.href = `${BASE_URL}/${filterUrl(check.check_url)}`
 }
 
-const goBack = () => {
-    router.push('/customers')
-}
+const goBack = () => router.push('/customers')
+</script>
+
+<script>
+// InfoRow inline component
+import { defineComponent, h } from 'vue'
+import { useThemeStore } from '@/stores/theme'
+
+export default defineComponent({
+    components: {
+        InfoRow: defineComponent({
+            props: ['label', 'value', 'icon', 'highlight'],
+            setup(props) {
+                const themeStore = useThemeStore()
+                const icons = {
+                    user: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z',
+                    phone: 'M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z',
+                    location: 'M15 10.5a3 3 0 11-6 0 3 3 0 016 0z M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z',
+                    money: 'M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z',
+                }
+                return () => h('div', { class: 'flex flex-col gap-1' }, [
+                    h('p', { class: 'text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider' }, props.label),
+                    h('p', {
+                        class: `text-sm font-semibold ${props.highlight
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : themeStore.isDark ? 'text-slate-200' : 'text-slate-700'}`
+                    }, props.value || '-')
+                ])
+            }
+        })
+    }
+})
 </script>
