@@ -165,14 +165,31 @@
                                 <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">
                                     {{ $t("To'lovlar") }}
                                 </p>
-                                <div class="rounded-xl px-4 py-3 flex items-center justify-between"
-                                    :class="themeStore.isDark ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-200'">
-                                    <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                                        {{ $t('Jami to\'langan') }}
-                                    </span>
-                                    <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                                        {{ totalPaid.toLocaleString() }} {{ $t("so'm") }}
-                                    </span>
+                                <div class="space-y-2">
+                                    <div class="rounded-xl px-4 py-3 flex items-center justify-between"
+                                        :class="themeStore.isDark ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-200'">
+                                        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                            {{ $t('Jami to\'langan') }}
+                                        </span>
+                                        <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                                            {{ totalPaid.toLocaleString() }} {{ $t("so'm") }}
+                                        </span>
+                                    </div>
+                                    <div v-if="remainingDebt > 0" class="rounded-xl px-4 py-3 flex items-center justify-between"
+                                        :class="themeStore.isDark ? 'bg-red-500/10 border border-red-500/20' : 'bg-red-50 border border-red-200'">
+                                        <span class="text-xs text-red-600 dark:text-red-400 font-medium">
+                                            {{ $t('Qarz') }}
+                                        </span>
+                                        <span class="text-sm font-bold text-red-600 dark:text-red-400">
+                                            {{ remainingDebt.toLocaleString() }} {{ $t("so'm") }}
+                                        </span>
+                                    </div>
+                                    <button v-if="remainingDebt > 0"
+                                        @click="showDebtModal = true"
+                                        class="w-full mt-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
+                                        style="background:#1e3a5f;">
+                                        {{ $t("Qarz to'lash") }}
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -317,6 +334,96 @@
             </div>
         </div>
     </div>
+
+    <!-- Qarz to'lash modal -->
+    <Teleport to="body">
+        <Transition name="modal-fade">
+            <div v-if="showDebtModal"
+                class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                style="background:rgba(0,0,0,0.5);"
+                @click.self="closeDebtModal">
+                <div class="w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden"
+                    :class="themeStore.isDark ? 'bg-[#1f2937]' : 'bg-white'">
+                    <!-- Header -->
+                    <div class="px-6 py-4 flex items-center justify-between" style="background:#1e3a5f;">
+                        <h3 class="text-white font-bold text-base">{{ $t("Qarz to'lash") }}</h3>
+                        <button @click="closeDebtModal"
+                            class="w-7 h-7 rounded flex items-center justify-center text-white"
+                            style="background:rgba(255,255,255,0.15);">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="p-6 space-y-4">
+                        <!-- Qarz ma'lumoti -->
+                        <div class="rounded-xl px-4 py-3 flex items-center justify-between"
+                            :class="themeStore.isDark ? 'bg-red-500/10 border border-red-500/20' : 'bg-red-50 border border-red-200'">
+                            <span class="text-xs font-medium text-red-600 dark:text-red-400">{{ $t('Qolgan qarz') }}</span>
+                            <span class="text-sm font-bold text-red-600 dark:text-red-400">
+                                {{ remainingDebt.toLocaleString() }} {{ $t("so'm") }}
+                            </span>
+                        </div>
+
+                        <!-- Xato -->
+                        <div v-if="debtError" class="text-xs text-red-500 px-1">{{ debtError }}</div>
+
+                        <!-- Miqdor -->
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                                {{ $t("To'lov miqdori") }} <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                :value="debtAmount"
+                                @input="handleDebtAmountInput"
+                                type="text"
+                                inputmode="numeric"
+                                :placeholder="$t('Miqdorni kiriting')"
+                                class="w-full px-3 py-2.5 rounded-lg border text-sm transition-all focus:outline-none focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20"
+                                :class="themeStore.isDark
+                                    ? 'bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-500'
+                                    : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'"
+                            />
+                        </div>
+
+                        <!-- To'lov turi -->
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                                {{ $t("To'lov turi") }} <span class="text-red-500">*</span>
+                            </label>
+                            <select v-model="debtPaymentType"
+                                class="w-full px-3 py-2.5 rounded-lg border text-sm transition-all focus:outline-none focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20 appearance-none cursor-pointer"
+                                :class="themeStore.isDark
+                                    ? 'bg-slate-700 border-slate-600 text-slate-100'
+                                    : 'bg-slate-50 border-slate-200 text-slate-900'">
+                                <option v-for="opt in paymentOptions" :key="opt.value" :value="opt.value">
+                                    {{ $t(opt.label) }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="px-6 py-4 flex justify-end gap-3 border-t"
+                        :class="themeStore.isDark ? 'border-white/5 bg-black/20' : 'border-slate-100 bg-slate-50'">
+                        <button @click="closeDebtModal"
+                            class="px-5 py-2 rounded text-sm font-medium"
+                            :class="themeStore.isDark ? 'text-slate-400' : 'text-slate-500'">
+                            {{ $t('Bekor qilish') }}
+                        </button>
+                        <button @click="payDebt" :disabled="debtSaving"
+                            class="px-5 py-2 rounded text-white text-sm font-semibold transition-all active:scale-[0.97] disabled:opacity-60 flex items-center gap-2"
+                            style="background:#1e3a5f;">
+                            <div v-if="debtSaving" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            {{ $t("To'lash") }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+    </Teleport>
 </template>
 
 <script setup>
@@ -339,12 +446,63 @@ const checks = ref([])
 const loading = ref(false)
 const statusSaving = ref(false)
 
+const showDebtModal = ref(false)
+const debtAmount = ref('')
+const debtPaymentType = ref('NAQD')
+const debtSaving = ref(false)
+const debtError = ref('')
+
+const paymentOptions = [
+  { value: 'NAQD', label: 'Naqd pul' },
+  { value: 'KARTA', label: 'Plastik karta' },
+  { value: 'ONLINE', label: "Online to'lov" },
+  { value: 'BANK_TRANSFER', label: "Bank o'tkazmasi" },
+]
+
+const handleDebtAmountInput = (e) => {
+  const raw = e.target.value.replace(/\D/g, '')
+  debtAmount.value = raw.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+}
+
+const closeDebtModal = () => {
+  showDebtModal.value = false
+  debtAmount.value = ''
+  debtPaymentType.value = 'NAQD'
+  debtError.value = ''
+}
+
+const payDebt = async () => {
+  debtError.value = ''
+  const amountRaw = Number(String(debtAmount.value).replace(/\./g, ''))
+  if (!amountRaw || amountRaw <= 0) {
+    debtError.value = "To'lov miqdorini kiriting"
+    return
+  }
+  if (amountRaw > remainingDebt.value) {
+    debtError.value = `Qarzdan ko'p kiritildi. Maksimal: ${remainingDebt.value.toLocaleString()} so'm`
+    return
+  }
+  debtSaving.value = true
+  try {
+    await api.put(ENDPOINTS.CUSTOMER(customer.value.id), {
+      paymentAmount: amountRaw,
+      paymentType: debtPaymentType.value,
+    })
+    await fetchCustomerData()
+    closeDebtModal()
+  } catch (e) {
+    debtError.value = "Xatolik yuz berdi"
+  } finally {
+    debtSaving.value = false
+  }
+}
+
 const statusLabels = computed(() => ({
   NAVBATDA: langStore.t('Navbatda'),
-//   YURISTDA: langStore.t('Yuristda'),
   KORIB_CHIQILDI: langStore.t("Ko'rib chiqildi"),
   JARAYONDA: langStore.t('Maslahat berildi'),
   YAKUNLANDI: langStore.t('Shartnoma tushuldi'),
+  YURISTDA: langStore.t('Maslahat berildi va shartnoma tuzildi'),
 //   BEKOR_QILINDI: langStore.t('Bekor qilindi'),
 }))
 
@@ -371,6 +529,11 @@ const changeStatus = async (newStatus) => {
 const totalPaid = computed(() =>
     payments.value.reduce((sum, p) => sum + Number(p.amount || 0), 0)
 )
+
+const remainingDebt = computed(() => {
+  const price = Number(customer.value?.price || 0)
+  return Math.max(0, price - totalPaid.value)
+})
 
 const fetchCustomerData = async () => {
     const id = route.params.id
@@ -445,3 +608,14 @@ export default defineComponent({
     }
 })
 </script>
+
+<style scoped>
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+</style>

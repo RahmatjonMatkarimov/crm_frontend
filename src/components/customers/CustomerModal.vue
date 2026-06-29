@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, computed, getCurrentInstance } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, computed, getCurrentInstance } from 'vue'
 import { useCustomersStore } from '@/stores/customers'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
@@ -32,8 +32,11 @@ const source = ref('')
 const telegram = ref('')
 const appealType = ref('')
 const paymentAmount = ref('')
-const paymentType = ref('NAQD')
+const paymentType = ref('')
 const price = ref('')
+const showPriceMenu = ref(false)
+const showPaymentMenu = ref(false)
+const priceMenuAnchor = ref(null)
 
 const formatMoney = (amount) => {
   if (!amount) return '0'
@@ -521,7 +524,7 @@ Yuridik Xizmatlar va Hujjatlar Tayyorlash Byurosi
   <div class="divider"></div>
 
   <div class="notice">
-    <b>{{ $t('Eslatma') }}</b><br>
+    <b>Eslatma</b><br>
     Ushbu chekni saqlab qo'ying.<br>
     Navbatni tekshirish uchun ID raqamdan foydalaning.
   </div>
@@ -560,14 +563,26 @@ const formatDate = (d) => d ? new Date(d).toLocaleString('uz-UZ', {
   minute: '2-digit'
 }) : '—'
 
+const handleClickOutside = (e) => {
+  if (priceMenuAnchor.value && !priceMenuAnchor.value.contains(e.target)) {
+    showPriceMenu.value = false
+    showPaymentMenu.value = false
+  }
+}
+
 onMounted(async () => {
   pricesStore.fetchPrices()
+  document.addEventListener('click', handleClickOutside, true)
   try {
     const { data: all } = await api.get(ENDPOINTS.ALL_USERS)
     users.value = all.filter(u => u.role === 'YURIST')
   } catch (e) {
     console.error('Users yuklashda xatolik:', e)
   }
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside, true)
 })
 
 // ==================== EDITING WATCH ====================
@@ -707,7 +722,6 @@ const handleInput = () => {
 const save = async () => {
   error.value = ''
   const isEditing = !!props.editing?.id
-  price.value = pricesStore.prices.price_one
   const emptyFields = []
   if (!name.value) emptyFields.push('Ism')
   if (!surname.value) emptyFields.push('Familiya')
@@ -717,7 +731,7 @@ const save = async () => {
   if (!selectedDistrict.value) emptyFields.push('Tuman')
   if (!source.value) emptyFields.push('Manba')
   if (!assignedToId.value) emptyFields.push('Mas\'ul xodim')
-  if (!paymentAmount.value) emptyFields.push('To\'lov miqdori')
+  if (paymentType.value !== 'NASIYA' && !paymentAmount.value) emptyFields.push('To\'lov miqdori')
   if (!paymentType.value) emptyFields.push('To\'lov turi')
   if (!price.value) emptyFields.push('Narx')
   if (!telegram.value) emptyFields.push('Telegram')
@@ -725,15 +739,8 @@ const save = async () => {
     error.value = `Quyidagi maydonlar to\'ldirilmagan: ${emptyFields.join(', ')}`
     return
   }
-
-
-  if (!isEditing && price.value !== Number(String(paymentAmount.value).replace(/\./g, ''))) {
-    error.value = 'To\'liq to\'lov amalga oshirilishi kerak'
-    return
-  }
-
   // Popup brauzer tomonidan bloklanmasligi uchun user gesture paytida ochib qo'yamiz
-  const isNewCash = !props.editing?.id && paymentAmount.value && paymentType.value === 'NAQD'
+  const isNewCash = !props.editing?.id && paymentType.value
   let popupWindow = null
   if (isNewCash) {
     popupWindow = window.open('about:blank', '_blank')
@@ -767,10 +774,9 @@ const save = async () => {
     source: source.value || null,
     telegram: telegram.value || null,
     appealType: appealType.value || "",
-    paymentAmount: paymentAmount.value ? Number(String(paymentAmount.value).replace(/\./g, '')) : null,
+    paymentAmount: paymentType.value === 'NASIYA' ? 0 : (paymentAmount.value ? Number(String(paymentAmount.value).replace(/\./g, '')) : null),
     paymentType: paymentType.value || null,
-    // price: price.value !== '' ? Number(price.value) : 0,
-    price: pricesStore.prices.price_one
+    price: price.value !== '' ? Number(price.value) : 0,
   }
 
   const result = props.editing?.id
@@ -780,48 +786,56 @@ const save = async () => {
   if (result?.success) {
     success.value = props.editing?.id ? 'Mijoz yangilandi!' : 'Mijoz yaratildi!'
 
-    // Yangi mijoz yaratilganda va naqd to'lov bo'lsa — PDF yaratib backendga saqlaymiz
-    const isNewCustomerWithCashPayment = !props.editing?.id &&
-      paymentAmount.value
-    if (isNewCustomerWithCashPayment) {
+    // Yangi mijoz yaratilganda — chek chiqarish
+    const isNewCustomer = !props.editing?.id && paymentType.value
+    if (isNewCustomer) {
       const customerData = result.customer || result
       const createdCustomer = result.customer || result
-
-      const pdfBlob = await generateReceiptPDF({
-        fullName: `${surname.value} ${name.value} ${father_name.value}`,
-        clientId: createdCustomer?.customer_id || '—',
-        queueNumber: createdCustomer?.queueNumber || '—',
+      const fish = `${surname.value} ${name.value} ${father_name.value}`.trim()
+      const params = new URLSearchParams({
+        fish,
+        telefon: phone.value || '',
+        manzil: fullAddress || '',
+        id: `MJZ-${createdCustomer?.customer_id || ''}`,
+        raqam: `A-${String(createdCustomer?.queueNumber).padStart(2, '0')}` || '',
+        yurist: createdCustomer.assignedTo ? `${createdCustomer.assignedTo.surname} ${createdCustomer.assignedTo.name}` : '—',
+        sana: Date.now().toString()
       })
 
-      if (pdfBlob) {
-        const formData = new FormData()
-        formData.append('checkFile', pdfBlob, `chek-${surname.value || 'mijoz'}-${Date.now()}.pdf`)
+      if (paymentType.value){
+        // Naqd/karta/online: PDF yaratib backendga saqlash
+        const pdfBlob = await generateReceiptPDF({
+          fullName: fish,
+          clientId: createdCustomer?.customer_id || '—',
+          queueNumber: createdCustomer?.queueNumber || '—',
+        })
 
-        const newPayment = customerData.payments?.[customerData.payments?.length - 1]
-        if (newPayment?.id) {
-          formData.append('paymentId', newPayment.id)
-        }
+        if (pdfBlob) {
+          const formData = new FormData()
+          formData.append('checkFile', pdfBlob, `chek-${surname.value || 'mijoz'}-${Date.now()}.pdf`)
 
-        const res = await api.post(ENDPOINTS.CUSTOMER_CHECK(customerData.id), formData)
+          const newPayment = customerData.payments?.[customerData.payments?.length - 1]
+          if (newPayment?.id) {
+            formData.append('paymentId', newPayment.id)
+          }
 
-        if (res.status === 200 || res.status === 201) {
-          const fish = `${surname.value} ${name.value} ${father_name.value}`.trim()
-          const params = new URLSearchParams({
-            fish,
-            telefon: phone.value || '',
-            manzil: fullAddress || '',
-            id: `MJZ-${createdCustomer?.customer_id || ''}`,
-            raqam: `A-${String(createdCustomer?.queueNumber).padStart(2, '0')}` || '',
-            yurist: createdCustomer.assignedTo ? `${createdCustomer.assignedTo.surname} ${createdCustomer.assignedTo.name}` : '—',
-            sana: Date.now().toString()
-          })
-          printReceiptFrontend({
-            fullName: fish,
-            clientId: createdCustomer?.customer_id || '—',
-            queueNumber: createdCustomer?.queueNumber || '—',
-          }, `/qabulxati.html?${params.toString()}`, popupWindow)
+          try {
+            const res = await api.post(ENDPOINTS.CUSTOMER_CHECK(customerData.id), formData)
+            if (res.status === 200 || res.status === 201) {
+              printReceiptFrontend({
+                fullName: fish,
+                clientId: createdCustomer?.customer_id || '—',
+                queueNumber: createdCustomer?.queueNumber || '—',
+              }, `/qabulxati.html?${params.toString()}`, popupWindow)
+            } else {
+              console.error('❌ Chek saqlanmadi:', res.status)
+              if (popupWindow) popupWindow.close()
+            }
+          } catch (e) {
+            console.error('❌ Chek yuklashda xato:', e)
+            if (popupWindow) popupWindow.close()
+          }
         } else {
-          console.error('❌ Chek saqlanmadi:', res.status)
           if (popupWindow) popupWindow.close()
         }
       }
@@ -833,6 +847,7 @@ const save = async () => {
     error.value = result?.error || 'Xatolik yuz berdi'
   }
 }
+
 const phone2isTelegram = ref(false)
 
 watch(phone2, (newVal) => {
@@ -841,21 +856,37 @@ watch(phone2, (newVal) => {
   }
 })
 
+watch(paymentType, (val) => {
+  if (val === 'NASIYA') {
+    paymentAmount.value = ''
+  } else if (price.value) {
+    paymentAmount.value = String(price.value).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  }
+})
+
 const handlePhone2isTelegram = () => {
-  if (phone2isTelegram.value && phone2.value) {
-    telegram.value = phone2.value
+  if (phone2isTelegram.value && phone.value) {
+    telegram.value = phone.value
   } else if (!phone2isTelegram.value) {
     telegram.value = ''
   }
 }
+
+const paymentOptions = ref([
+  { value: 'NAQD', label: 'Naqd pul' },
+  { value: 'KARTA', label: 'Plastik karta' },
+  { value: 'ONLINE', label: "Online to'lov" },
+  { value: 'BANK_TRANSFER', label: "Bank o'tkazmasi" },
+  { value: 'NASIYA', label: 'Nasiya' },
+])
 
 </script>
 
 <template>
   <Teleport to="body">
     <Transition name="modal-fade">
-    <div class="fixed inset-0 z-50 flex flex-col"
-      :style="themeStore.isDark ? 'background:#1f2937;' : 'background:#ffffff;'">
+      <div class="fixed inset-0 z-50 flex flex-col"
+        :style="themeStore.isDark ? 'background:#1f2937;' : 'background:#ffffff;'">
 
         <!-- Modal Header -->
         <div class="px-6 py-5 flex items-center justify-between shrink-0" style="background:#1e3a5f;">
@@ -863,12 +894,14 @@ const handlePhone2isTelegram = () => {
             <h2 class="text-white text-base font-bold">
               {{ props.editing?.id ? $t('Mijozni tahrirlash') : $t("Yangi mijoz qo'shish") }}
             </h2>
-            <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.55);">{{ $t("Majburiy maydonlarni to'ldiring") }}</p>
+            <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.55);">{{ $t("Majburiy maydonlarni to'ldiring") }}
+            </p>
           </div>
           <button @click="$emit('close')"
             class="w-8 h-8 rounded flex items-center justify-center text-white transition-all"
             style="background:rgba(255,255,255,0.12);">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+              stroke="currentColor" class="w-4 h-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -920,17 +953,6 @@ const handlePhone2isTelegram = () => {
                   $t('Telefon') }}
                 <span class="text-red-500">*</span></label>
               <input v-model="phone" @input="handlePhone($event, 1)" type="tel" placeholder="+998 XX XXX XX XX"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
-            </div>
-
-            <!-- Qo'shimcha telefon -->
-            <div class="space-y-1">
-              <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                {{ $t("Qo'shimcha telefon") }}
-              </label>
-
-
-              <input v-model="phone2" @input="handlePhone($event, 2)" type="tel" placeholder="+998 XX XXX XX XX"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
               <label class="flex items-center mt-1 gap-2 text-sm cursor-pointer">
                 <input type="checkbox" v-model="phone2isTelegram" @change="handlePhone2isTelegram"
@@ -1004,11 +1026,118 @@ const handlePhone2isTelegram = () => {
               </select>
             </div>
 
+            <div class="space-y-2">
+              <label
+                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                  $t("Maslaxat narxi") }} <span class="text-red-500">*</span></label>
+
+              <div class="relative" ref="priceMenuAnchor">
+                <!-- Narx select -->
+                <div class="relative">
+                  <div
+                    @click="showPriceMenu = !showPriceMenu; showPaymentMenu = false"
+                    class="w-full flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm cursor-pointer transition-all hover:border-[#1e3a5f]"
+                    :class="price ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500'">
+                    <span>{{ price ? formatMoney(price) + $t(" so'm") : $t("Narxni tanlang") }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 transition-transform" :class="showPriceMenu ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+
+                  <!-- Narx dropdown -->
+                  <Transition name="submenu-fade">
+                    <div v-if="showPriceMenu"
+                      class="absolute z-50 top-0 left-full ml-1 min-w-[180px] rounded-xl shadow-2xl border"
+                      :style="themeStore.isDark ? 'background:#1f2937; border-color:#374151;' : 'background:#ffffff; border-color:#e2e8f0;'">
+                      <div class="px-3 py-2 border-b rounded-t-xl overflow-hidden"
+                        :style="themeStore.isDark ? 'border-color:#374151;' : 'border-color:#f1f5f9;'">
+                        <p class="text-[10px] font-semibold uppercase tracking-wider"
+                          :style="themeStore.isDark ? 'color:#6b7280;' : 'color:#94a3b8;'">
+                          {{ $t("Narxni tanlang") }}
+                        </p>
+                      </div>
+                      <div class="py-1" style="position: relative;">
+                        <button type="button"
+                          @click.stop="price = pricesStore.prices.price_one; paymentAmount = String(pricesStore.prices.price_one).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); showPaymentMenu = true"
+                          class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
+                          :class="Number(price) === pricesStore.prices.price_one
+                            ? 'bg-[#1e3a5f] text-white'
+                            : themeStore.isDark ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'">
+                          {{ formatMoney(pricesStore.prices.price_one) + $t(" so'm") }}
+                          <svg v-if="Number(price) === pricesStore.prices.price_one" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </button>
+                        <button type="button"
+                          @click.stop="price = pricesStore.prices.price_two; paymentAmount = String(pricesStore.prices.price_two).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); showPaymentMenu = true"
+                          class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
+                          :class="Number(price) === pricesStore.prices.price_two
+                            ? 'bg-[#1e3a5f] text-white'
+                            : themeStore.isDark ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'">
+                          {{ formatMoney(pricesStore.prices.price_two) + $t(" so'm") }}
+                          <svg v-if="Number(price) === pricesStore.prices.price_two" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </button>
+
+                        <!-- To'lov turi submenu — narx menyusining yonidan chiqadi -->
+                        <Transition name="submenu-fade">
+                          <div v-if="showPaymentMenu"
+                            class="absolute z-50 top-0 left-full ml-1 min-w-[200px] rounded-xl shadow-2xl border overflow-hidden"
+                            :style="themeStore.isDark ? 'background:#1f2937; border-color:#374151;' : 'background:#ffffff; border-color:#e2e8f0;'">
+                            <div class="px-3 py-2 border-b"
+                              :style="themeStore.isDark ? 'border-color:#374151;' : 'border-color:#f1f5f9;'">
+                              <p class="text-[10px] font-semibold uppercase tracking-wider"
+                                :style="themeStore.isDark ? 'color:#6b7280;' : 'color:#94a3b8;'">
+                                {{ $t("To'lov turini tanlang") }}
+                              </p>
+                            </div>
+                            <div class="py-1">
+                              <button v-for="opt in paymentOptions" :key="opt.value"
+                                type="button"
+                                @click.stop="paymentType = opt.value; showPaymentMenu = false; showPriceMenu = false"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all text-left"
+                                :class="paymentType === opt.value
+                                  ? 'bg-[#1e3a5f] text-white'
+                                  : themeStore.isDark ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'">
+                                <span class="font-medium text-[13px]">{{ $t(opt.label) }}</span>
+                                <svg v-if="paymentType === opt.value" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </Transition>
+                      </div>
+                    </div>
+                  </Transition>
+                </div>
+
+                <!-- Tanlangan narx va to'lov turi ko'rsatkich -->
+                <div v-if="price && paymentType && !showPriceMenu && !showPaymentMenu" class="mt-2 flex items-center gap-2 flex-wrap">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
+                    style="background:#e8f0fe; color:#1e3a5f;"
+                    @click="showPriceMenu = true">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {{ formatMoney(price) }} {{ $t("so'm") }}
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
+                    style="background:#f0fdf4; color:#166534;"
+                    @click="showPaymentMenu = true">
+                    {{ paymentType === 'NAQD' ? '💵' : paymentType === 'KARTA' ? '💳' : paymentType === 'ONLINE' ? '📱' : paymentType === 'NASIYA' ? '🤝' : '🏦' }}
+                    {{ paymentType === 'NAQD' ? $t('Naqd pul') : paymentType === 'KARTA' ? $t('Plastik karta') : paymentType === 'ONLINE' ? $t("Online to'lov") : paymentType === 'NASIYA' ? $t('Nasiya') : $t("Bank o'tkazmasi") }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <!-- Mas'ul yurist -->
             <div class="space-y-1">
               <label
                 class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
-                  $t("Mas'ul yurist") }} <span class="text-red-500">*</span></label>
+                  $t("Qabul qiluvchi mutahasis") }} <span class="text-red-500">*</span></label>
               <select v-model="assignedToId"
                 class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20 cursor-pointer appearance-none">
                 <option value="">{{ $t('— Belgilanmagan —') }}</option>
@@ -1018,54 +1147,7 @@ const handlePhone2isTelegram = () => {
               </select>
             </div>
 
-            <!-- To'lov summasi -->
-            <div class="space-y-1">
-              <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                {{ props.editing?.id ? $t("Qarzni to'lash summasi (so'mda)") : $t("To'lov summasi (so'mda)") }}
-                <span v-if="!props.editing?.id" class="text-red-500">*</span>
-              </label>
-              <input v-model="paymentAmount" @input="handleInputPrice" type="string"
-                :placeholder="$t('Masalan: 500000')"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
-            </div>
 
-            <!-- To'lov turi -->
-            <div class="space-y-1">
-              <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
-                  $t("To'lov turi") }} <span class="text-red-500">*</span></label>
-              <select v-model="paymentType"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20 cursor-pointer appearance-none">
-                <option value="NAQD">{{ $t('Naqd pul') }}</option>
-                <option value="KARTA">{{ $t('Plastik karta') }}</option>
-                <option value="ONLINE">{{ $t("Online to'lov") }}</option>
-                <option value="BANK_TRANSFER">{{ $t("Bank o'tkazmasi") }}</option>
-              </select>
-            </div>
-
-            <!-- <div class="sm:col-span-2 space-y-2">
-              <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
-                  $t("Shartnoma summasi (so'mda)") }} <span class="text-red-500">*</span></label>
-
-              <div class="grid grid-cols-3 gap-2">
-                <button type="button" @click="price = pricesStore.prices.price_one"
-                  :class="Number(price) === pricesStore.prices.price_one ? 'bg-[#1e3a5f] text-white border-[#1e3a5f] shadow' : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600'"
-                  class="px-3 py-2 border rounded-lg text-[10px] font-medium hover:border-[#1e3a5f] transition-all cursor-pointer">
-                  {{ formatMoney(pricesStore.prices.price_one) + $t(' so\'m') }}
-                </button>
-                <button type="button" @click="price = pricesStore.prices.price_two"
-                  :class="Number(price) === pricesStore.prices.price_two ? 'bg-[#1e3a5f] text-white border-[#1e3a5f] shadow' : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600'"
-                  class="px-3 py-2 border rounded-lg text-[10px] font-medium hover:border-[#1e3a5f] transition-all cursor-pointer">
-                  {{ formatMoney(pricesStore.prices.price_two) + $t(' so\'m') }}
-                </button>
-                <button type="button" @click="price = pricesStore.prices.price_three"
-                  :class="Number(price) === pricesStore.prices.price_three ? 'bg-[#1e3a5f] text-white border-[#1e3a5f] shadow' : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600'"
-                  class="px-3 py-2 border rounded-lg text-[10px] font-medium hover:border-[#1e3a5f] transition-all cursor-pointer">
-                  {{ formatMoney(pricesStore.prices.price_three) + $t(' so\'m') }}
-                </button>
-              </div>
-            </div> -->
 
             <!-- Izoh -->
             <div class="sm:col-span-2 space-y-1">
@@ -1094,31 +1176,49 @@ const handlePhone2isTelegram = () => {
         <!-- Modal Footer -->
         <div class="px-6 py-4 flex justify-end gap-3 shrink-0"
           :style="themeStore.isDark ? 'border-top:1px solid #374151; background:#111827;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
-          <button @click="$emit('close')"
-            class="px-5 py-2 rounded text-sm font-medium transition-all"
+          <button @click="$emit('close')" class="px-5 py-2 rounded text-sm font-medium transition-all"
             :style="themeStore.isDark ? 'color:#9ca3af;' : 'color:#4a5568;'">
             {{ $t('Bekor qilish') }}
           </button>
-          <button @click="save" class="px-5 py-2 rounded text-white text-sm font-semibold active:scale-[0.97] transition-all" style="background:#1e3a5f;">
+          <button @click="save"
+            class="px-5 py-2 rounded text-white text-sm font-semibold active:scale-[0.97] transition-all"
+            style="background:#1e3a5f;">
             {{ props.editing?.id ? $t('Saqlash') : $t('Yaratish') }}
           </button>
         </div>
-    </div>
+      </div>
     </Transition>
   </Teleport>
 </template>
 
 <style scoped>
-.modal-fade-enter-active, .modal-fade-leave-active {
+.submenu-fade-enter-active,
+.submenu-fade-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.submenu-fade-enter-from,
+.submenu-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+}
+
+.modal-fade-enter-active,
+.modal-fade-leave-active {
   transition: opacity 0.22s ease;
 }
-.modal-fade-enter-from, .modal-fade-leave-to {
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
   opacity: 0;
 }
-.modal-fade-enter-active > *, .modal-fade-leave-active > * {
-  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease;
+
+.modal-fade-enter-active>*,
+.modal-fade-leave-active>* {
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.22s ease;
 }
-.modal-fade-enter-from > *, .modal-fade-leave-to > * {
+
+.modal-fade-enter-from>*,
+.modal-fade-leave-to>* {
   transform: scale(0.96) translateY(10px);
   opacity: 0;
 }

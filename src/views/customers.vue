@@ -40,293 +40,7 @@ onMounted(() => {
   pricesStore.fetchPrices()
 })
 
-
-const formatNumberWithDots = (number) => {
-  if (!number || isNaN(number)) return "0";
-  return Number(number).toLocaleString("uz-UZ", { minimumFractionDigits: 0 }).replace(/,/g, ".");
-};
-function numberToUzbekWords(n) {
-  const ones = [
-    '',
-    'bir',
-    'ikki',
-    'uch',
-    "to'rt",
-    'besh',
-    'olti',
-    'yetti',
-    'sakkiz',
-    "to'qqiz",
-  ];
-  const tens = [
-    '',
-    "o'n",
-    'yigirma',
-    "o'ttiz",
-    'qirq',
-    'ellik',
-    'oltmish',
-    'yetmish',
-    'sakson',
-    "to'qson",
-  ];
-  const hundreds = [
-    '',
-    'bir yuz',
-    'ikki yuz',
-    'uch yuz',
-    "to'rt yuz",
-    'besh yuz',
-    'olti yuz',
-    'yetti yuz',
-    'sakkiz yuz',
-    "to'qqiz yuz",
-  ];
-
-  if (typeof n !== 'number' || isNaN(n)) return "Noto'g'ri qiymat";
-  if (n === 0) return 'nol';
-  if (n < 0) return 'manfiy ' + numberToUzbekWords(-n);
-  if (n > 999_999_999_999) return 'Milliardgacha son kiriting.';
-
-  const getThreeDigitWords = (num) => {
-    const h = Math.floor(num / 100);
-    const t = Math.floor((num % 100) / 10);
-    const o = num % 10;
-
-    let parts = [];
-    if (h > 0) parts.push(hundreds[h]);
-    if (t > 0 || o > 0) parts.push(tens[t] + (o > 0 ? ' ' + ones[o] : ''));
-    return parts.join(' ').trim();
-  };
-
-  let result = '';
-
-  const billions = Math.floor(n / 1_000_000_000);
-  const millions = Math.floor((n % 1_000_000_000) / 1_000_000);
-  const thousands = Math.floor((n % 1_000_000) / 1_000);
-  const rest = n % 1_000;
-
-  if (billions > 0) result += getThreeDigitWords(billions) + ' milliard ';
-  if (millions > 0) result += getThreeDigitWords(millions) + ' million ';
-  if (thousands > 0) result += getThreeDigitWords(thousands) + ' ming ';
-  if (rest > 0) result += getThreeDigitWords(rest);
-
-  return result.trim();
-}
-
-import html2pdf from 'html2pdf.js'
 import { useRouter } from 'vue-router'
-// const generateReceiptPDF = async (customer, paymentAmount) => {
-//   console.log('🚀 generateReceiptPDF chaqirildi');
-//   console.log('Customer:', customer?.surname, customer?.name);
-//   console.log('Payment Amount:', paymentAmount);
-
-//   if (!customer) {
-//     console.error("❌ Mijoz ma'lumotlari yo'q");
-//     return null;
-//   }
-
-//   if (!paymentAmount || paymentAmount <= 0) {
-//     console.error("❌ Payment amount noto'g'ri:", paymentAmount);
-//     return null;
-//   }
-
-//   const today = new Date();
-//   const day = String(today.getDate()).padStart(2, '0');
-//   const month = String(today.getMonth() + 1).padStart(2, '0');
-//   const year = today.getFullYear();
-//   const formattedDate = `${day}.${month}.${year}`;
-
-//   const receiptHTML = `
-//      <!DOCTYPE html>
-//     <html>
-//     <head>
-//       <title>Chek</title>
-//     </head>
-//     <body>
-//       <table style="border: 1px solid black; height:80px; width:100%; border-collapse: collapse;">
-//         <tr>
-//             <td rowspan="8" style="text-align: center; color: black; border: 1px solid black;"><div style="display: flex; justify-content: center; align-items: center;"><img src="/telegram-cloud.jpg"  width="150px" alt=""></div></td>
-//             <td rowspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Markaziy korxona manzili</td>
-//             <td rowspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Xorazm viloyati, Xiva shaxar, <br> Yangi-hayot mahallasi, Sportchilar ko'chasi 14-uy</td>
-//             <td rowspan="5" style="width: 70px; text-align: center; color: black; padding-bottom:10px; border: 1px solid black;"></td>
-//         </tr>
-//         <tr>
-//         </tr>
-//         <tr>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px;">Shartnoma raqami</td>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px; ">№${1 || 'Mavjud emas'}</td>
-//         </tr>
-//         <tr>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px; ">To'lov maqsadi</td>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px; ">Konsalting xizmat</td>
-//         </tr>
-//         <tr>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px; ">Shartnomani umumiy bahosi</td>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; padding-bottom:10px;font-size:10px; ">${formatNumberWithDots(customer.price)} so'm</td>
-//         </tr>
-//         <tr>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; height:15px;font-size:10px; padding-bottom:10px; ">Joriy to'lov</td>
-//           <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;height:15px;font-size:10px; padding-bottom:10px; ">${formatNumberWithDots(paymentAmount)} so'm</td>
-//         </tr>
-//         <tr>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">Qoldiq qarzdorlik</td>
-//           <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">${customer.price - (customer.payments.reduce((a, b) => a + b.amount, 0) + paymentAmount) <= 0 ? "To'landi" : formatNumberWithDots(customer.price - (customer.payments.reduce((a, b) => a + b.amount, 0) + paymentAmount)) + " so'm"}</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">Joriy to'lov qilingan sana</td>
-//             <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">${formattedDate}</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">To'lovchining F.I.O.:</td>
-//             <td colspan="3" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">${customer.name} ${customer.surname} ${customer.father_name}</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">Xiva Shaxar</td>
-//             <td colspan="3" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">STIR 307675491      MFO: 01037</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">To'lovni qabul qiluvchi korxona</td>
-//             <td colspan="3" style="width: 100px; text-align: center; color: black;font-size:10px; padding-bottom:10px;  border: 1px solid black;">"YURIST KONSUL KONSALTING" X/k</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; padding-bottom:10px; ">TO'LOV SUMMASI SO"Z BILAN</td>
-//             <td colspan="3" style="width: 100px; text-align: center; color: black;font-size:10px;  text-transform: uppercase; border: 1px solid black; padding-bottom:10px; ">${numberToUzbekWords(+paymentAmount)} so'm</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 80px; text-align: center; color: black; font-size:10px;  border: 1px solid black; padding-bottom:10px; ">Texnik yordam: +998 62 226 99 00</td>
-//             <td colspan="3" style="width: 110px; text-align: center; color: black;font-size:10px;  border: 1px solid black; padding-bottom:10px; ">ushbu to'lov ARIZASUD.UZ tizimi orqali amalga oshirilgan</td>
-//         </tr>
-//         <tr>
-//             <td colspan="4" style="width: 100px; text-align: center; color: black;font-size:9px; padding-bottom:10px; text-transform: uppercase; border: 1px solid black;">To'lov pattasi faqatgina kassa muhri bilan tasdiqlangandan so'ng haqiqiy hisoblanadi. Agar pattada muhr bo'lmasa, u rasmiy kuchga ega emas va yaroqsiz deb topiladi. Shu sababli, har qanday to'lov hujjatining muhrlanganligiga e'tibor berish lozim.</td>
-//         </tr>
-//     </table>
-//       <script>
-//         window.onload = () => {
-//           setTimeout(() => {
-//             window.print();
-//             setTimeout(() => window.close(), 500);
-//           }, 300);
-//         }
-//       <\/script>
-//     </body>
-//     </html>
-//   `;
-
-//   console.log('📄 HTML tayyorlandi (length:', receiptHTML.length, ')');
-
-//   const element = document.createElement('div');
-//   element.innerHTML = receiptHTML;
-
-//   const options = {
-//     margin: [1, 1, 1, 1],
-//     image: { type: 'jpeg', quality: 0.98 },
-//     html2canvas: { scale: 2, useCORS: true },
-//     jsPDF: { unit: 'mm', format: [100, 250], orientation: 'landscape' }
-//   };
-
-//   try {
-//     console.log('🔄 html2pdf ishga tushmoqda...');
-//     const pdfBlob = await html2pdf()
-//       .from(element)
-//       .set(options)
-//       .outputPdf('blob');
-
-//     console.log('✅ PDF muvaffaqiyatli yaratildi! Size:', pdfBlob.size, 'bytes');
-//     return pdfBlob;
-//   } catch (error) {
-//     console.error('❌ PDF yaratish xatosi:', error);
-//     return null;
-//   }
-// };
-// const printReceiptFrontend = async (customer) => {
-//   if (paymentType.value !== 'NAQD' || !paymentAmount.value) return
-
-//   const today = new Date();
-//   const day = String(today.getDate()).padStart(2, '0');
-//   const month = String(today.getMonth() + 1).padStart(2, '0');
-//   const year = today.getFullYear();
-//   const formattedDate = `${day}.${month}.${year}`;
-//   // Chek oynasini ochish
-//   const printWindow = window.open('', '_blank')
-//   printWindow.document.write(`
-//     <!DOCTYPE html>
-//     <html>
-//     <head>
-//       <title>Chek</title>
-//     </head>
-//     <body>
-//       <table style="border: 1px solid black; height:80px; width:100%; border-collapse: collapse;">
-//         <tr>
-//             <td rowspan="8" style="text-align: center; color: black; border: 1px solid black;"><img src="/telegram-cloud.jpg" width="150px" alt=""></td>
-//             <td rowspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; vertical-align: middle;">Markaziy korxona manzili</td>
-//             <td rowspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; vertical-align: middle;">Xorazm viloyati, Xiva shaxar, <br> Yangi-hayot mahallasi, Sportchilar ko'chasi 14-uy</td>
-//             <td rowspan="5" style="width: 70px; text-align: center; color: black; border: 1px solid black;"></td>
-//         </tr>
-//         <tr>
-//         </tr>
-//         <tr>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px;">Shartnoma raqami</td>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">№${1 || 'Mavjud emas'}</td>
-//         </tr>
-//         <tr>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">To'lov maqsadi</td>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Konsalting xizmat</td>
-//         </tr>
-//         <tr>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Shartnomani umumiy bahosi</td>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">${formatNumberWithDots(customer.price)} so'm</td>
-//         </tr>
-//         <tr>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black; height:15px;font-size:10px; ">Joriy to'lov</td>
-//           <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;height:15px;font-size:10px; ">${formatNumberWithDots(paymentAmount.value)} so'm</td>
-//         </tr>
-//         <tr>
-//           <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Qoldiq qarzdorlik</td>
-//           <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">${customer.price - (customer.payments.reduce((a, b) => a + b.amount, 0) + paymentAmount.value) <= 0 ? "To'landi" : formatNumberWithDots(customer.price - (customer.payments.reduce((a, b) => a + b.amount, 0) + paymentAmount.value)) + " so'm"}</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Joriy to'lov qilingan sana</td>
-//             <td colspan="2" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">${formattedDate}</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">To'lovchining F.I.O.:</td>
-//             <td colspan="3" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">${customer.name} ${customer.surname} ${customer.father_name}</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">Xiva Shaxar</td>
-//             <td colspan="3" style="width: 100px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">STIR 307675491      MFO: 01037</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">To'lovni qabul qiluvchi korxona</td>
-//             <td colspan="3" style="width: 100px; text-align: center; color: black;font-size:10px;  border: 1px solid black;">"YURIST KONSUL KONSALTING" X/k</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 80px; text-align: center; color: black; border: 1px solid black;font-size:10px; ">TO'LOV SUMMASI SO"Z BILAN</td>
-//             <td colspan="3" style="width: 100px; text-align: center; color: black;font-size:10px;  text-transform: uppercase; border: 1px solid black;">${numberToUzbekWords(+paymentAmount.value)} so'm</td>
-//         </tr>
-//         <tr>
-//             <td style="width: 80px; text-align: center; color: black; font-size:10px;  border: 1px solid black;">Texnik yordam: +998 62 226 99 00</td>
-//             <td colspan="3" style="width: 110px; text-align: center; color: black;font-size:10px;  border: 1px solid black;">ushbu to'lov ARIZASUD.UZ tizimi orqali amalga oshirilgan</td>
-//         </tr>
-//         <tr>
-//             <td colspan="4" style="width: 100px; text-align: center; color: black;font-size:9px;  text-transform: uppercase; border: 1px solid black;">To'lov pattasi faqatgina kassa muhri bilan tasdiqlangandan so'ng haqiqiy hisoblanadi. Agar pattada muhr bo'lmasa, u rasmiy kuchga ega emas va yaroqsiz deb topiladi. Shu sababli, har qanday to'lov hujjatining muhrlanganligiga e'tibor berish lozim.</td>
-//         </tr>
-//     </table>
-//       <script>
-//         window.onload = () => {
-//           setTimeout(() => {
-//             window.print();
-//             setTimeout(() => window.close(), 500);
-//           }, 300);
-//         }
-//       <\/script>
-//     </body>
-//     </html>
-//   `)
-
-//   printWindow.document.close()
-// }
 
 const filtered = computed(() => {
   const q = search.value.toLowerCase().trim()
@@ -443,12 +157,6 @@ const countByDate = (dateKey) => {
   }).length
 }
 
-const debtorsCount = computed(() => {
-  return store.customers.filter(c => {
-    const paid = c.payments?.[c.payments?.length - 1]?.amount
-    return (c.price || 0) - paid > 0
-  }).length
-})
 
 const openPricesModal = () => {
   editingPriceOne.value = pricesStore.prices.price_one
@@ -471,81 +179,10 @@ const savePrices = async () => {
   }
 }
 
-// const payDebt = async (customer) => {
-//   console.log('💰 payDebt boshlandi - Customer ID:', customer?.id);
-
-//   if (!paymentAmount.value || Number(paymentAmount.value) <= 0) {
-//     alert("To'lov summasini kiriting!");
-//     return;
-//   }
-
-//   const data = {
-//     paymentAmount: Number(paymentAmount.value),
-//     paymentType: paymentType.value || 'NAQD',
-//   };
-
-//   const result = await store.updateCustomer(customer.id, data);
-
-//   if (result.success) {
-//     const newPayment = result.customer?.payments?.[result.customer.payments?.length - 1];
-//     console.log('🆕 Yangi payment:', newPayment);
-
-//     // PDF yaratish
-//     const pdfBlob = await generateReceiptPDF(customer, Number(paymentAmount.value));
-
-//     if (pdfBlob && newPayment?.id) {
-//       console.log('📤 Backendga PDF yuborilmoqda...');
-
-//       const formData = new FormData();
-//       formData.append('checkFile', pdfBlob, `chek-${customer.surname || 'mijoz'}-${Date.now()}.pdf`);
-//       formData.append('paymentId', newPayment.id);
-
-//       // ✅ TOKEN BILAN YUBORISH
-//       const res = await fetch(`http://localhost:4000/api/customers/${customer.id}/check`, {
-//         method: 'POST',
-//         headers: {
-//           'Authorization': `Bearer ${useAuthStore().token}`
-//         },
-//         body: formData
-//       });
-
-//       console.log('Backend javobi status:', res.status);
-
-//       if (res.ok) {
-//         console.log('✅ Chek backendga muvaffaqiyatli saqlandi!');
-//         const checkResult = await res.json();
-//         console.log('Check result:', checkResult);
-//       } else {
-//         const errorText = await res.text();
-//         console.error('❌ Backend xatosi:', res.status, errorText);
-//         alert(`Chek saqlanmadi! Xato: ${res.status}`);
-//       }
-//     }
-
-//     // Chop etish (eski usul)
-//     // await printReceiptFrontend(customer);
-
-//     paymentAmount.value = 0;
-//     showDebtModal.value = false;
-//     await store.fetchCustomers();
-//   } else {
-//     alert('Xatolik: ' + (result.error || 'Noma'lum xato'));
-//   }
-// };
-
 
 const allChecked = computed(() =>
   filtered.value.length > 0 && filtered.value.every(c => selected.value.includes(c.id))
 )
-const indeterminate = computed(() => selected.value.length > 0 && !allChecked.value)
-
-const toggleAll = () => {
-  if (allChecked.value) {
-    selected.value = selected.value.filter(id => !filtered.value.find(c => c.id === id))
-  } else {
-    selected.value = [...new Set([...selected.value, ...filtered.value.map(c => c.id)])]
-  }
-}
 
 const toggleOne = (id) => {
   if (selected.value.includes(id)) {
@@ -571,26 +208,6 @@ const archiveSelected = async () => {
   selected.value = []
 }
 
-const formatDate = (d) => d ? new Date(d).toLocaleDateString('uz-UZ') : '—'
-
-const statusLabels = computed(() => ({
-  NAVBATDA: proxy.$t('Navbatda'),
-  YURISTDA: proxy.$t('Yuristda'),
-  KORIB_CHIQILDI: proxy.$t("Ko'rib chiqildi"),
-  JARAYONDA: proxy.$t('Jarayonda'),
-  YAKUNLANDI: proxy.$t('Yakunlandi'),
-  BEKOR_QILINDI: proxy.$t('Bekor qilindi'),
-}))
-
-const statusColors = {
-  NAVBATDA: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  YURISTDA: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-  KORIB_CHIQILDI: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  JARAYONDA: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-  YAKUNLANDI: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-  BEKOR_QILINDI: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
-}
-
 const statusInlineColors = {
   NAVBATDA: { bg: '#dbeafe', color: '#1d4ed8' },
   YURISTDA: { bg: '#ede9fe', color: '#7c3aed' },
@@ -600,39 +217,6 @@ const statusInlineColors = {
   BEKOR_QILINDI: { bg: '#fee2e2', color: '#dc2626' },
 }
 
-const changeStatus = async (customer, newStatus) => {
-  await store.updateCustomer(customer.id, { status: newStatus })
-}
-
-const tabs = computed(() => [
-  { key: 'all', label: proxy.$t('Barchasi') },
-  { key: 'NAVBATDA', label: proxy.$t('Navbatda') },
-  { key: 'YURISTDA', label: proxy.$t('Yuristda') },
-  { key: 'KORIB_CHIQILDI', label: proxy.$t("Ko'rib chiqildi") },
-  { key: 'JARAYONDA', label: proxy.$t('Jarayonda') },
-  { key: 'YAKUNLANDI', label: proxy.$t('Yakunlandi') },
-  { key: 'BEKOR_QILINDI', label: proxy.$t('Bekor qilindi') },
-])
-
-const sourceLabels = {
-  INSTAGRAM: 'Instagram',
-  TELEGRAM: 'Telegram',
-  YOUTUBE: 'YouTube',
-  TANISHIDAN: 'Tanishidan'
-}
-
-const sourceColors = {
-  INSTAGRAM: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
-  TELEGRAM: 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
-  YOUTUBE: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  TANISHIDAN: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-}
-
-const paymentTypeLabels = computed(() => ({
-  NAQD: proxy.$t('Naqd pul'),
-  KARTA: proxy.$t('Plastik karta'),
-  PUL_OTKAZISH: proxy.$t("Pul o'tkazish"),
-}))
 const openCustomer = (id) => {
   router.push('/customer/' + id)
 }
@@ -658,6 +242,15 @@ const formatMoney = (amount) => {
         </p>
       </div>
       <div class="flex items-center gap-2">
+                <button @click="openCreate" v-if="authStore.permission.add_customers"
+          class="flex items-center gap-2 px-4 py-2.5 rounded text-white text-sm font-semibold active:scale-[0.98] transition-all cursor-pointer"
+          style="background:#1e3a5f;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+            stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          {{ $t('Yangi mijoz') }}
+        </button>
         <button @click="openPricesModal" v-if="authStore.permission.edit_prices"
           class="flex items-center gap-2 px-4 py-2.5 rounded text-sm font-medium transition-all cursor-pointer active:scale-[0.98]"
           :style="themeStore.isDark
@@ -671,15 +264,7 @@ const formatMoney = (amount) => {
           </svg>
           {{ $t('Narx sozlamalari') }}
         </button>
-        <button @click="openCreate" v-if="authStore.permission.add_customers"
-          class="flex items-center gap-2 px-4 py-2.5 rounded text-white text-sm font-semibold active:scale-[0.98] transition-all cursor-pointer"
-          style="background:#1e3a5f;">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-            stroke="currentColor" class="w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          {{ $t('Yangi mijoz') }}
-        </button>
+
       </div>
     </div>
 
@@ -731,10 +316,10 @@ const formatMoney = (amount) => {
         >
           <option value="all">{{ $t('Barchasi') }} ({{ byDateOnly.length }})</option>
           <option value="NAVBATDA">{{ $t('Navbatda') }} ({{ byDateOnly.filter(c => c.status === 'NAVBATDA').length }})</option>
-          <!-- <option value="YURISTDA">{{ $t('Yuristda') }} ({{ byDateOnly.filter(c => c.status === 'YURISTDA').length }})</option> -->
           <option value="KORIB_CHIQILDI">{{ $t("Ko'rib chiqildi") }} ({{ byDateOnly.filter(c => c.status === 'KORIB_CHIQILDI').length }})</option>
           <option value="JARAYONDA">{{ $t('Shartnoma tuzildi') }} ({{ byDateOnly.filter(c => c.status === 'JARAYONDA').length }})</option>
           <option value="YAKUNLANDI">{{ $t('Maslahat berildi') }} ({{ byDateOnly.filter(c => c.status === 'YAKUNLANDI').length }})</option>
+          <option value="YURISTDA">{{ $t('Maslahat berildi va shartnoma tuzildiz') }} ({{ byDateOnly.filter(c => c.status === 'YURISTDA').length }})</option>
           <!-- <option value="BEKOR_QILINDI">{{ $t('Bekor qilindi') }} ({{ byDateOnly.filter(c => c.status === 'BEKOR_QILINDI').length }})</option> -->
         </select>
         <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none"
@@ -810,7 +395,7 @@ const formatMoney = (amount) => {
     </div>
 
     <!-- Cards grid -->
-    <div v-else-if="filtered.length > 0" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+    <div v-else-if="filtered.length > 0" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 bg-[#1e3a5f1e] p-5 border-2 border-[#1e3a5f7e] gap-4">
       <div v-for="c in filtered" :key="c.id" class="relative rounded p-5 cursor-pointer transition-all group" :style="themeStore.isDark
         ? 'background:#1f2937; border:1px solid ' + (selected.includes(c.id) ? '#1e3a5f' : '#374151') + ';'
         : 'background:#ffffff; border:1px solid ' + (selected.includes(c.id) ? '#1e3a5f' : '#d8dde6') + ';'"
@@ -973,13 +558,6 @@ const formatMoney = (amount) => {
                 class="w-full px-3 py-2.5 rounded text-sm transition-all focus:outline-none"
                 :style="themeStore.isDark ? 'background:#111827; border:1px solid #374151; color:#f3f4f6;' : 'background:#f7f8fa; border:1px solid #d8dde6; color:#1a1f36;'" />
             </div>
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-semibold uppercase tracking-wider"
-                :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">{{ $t('3-narx (so\'mda)') }}</label>
-              <input v-model="editingPriceThree" type="number"
-                class="w-full px-3 py-2.5 rounded text-sm transition-all focus:outline-none"
-                :style="themeStore.isDark ? 'background:#111827; border:1px solid #374151; color:#f3f4f6;' : 'background:#f7f8fa; border:1px solid #d8dde6; color:#1a1f36;'" />
-            </div>
           </div>
 
           <div class="px-6 py-4 flex justify-end gap-3"
@@ -992,90 +570,6 @@ const formatMoney = (amount) => {
               class="px-5 py-2 rounded text-white text-sm font-semibold active:scale-[0.97] transition-all"
               style="background:#1e3a5f;">
               {{ $t('Saqlash') }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </Transition>
-  </Teleport>
-
-  <!-- Debt Payment Modal -->
-  <Teleport to="body">
-    <Transition name="modal-fade">
-      <div v-if="showDebtModal" class="fixed inset-0 z-50 flex"
-        :class="themeStore.isDark ? 'bg-black/70' : 'bg-black/40'" style="backdrop-filter: blur(4px);"
-        @click.self="showDebtModal = false">
-        <div class="m-auto w-full max-w-md rounded overflow-hidden shadow-2xl"
-          :style="themeStore.isDark ? 'background:#1f2937;' : 'background:#ffffff;'">
-
-          <div class="px-6 py-5 flex items-center justify-between" style="background:#1e3a5f;">
-            <div>
-              <h3 class="text-white text-base font-bold">{{ $t("Qarzni to'lash") }}</h3>
-              <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.55);">{{ editingCustomer?.surname }} {{
-                editingCustomer?.name }}</p>
-            </div>
-            <button @click="showDebtModal = false"
-              class="w-8 h-8 rounded flex items-center justify-center text-white transition-all"
-              style="background:rgba(255,255,255,0.12);">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          <div class="p-6 space-y-4">
-            <div class="rounded p-4"
-              :style="themeStore.isDark ? 'background:#111827; border:1px solid #374151;' : 'background:#f7f8fa; border:1px solid #eaecf0;'">
-              <div class="flex justify-between text-sm mb-2">
-                <span :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">{{ $t('Jami shartnoma summasi')
-                  }}:</span>
-                <span class="font-bold" :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">{{
-                  formatMoney(editingCustomer?.price) }}</span>
-              </div>
-              <div class="flex justify-between text-sm mb-2">
-                <span :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">{{ $t("To'langan") }}:</span>
-                <span class="font-semibold" style="color:#276749;">{{formatMoney(editingCustomer?.payments.reduce((a,
-                  b) => a + b.amount, 0)) }}</span>
-              </div>
-              <div class="h-px my-3" :style="themeStore.isDark ? 'background:#374151' : 'background:#eaecf0'"></div>
-              <div class="flex justify-between font-bold">
-                <span :style="themeStore.isDark ? 'color:#9ca3af' : 'color:#4a5568'">{{ $t('Qolgan qarz') }}:</span>
-                <span style="color:#c53030;">{{formatMoney((editingCustomer?.price || 0) -
-                  (editingCustomer?.payments.reduce((a, b) => a + b.amount, 0))) }}</span>
-              </div>
-            </div>
-
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-semibold uppercase tracking-wider"
-                :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">{{ $t("To'lov summasi (so'm)") }}</label>
-              <input v-model="paymentAmount" type="number" placeholder="0"
-                class="w-full px-3 py-2.5 rounded text-lg font-bold transition-all focus:outline-none"
-                :style="themeStore.isDark ? 'background:#111827; border:1px solid #374151; color:#f3f4f6;' : 'background:#f7f8fa; border:1px solid #d8dde6; color:#1a1f36;'" />
-            </div>
-
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-semibold uppercase tracking-wider"
-                :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">{{ $t("To'lov usuli") }}</label>
-              <select v-model="paymentType" class="w-full px-3 py-2.5 rounded text-sm transition-all focus:outline-none"
-                :style="themeStore.isDark ? 'background:#111827; border:1px solid #374151; color:#f3f4f6;' : 'background:#f7f8fa; border:1px solid #d8dde6; color:#1a1f36;'">
-                <option value="NAQD">{{ $t('Naqd pul') }}</option>
-                <option value="KARTA">{{ $t('Plastik karta') }}</option>
-                <option value="PUL_OTKAZISH">{{ $t("Pul o'tkazish") }}</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="px-6 py-4 flex justify-end gap-3"
-            :style="themeStore.isDark ? 'border-top:1px solid #374151; background:#111827;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
-            <button @click="showDebtModal = false" class="px-5 py-2 rounded text-sm font-medium transition-all"
-              :style="themeStore.isDark ? 'color:#9ca3af' : 'color:#4a5568'">
-              {{ $t('Bekor qilish') }}
-            </button>
-            <button @click="payDebt(editingCustomer)"
-              class="px-5 py-2 rounded text-white text-sm font-semibold flex items-center gap-2 active:scale-[0.97] transition-all"
-              style="background:#1e3a5f;">
-              {{ $t("To'lovni saqlash") }}
             </button>
           </div>
         </div>
