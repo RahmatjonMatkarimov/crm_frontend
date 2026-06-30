@@ -886,12 +886,12 @@ const paymentOptions = ref([
   <Teleport to="body">
     <Transition name="modal-fade">
       <div class="fixed inset-0 z-50 flex flex-col"
-        :style="themeStore.isDark ? 'background:#1f2937;' : 'background:#ffffff;'">
+        :style="themeStore.isDark ? 'background:#264a75;' : 'background:#ffffff;'">
 
         <!-- Modal Header -->
-        <div class="px-6 py-5 flex items-center justify-between shrink-0" style="background:#1e3a5f;">
+        <div class="px-6 py-5 flex items-center justify-between shrink-0" style="background:#1A3A6B; border-bottom:3px solid #2E8B57;">
           <div>
-            <h2 class="text-white text-base font-bold">
+            <h2 class="text-white text-base font-bold tracking-wide">
               {{ props.editing?.id ? $t('Mijozni tahrirlash') : $t("Yangi mijoz qo'shish") }}
             </h2>
             <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.55);">{{ $t("Majburiy maydonlarni to'ldiring") }}
@@ -923,8 +923,8 @@ const paymentOptions = ref([
                 class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
                   $t('Ism') }}
                 <span class="text-red-500">*</span></label>
-              <input v-model="name" type="text" :placeholder="$t('Ismni kiriting')"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
+              <input v-model="name" type="text" :placeholder="$t('Ism')"
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
             </div>
 
             <!-- Familiya -->
@@ -933,8 +933,8 @@ const paymentOptions = ref([
                 class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
                   $t('Familiya') }}
                 <span class="text-red-500">*</span></label>
-              <input v-model="surname" type="text" :placeholder="$t('Familiyani kiriting')"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
+              <input v-model="surname" type="text" :placeholder="$t('Familiya')"
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
             </div>
 
             <!-- Otasining ismi -->
@@ -943,7 +943,7 @@ const paymentOptions = ref([
                 class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
                   $t('Otasining ismi') }} <span class="text-red-500">*</span></label>
               <input v-model="father_name" type="text" :placeholder="$t('Otasining ismi')"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
             </div>
 
             <!-- Telefon -->
@@ -953,7 +953,7 @@ const paymentOptions = ref([
                   $t('Telefon') }}
                 <span class="text-red-500">*</span></label>
               <input v-model="phone" @input="handlePhone($event, 1)" type="tel" placeholder="+998 XX XXX XX XX"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
               <label class="flex items-center mt-1 gap-2 text-sm cursor-pointer">
                 <input type="checkbox" v-model="phone2isTelegram" @change="handlePhone2isTelegram"
                   class="w-4 h-4 accent-blue-600">
@@ -978,7 +978,7 @@ const paymentOptions = ref([
                 </span>
                 <input v-model="telegram" @input="handleInput()" type="text"
                   :placeholder="$t('@username yoki +998 XX XXX XX XX')"
-                  class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
+                  class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
               </div>
             </div>
 
@@ -989,7 +989,7 @@ const paymentOptions = ref([
                   $t('Viloyat') }}
                 <span class="text-red-500">*</span></label>
               <select v-model="selectedRegion"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20 cursor-pointer appearance-none">
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 cursor-pointer appearance-none">
                 <option value="">{{ $t('— Viloyatni tanlang —') }}</option>
                 <option v-for="r in regions" :key="r.id" :value="r.id">{{ $t(r.name_uz) }}</option>
               </select>
@@ -1001,7 +1001,7 @@ const paymentOptions = ref([
                 class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
                   $t('Tuman / Shahar') }} <span class="text-red-500">*</span></label>
               <select v-model="selectedDistrict" :disabled="!selectedRegion"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20 cursor-pointer appearance-none">
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 cursor-pointer appearance-none">
                 <option value="">{{ $t('— Tuman tanlang —') }}</option>
                 <option v-for="d in filteredDistricts" :key="d.id" :value="d.id">{{ $t(d.name_uz) }}</option>
               </select>
@@ -1011,7 +1011,7 @@ const paymentOptions = ref([
             <div class="sm:col-span-2 space-y-1">
               <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Qo'shimcha manzil (ko'cha, mahalla, uy va h.k.)</label>
               <input v-model="address" type="text" :placeholder="$t(\"Ko'cha, mahalla, uy raqami, qo'shimcha ma'lumot\")"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
             </div> -->
 
             <!-- Manba -->
@@ -1020,7 +1020,7 @@ const paymentOptions = ref([
                 class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
                   $t('Qayerdan eshitib kelgan') }} <span class="text-red-500">*</span></label>
               <select v-model="source"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20 cursor-pointer appearance-none">
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 cursor-pointer appearance-none">
                 <option value="">{{ $t('— Tanlanmagan —') }}</option>
                 <option v-for="s in sourceOptions" :key="s.value" :value="s.value">{{ $t(s.label) }}</option>
               </select>
@@ -1036,7 +1036,7 @@ const paymentOptions = ref([
                 <div class="relative">
                   <div
                     @click="showPriceMenu = !showPriceMenu; showPaymentMenu = false"
-                    class="w-full flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm cursor-pointer transition-all hover:border-[#1e3a5f]"
+                    class="w-full flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm cursor-pointer transition-all hover:border-[#1A3A6B]"
                     :class="price ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500'">
                     <span>{{ price ? formatMoney(price) + $t(" so'm") : $t("Narxni tanlang") }}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 transition-transform" :class="showPriceMenu ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1048,11 +1048,11 @@ const paymentOptions = ref([
                   <Transition name="submenu-fade">
                     <div v-if="showPriceMenu"
                       class="absolute z-50 top-0 left-full ml-1 min-w-[180px] rounded-xl shadow-2xl border"
-                      :style="themeStore.isDark ? 'background:#1f2937; border-color:#374151;' : 'background:#ffffff; border-color:#e2e8f0;'">
+                      :style="themeStore.isDark ? 'background:#264a75; border-color:#3a6090;' : 'background:#ffffff; border-color:#e2e8f0;'">
                       <div class="px-3 py-2 border-b rounded-t-xl overflow-hidden"
-                        :style="themeStore.isDark ? 'border-color:#374151;' : 'border-color:#f1f5f9;'">
+                        :style="themeStore.isDark ? 'border-color:#3a6090;' : 'border-color:#f1f5f9;'">
                         <p class="text-[10px] font-semibold uppercase tracking-wider"
-                          :style="themeStore.isDark ? 'color:#6b7280;' : 'color:#94a3b8;'">
+                          :style="themeStore.isDark ? 'color:#6090b8;' : 'color:#94a3b8;'">
                           {{ $t("Narxni tanlang") }}
                         </p>
                       </div>
@@ -1061,7 +1061,7 @@ const paymentOptions = ref([
                           @click.stop="price = pricesStore.prices.price_one; paymentAmount = String(pricesStore.prices.price_one).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); showPaymentMenu = true"
                           class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
                           :class="Number(price) === pricesStore.prices.price_one
-                            ? 'bg-[#1e3a5f] text-white'
+                            ? 'bg-[#1A3A6B] text-white'
                             : themeStore.isDark ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'">
                           {{ formatMoney(pricesStore.prices.price_one) + $t(" so'm") }}
                           <svg v-if="Number(price) === pricesStore.prices.price_one" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -1072,7 +1072,7 @@ const paymentOptions = ref([
                           @click.stop="price = pricesStore.prices.price_two; paymentAmount = String(pricesStore.prices.price_two).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); showPaymentMenu = true"
                           class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
                           :class="Number(price) === pricesStore.prices.price_two
-                            ? 'bg-[#1e3a5f] text-white'
+                            ? 'bg-[#1A3A6B] text-white'
                             : themeStore.isDark ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'">
                           {{ formatMoney(pricesStore.prices.price_two) + $t(" so'm") }}
                           <svg v-if="Number(price) === pricesStore.prices.price_two" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -1084,11 +1084,11 @@ const paymentOptions = ref([
                         <Transition name="submenu-fade">
                           <div v-if="showPaymentMenu"
                             class="absolute z-50 top-0 left-full ml-1 min-w-[200px] rounded-xl shadow-2xl border overflow-hidden"
-                            :style="themeStore.isDark ? 'background:#1f2937; border-color:#374151;' : 'background:#ffffff; border-color:#e2e8f0;'">
+                            :style="themeStore.isDark ? 'background:#264a75; border-color:#3a6090;' : 'background:#ffffff; border-color:#e2e8f0;'">
                             <div class="px-3 py-2 border-b"
-                              :style="themeStore.isDark ? 'border-color:#374151;' : 'border-color:#f1f5f9;'">
+                              :style="themeStore.isDark ? 'border-color:#3a6090;' : 'border-color:#f1f5f9;'">
                               <p class="text-[10px] font-semibold uppercase tracking-wider"
-                                :style="themeStore.isDark ? 'color:#6b7280;' : 'color:#94a3b8;'">
+                                :style="themeStore.isDark ? 'color:#6090b8;' : 'color:#94a3b8;'">
                                 {{ $t("To'lov turini tanlang") }}
                               </p>
                             </div>
@@ -1098,7 +1098,7 @@ const paymentOptions = ref([
                                 @click.stop="paymentType = opt.value; showPaymentMenu = false; showPriceMenu = false"
                                 class="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all text-left"
                                 :class="paymentType === opt.value
-                                  ? 'bg-[#1e3a5f] text-white'
+                                  ? 'bg-[#1A3A6B] text-white'
                                   : themeStore.isDark ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'">
                                 <span class="font-medium text-[13px]">{{ $t(opt.label) }}</span>
                                 <svg v-if="paymentType === opt.value" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -1116,7 +1116,7 @@ const paymentOptions = ref([
                 <!-- Tanlangan narx va to'lov turi ko'rsatkich -->
                 <div v-if="price && paymentType && !showPriceMenu && !showPaymentMenu" class="mt-2 flex items-center gap-2 flex-wrap">
                   <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
-                    style="background:#e8f0fe; color:#1e3a5f;"
+                    style="background:#e8f0fe; color:#1A3A6B;"
                     @click="showPriceMenu = true">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -1139,7 +1139,7 @@ const paymentOptions = ref([
                 class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
                   $t("Qabul qiluvchi mutahasis") }} <span class="text-red-500">*</span></label>
               <select v-model="assignedToId"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20 cursor-pointer appearance-none">
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 cursor-pointer appearance-none">
                 <option value="">{{ $t('— Belgilanmagan —') }}</option>
                 <option v-for="u in users" :key="u.id" :value="u.id">
                   {{ $t(u.surname) }} {{ $t(u.name) }}
@@ -1155,7 +1155,7 @@ const paymentOptions = ref([
                 class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
                   $t('Murojaatning qisqacha mazmuni') }}</label>
               <textarea v-model="description" rows="3" :placeholder="$t('Murojaatning qisqacha mazmuni...')"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20 resize-none"></textarea>
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 resize-none"></textarea>
             </div>
 
             <!-- Yaratilgan sana -->
@@ -1175,14 +1175,14 @@ const paymentOptions = ref([
 
         <!-- Modal Footer -->
         <div class="px-6 py-4 flex justify-end gap-3 shrink-0"
-          :style="themeStore.isDark ? 'border-top:1px solid #374151; background:#111827;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
+          :style="themeStore.isDark ? 'border-top:1px solid #3a6090; background:#1e3a5f;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
           <button @click="$emit('close')" class="px-5 py-2 rounded text-sm font-medium transition-all"
-            :style="themeStore.isDark ? 'color:#9ca3af;' : 'color:#4a5568;'">
+            :style="themeStore.isDark ? 'color:#7aaad4;' : 'color:#4a5568;'">
             {{ $t('Bekor qilish') }}
           </button>
           <button @click="save"
-            class="px-5 py-2 rounded text-white text-sm font-semibold active:scale-[0.97] transition-all"
-            style="background:#1e3a5f;">
+            class="px-5 py-2 text-white text-sm font-bold active:scale-[0.97] transition-all"
+            style="background:#1A3A6B; border-radius:4px; letter-spacing:0.03em;">
             {{ props.editing?.id ? $t('Saqlash') : $t('Yaratish') }}
           </button>
         </div>

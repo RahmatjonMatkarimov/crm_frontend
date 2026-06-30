@@ -3,16 +3,19 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --primary:       #1e3a5f;
-  --primary-hover: #162d4a;
-  --bg-page:       #f0f2f5;
+  --primary:       #1A3A6B;
+  --primary-hover: #163060;
+  --primary-dark:  #112850;
+  --accent:        #2E8B57;
+  --accent-hover:  #256b45;
+  --bg-page:       #eef1f6;
   --bg-card:       #ffffff;
-  --border:        #d8dde6;
-  --border-light:  #eaecf0;
+  --border:        #d0d7e3;
+  --border-light:  #e8ecf2;
   --text-1:        #1a1f36;
   --text-2:        #4a5568;
   --text-3:        #8892a4;
-  --success:       #276749;
+  --success:       #2E8B57;
   --success-bg:    #f0fff4;
   --danger:        #c53030;
   --danger-bg:     #fff5f5;
@@ -25,21 +28,27 @@ html {
 }
 
 html.dark {
-  --primary:       #2d5282;
-  --primary-hover: #2a4a76;
-  --bg-page:       #111827;
-  --bg-card:       #1f2937;
-  --border:        #374151;
-  --border-light:  #2d3748;
-  --text-1:        #f3f4f6;
-  --text-2:        #9ca3af;
-  --text-3:        #6b7280;
-  --success-bg:    #064e3b;
-  --danger-bg:     #7f1d1d;
-  --warning-bg:    #78350f;
+  --primary:       #1A3A6B;
+  --primary-hover: #163060;
+  --accent:        #2E8B57;
+  --bg-page:       #1e3a5f;
+  --bg-card:       #264a75;
+  --border:        #3a6090;
+  --border-light:  #305080;
+  --text-1:        #e8f0ff;
+  --text-2:        #90b8e0;
+  --text-3:        #6090b8;
+  --success:       #2E8B57;
+  --success-bg:    #1a4a2a;
+  --danger:        #c53030;
+  --danger-bg:     #4a1818;
+  --warning:       #b45309;
+  --warning-bg:    #4a2800;
 
-  background-color: #111827;
+  background-color: #1e3a5f;
 }
+
+.dark ::-webkit-scrollbar-thumb { background: #3a6090; }
 
 body {
   margin: 0;
@@ -59,13 +68,14 @@ body {
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #c1c9d6; border-radius: 99px; }
-.dark ::-webkit-scrollbar-thumb { background: #374151; }
+::-webkit-scrollbar-thumb { background: #9badc5; border-radius: 99px; }
+.dark ::-webkit-scrollbar-thumb { background: #2a3a52; }
 
 .btn-primary {
   background: var(--primary);
   color: #ffffff;
   transition: background 0.15s;
+  border-radius: 4px;
 }
 .btn-primary:hover { background: var(--primary-hover); }
 .btn-primary:active { transform: scale(0.98); }
@@ -73,17 +83,113 @@ body {
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
+/* Davlat uslubi: faol nav element yashil chiziq bilan */
 .nav-link-active {
-  background: rgba(255,255,255,0.12) !important;
+  background: rgba(46,139,87,0.18) !important;
   color: #ffffff !important;
-  border-left: 3px solid #ffffff;
+  border-left: 3px solid #2E8B57 !important;
+  padding-left: calc(0.75rem - 3px) !important;
+}
+
+.nav-link:hover {
+  background: rgba(255,255,255,0.1);
+  color: #ffffff;
+}
+
+/* Davlat saytlari uchun jadval uslubi */
+.gov-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.gov-table thead {
+  background: #f0f4f8;
+}
+.dark .gov-table thead {
+  background: #0a1828;
+}
+.gov-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #d0d7e3;
+  white-space: nowrap;
+}
+.dark .gov-table th {
+  color: #3e6080;
+  border-bottom-color: #19304d;
+}
+.gov-table td {
+  padding: 11px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid #e8ecf2;
+  color: #1a1f36;
+}
+.dark .gov-table td {
+  border-bottom-color: #142540;
+  color: #d8e8f8;
+}
+.gov-table tr:last-child td {
+  border-bottom: none;
+}
+.gov-table tr:hover td {
+  background: #f5f7fb;
+}
+.dark .gov-table tr:hover td {
+  background: #0a1828;
+}
+
+/* Davlat uslubi badge */
+.gov-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.gov-badge-green  { background: #f0fff4; color: #2E8B57; border: 1px solid #b7e4c7; }
+.gov-badge-red    { background: #fff5f5; color: #c53030; border: 1px solid #f5c0c0; }
+.gov-badge-yellow { background: #fffbeb; color: #b45309; border: 1px solid #f5d77e; }
+.gov-badge-blue   { background: #eff6ff; color: #1A3A6B; border: 1px solid #bfdbfe; }
+.dark .gov-badge-green  { background: #082918; color: #3aab6d; border-color: #0f4a28; }
+.dark .gov-badge-red    { background: #280a0a; color: #e05555; border-color: #4a1010; }
+.dark .gov-badge-yellow { background: #281500; color: #d4890a; border-color: #4a2800; }
+.dark .gov-badge-blue   { background: #07182e; color: #5a9fd4; border-color: #102a4a; }
+
+/* Page title with green left bar */
+.gov-page-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1A3A6B;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dark .gov-page-title {
+  color: #d8e8f8;
+}
+.gov-page-title::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 20px;
+  background: #2E8B57;
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px rgba(30,58,95,0.12);
+  box-shadow: 0 0 0 2px rgba(26,58,107,0.12);
 }

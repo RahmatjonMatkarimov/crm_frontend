@@ -232,19 +232,18 @@ const formatMoney = (amount) => {
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold" :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">{{ $t('Mijozlar')
-          }}</h1>
-        <p class="text-sm mt-0.5" :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">
+        <h1 class="gov-page-title text-xl font-bold" :style="themeStore.isDark ? 'color:#e8edf5' : 'color:#1A3A6B'">{{ $t('Mijozlar') }}</h1>
+        <p class="text-sm mt-1" :style="themeStore.isDark ? 'color:#5a7290' : 'color:#4a5568'">
           {{ $t('Faol mijozlar') }} — {{ $t('Jami') }}
-          <span class="font-bold" :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">{{
+          <span class="font-bold" :style="themeStore.isDark ? 'color:#e8edf5' : 'color:#1A3A6B'">{{
             store.customers.length }}</span>
           {{ $t('ta') }}
         </p>
       </div>
       <div class="flex items-center gap-2">
                 <button @click="openCreate" v-if="authStore.permission.add_customers"
-          class="flex items-center gap-2 px-4 py-2.5 rounded text-white text-sm font-semibold active:scale-[0.98] transition-all cursor-pointer"
-          style="background:#1e3a5f;">
+          class="flex items-center gap-2 px-4 py-2.5 text-white text-sm font-bold active:scale-[0.98] transition-all cursor-pointer"
+          style="background:#1A3A6B; border-radius:4px; letter-spacing:0.03em;">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
             stroke="currentColor" class="w-4 h-4">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -254,7 +253,7 @@ const formatMoney = (amount) => {
         <button @click="openPricesModal" v-if="authStore.permission.edit_prices"
           class="flex items-center gap-2 px-4 py-2.5 rounded text-sm font-medium transition-all cursor-pointer active:scale-[0.98]"
           :style="themeStore.isDark
-            ? 'background:#1f2937; border:1px solid #374151; color:#9ca3af;'
+            ? 'background:#264a75; border:1px solid #3a6090; color:#7aaad4;'
             : 'background:#ffffff; border:1px solid #d8dde6; color:#4a5568;'">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
             stroke="currentColor" class="w-4 h-4">
@@ -278,7 +277,7 @@ const formatMoney = (amount) => {
       </span>
       <input v-model="search" type="text" :placeholder="$t('Ism, familiya, telefon, manzil yoki') + ' MJZ-ID...'"
         class="w-full pl-11 pr-4 py-3 rounded text-sm transition-all focus:outline-none" :style="themeStore.isDark
-          ? 'background:#1f2937; border:1px solid #374151; color:#f3f4f6;'
+          ? 'background:#264a75; border:1px solid #3a6090; color:#ddeaff;'
           : 'background:#ffffff; border:1px solid #d8dde6; color:#1a1f36;'" />
     </div>
 
@@ -292,13 +291,13 @@ const formatMoney = (amount) => {
         { key: 'range', label: $t('Sana oralig\'i') },
       ]" :key="tab.key" @click="dateFilter = tab.key"
         class="px-4 py-2 rounded text-sm font-semibold transition-all cursor-pointer" :style="dateFilter === tab.key
-          ? 'background:#1e3a5f; color:#ffffff;'
+          ? 'background:#1A3A6B; color:#ffffff;'
           : themeStore.isDark
-            ? 'background:#1f2937; border:1px solid #374151; color:#9ca3af;'
+            ? 'background:#264a75; border:1px solid #3a6090; color:#7aaad4;'
             : 'background:#ffffff; border:1px solid #d8dde6; color:#4a5568;'">
         {{ tab.label }}
         <span v-if="tab.key !== 'range'" class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded"
-          :style="dateFilter === tab.key ? 'background:rgba(255,255,255,0.2); color:#ffffff;' : themeStore.isDark ? 'background:#374151; color:#9ca3af;' : 'background:#eef2f7; color:#1e3a5f;'">
+          :style="dateFilter === tab.key ? 'background:rgba(255,255,255,0.2); color:#ffffff;' : themeStore.isDark ? 'background:#3a6090; color:#7aaad4;' : 'background:#eef2f7; color:#1A3A6B;'">
           {{ tab.key === 'all' ? byStatusOnly.length : countByDate(tab.key) }}
         </span>
       </button>
@@ -311,7 +310,7 @@ const formatMoney = (amount) => {
           :style="statusFilter !== 'all'
             ? `background:${statusInlineColors[statusFilter]?.bg}; color:${statusInlineColors[statusFilter]?.color}; border:1px solid ${statusInlineColors[statusFilter]?.color}40;`
             : themeStore.isDark
-              ? 'background:#1f2937; border:1px solid #374151; color:#f3f4f6;'
+              ? 'background:#264a75; border:1px solid #3a6090; color:#ddeaff;'
               : 'background:#ffffff; border:1px solid #d8dde6; color:#1a1f36;'"
         >
           <option value="all">{{ $t('Barchasi') }} ({{ byDateOnly.length }})</option>
@@ -324,7 +323,7 @@ const formatMoney = (amount) => {
         </select>
         <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none"
           fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          :style="statusFilter !== 'all' ? `color:${statusInlineColors[statusFilter]?.color}` : themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4'">
+          :style="statusFilter !== 'all' ? `color:${statusInlineColors[statusFilter]?.color}` : themeStore.isDark ? 'color:#4d7eaa' : 'color:#8892a4'">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
         </svg>
       </div>
@@ -339,18 +338,18 @@ const formatMoney = (amount) => {
       <div v-if="dateFilter === 'range'" class="flex items-center gap-3 flex-wrap">
         <div class="flex items-center gap-2 flex-1 min-w-0">
           <label class="text-xs font-semibold shrink-0"
-            :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">{{ $t('Dan') }}:</label>
+            :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">{{ $t('Dan') }}:</label>
           <input v-model="dateFrom" type="date"
             class="flex-1 px-3 py-2 rounded text-sm transition-all focus:outline-none" :style="themeStore.isDark
-              ? 'background:#1f2937; border:1px solid #374151; color:#f3f4f6;'
+              ? 'background:#264a75; border:1px solid #3a6090; color:#ddeaff;'
               : 'background:#ffffff; border:1px solid #d8dde6; color:#1a1f36;'" />
         </div>
         <div class="flex items-center gap-2 flex-1 min-w-0">
           <label class="text-xs font-semibold shrink-0"
-            :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">{{ $t('Gacha') }}:</label>
+            :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">{{ $t('Gacha') }}:</label>
           <input v-model="dateTo" type="date" class="flex-1 px-3 py-2 rounded text-sm transition-all focus:outline-none"
             :style="themeStore.isDark
-              ? 'background:#1f2937; border:1px solid #374151; color:#f3f4f6;'
+              ? 'background:#264a75; border:1px solid #3a6090; color:#ddeaff;'
               : 'background:#ffffff; border:1px solid #d8dde6; color:#1a1f36;'" />
         </div>
         <button v-if="dateFrom || dateTo" @click="dateFrom = ''; dateTo = ''"
@@ -365,13 +364,13 @@ const formatMoney = (amount) => {
     <Transition enter-active-class="transition-all duration-200" enter-from-class="opacity-0 -translate-y-2"
       leave-active-class="transition-all duration-150" leave-to-class="opacity-0 -translate-y-2">
       <div v-if="selected.length > 0" class="flex items-center justify-between px-5 py-3 rounded"
-        :style="themeStore.isDark ? 'background:#1f2937; border:1px solid #374151;' : 'background:#eef2f7; border:1px solid #d8dde6;'">
-        <span class="text-sm font-semibold" :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">
+        :style="themeStore.isDark ? 'background:#264a75; border:1px solid #3a6090;' : 'background:#eef2f7; border:1px solid #d8dde6;'">
+        <span class="text-sm font-semibold" :style="themeStore.isDark ? 'color:#ddeaff' : 'color:#1a1f36'">
           {{ selected.length }} {{ $t('ta tanlandi') }}
         </span>
         <div class="flex gap-2">
           <button @click="selected = []" class="px-4 py-1.5 rounded text-sm font-medium transition-colors"
-            :style="themeStore.isDark ? 'color:#9ca3af' : 'color:#4a5568'">
+            :style="themeStore.isDark ? 'color:#7aaad4' : 'color:#4a5568'">
             {{ $t('Bekor qilish') }}
           </button>
           <button @click="archiveSelected"
@@ -389,16 +388,16 @@ const formatMoney = (amount) => {
 
     <!-- Loading -->
     <div v-if="store.loading" class="flex items-center justify-center py-16 gap-3"
-      :style="themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4'">
+      :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#8892a4'">
       <div class="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin opacity-60"></div>
       <span class="text-sm">{{ $t('Yuklanmoqda...') }}</span>
     </div>
 
     <!-- Cards grid -->
-    <div v-else-if="filtered.length > 0" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 bg-[#1e3a5f1e] p-5 border-2 border-[#1e3a5f7e] gap-4">
+    <div v-else-if="filtered.length > 0" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 bg-[#1A3A6B1e] p-5 border-2 border-[#1A3A6B7e] gap-4">
       <div v-for="c in filtered" :key="c.id" class="relative rounded p-5 cursor-pointer transition-all group" :style="themeStore.isDark
-        ? 'background:#1f2937; border:1px solid ' + (selected.includes(c.id) ? '#1e3a5f' : '#374151') + ';'
-        : 'background:#ffffff; border:1px solid ' + (selected.includes(c.id) ? '#1e3a5f' : '#d8dde6') + ';'"
+        ? 'background:#264a75; border:1px solid ' + (selected.includes(c.id) ? '#1A3A6B' : '#3a6090') + ';'
+        : 'background:#ffffff; border:1px solid ' + (selected.includes(c.id) ? '#1A3A6B' : '#d8dde6') + ';'"
         @click="openCustomer(c.id)">
 
         <!-- Selection indicator -->
@@ -409,15 +408,15 @@ const formatMoney = (amount) => {
         <!-- Top: Avatar + Name + Source -->
         <div class="flex items-start gap-3 mb-4">
           <div class="w-11 h-11 rounded flex items-center justify-center text-white font-bold text-base shrink-0"
-            style="background:#1e3a5f;">
+            style="background:#1A3A6B;">
             {{ ($t(c.surname) || $t(c.name) || '?')[0].toUpperCase() }}
           </div>
           <div class="flex-1 min-w-0 pr-6">
             <p class="font-bold text-sm truncate leading-tight"
-              :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">
+              :style="themeStore.isDark ? 'color:#ddeaff' : 'color:#1a1f36'">
               {{ $t(c.surname) }} {{ $t(c.name) }}
             </p>
-            <p class="text-xs mt-0.5 truncate" :style="themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4'">
+            <p class="text-xs mt-0.5 truncate" :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#8892a4'">
               {{ $t(c.father_name) || '' }}
             </p>
           </div>
@@ -431,8 +430,8 @@ const formatMoney = (amount) => {
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
             </svg>
-            <span class="text-xs" :style="themeStore.isDark ? 'color:#9ca3af' : 'color:#4a5568'">{{ c.phone }}</span>
-            <span v-if="c.phone2" class="text-[10px]" :style="themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4'">/
+            <span class="text-xs" :style="themeStore.isDark ? 'color:#7aaad4' : 'color:#4a5568'">{{ c.phone }}</span>
+            <span v-if="c.phone2" class="text-[10px]" :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#8892a4'">/
               {{ c.phone2 }}</span>
           </div>
           <div v-if="c.assignedTo" class="flex items-center gap-2">
@@ -441,7 +440,7 @@ const formatMoney = (amount) => {
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span class="text-xs truncate" :style="themeStore.isDark ? 'color:#9ca3af' : 'color:#4a5568'">
+            <span class="text-xs truncate" :style="themeStore.isDark ? 'color:#7aaad4' : 'color:#4a5568'">
               {{ $t(c.assignedTo.surname) }} {{ $t(c.assignedTo.name) }}
             </span>
           </div>
@@ -452,7 +451,7 @@ const formatMoney = (amount) => {
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
             </svg>
-            <span class="text-xs truncate" :style="themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4'">{{
+            <span class="text-xs truncate" :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#8892a4'">{{
               $t(c.address) }}</span>
           </div>
         </div>
@@ -477,7 +476,7 @@ const formatMoney = (amount) => {
           <!-- Actions -->
           <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" @click.stop>
             <button v-if="authStore.permission.edit_customers" @click="openEdit(c)" class="p-1.5 rounded transition-all"
-              :style="themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4'" title="Tahrirlash">
+              :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#8892a4'" title="Tahrirlash">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -502,17 +501,17 @@ const formatMoney = (amount) => {
     <!-- Empty state -->
     <div v-else-if="!store.loading" class="flex flex-col items-center justify-center py-20 gap-4">
       <div class="w-20 h-20 rounded flex items-center justify-center"
-        :style="themeStore.isDark ? 'background:#374151' : 'background:#eaecf0'">
-        <svg class="w-10 h-10" :style="themeStore.isDark ? 'color:#4b5563' : 'color:#c1c9d6'" fill="none"
+        :style="themeStore.isDark ? 'background:#3a6090' : 'background:#eaecf0'">
+        <svg class="w-10 h-10" :style="themeStore.isDark ? 'color:#3a6090' : 'color:#c1c9d6'" fill="none"
           viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       </div>
       <div class="text-center">
-        <p class="font-semibold" :style="themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4'">{{ $t('Mijoz topilmadi')
+        <p class="font-semibold" :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#8892a4'">{{ $t('Mijoz topilmadi')
           }}</p>
-        <p class="text-sm mt-1" :style="themeStore.isDark ? 'color:#4b5563' : 'color:#c1c9d6'">{{ $t('Qidiruv natijasi bo\'sh') }}</p>
+        <p class="text-sm mt-1" :style="themeStore.isDark ? 'color:#3a6090' : 'color:#c1c9d6'">{{ $t('Qidiruv natijasi bo\'sh') }}</p>
       </div>
     </div>
 
@@ -527,10 +526,10 @@ const formatMoney = (amount) => {
         :class="themeStore.isDark ? 'bg-black/70' : 'bg-black/40'" style="backdrop-filter: blur(4px);"
         @click.self="showPricesModal = false">
         <div class="m-auto w-full max-w-md rounded overflow-hidden flex flex-col shadow-2xl"
-          :style="themeStore.isDark ? 'background:#1f2937;' : 'background:#ffffff;'">
-          <div class="px-6 py-5 flex items-center justify-between" style="background:#1e3a5f;">
+          :style="themeStore.isDark ? 'background:#264a75;' : 'background:#ffffff;'">
+          <div class="px-6 py-5 flex items-center justify-between" style="background:#1A3A6B; border-bottom:3px solid #2E8B57;">
             <div>
-              <h2 class="text-white text-base font-bold">{{ $t("Xizmat narxlarini o'zgartirish") }}</h2>
+              <h2 class="text-white text-base font-bold tracking-wide">{{ $t("Xizmat narxlarini o'zgartirish") }}</h2>
               <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.55);">{{ $t("Narxlarni o'zgartiring") }}</p>
             </div>
             <button @click="showPricesModal = false"
@@ -546,29 +545,29 @@ const formatMoney = (amount) => {
           <div class="p-6 space-y-4 flex-1">
             <div class="space-y-1.5">
               <label class="block text-[11px] font-semibold uppercase tracking-wider"
-                :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">{{ $t('1-narx (so\'mda)') }}</label>
+                :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">{{ $t('1-narx (so\'mda)') }}</label>
               <input v-model="editingPriceOne" type="number"
                 class="w-full px-3 py-2.5 rounded text-sm transition-all focus:outline-none"
-                :style="themeStore.isDark ? 'background:#111827; border:1px solid #374151; color:#f3f4f6;' : 'background:#f7f8fa; border:1px solid #d8dde6; color:#1a1f36;'" />
+                :style="themeStore.isDark ? 'background:#1e3a5f; border:1px solid #3a6090; color:#ddeaff;' : 'background:#f7f8fa; border:1px solid #d8dde6; color:#1a1f36;'" />
             </div>
             <div class="space-y-1.5">
               <label class="block text-[11px] font-semibold uppercase tracking-wider"
-                :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">{{ $t('2-narx (so\'mda)') }}</label>
+                :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">{{ $t('2-narx (so\'mda)') }}</label>
               <input v-model="editingPriceTwo" type="number"
                 class="w-full px-3 py-2.5 rounded text-sm transition-all focus:outline-none"
-                :style="themeStore.isDark ? 'background:#111827; border:1px solid #374151; color:#f3f4f6;' : 'background:#f7f8fa; border:1px solid #d8dde6; color:#1a1f36;'" />
+                :style="themeStore.isDark ? 'background:#1e3a5f; border:1px solid #3a6090; color:#ddeaff;' : 'background:#f7f8fa; border:1px solid #d8dde6; color:#1a1f36;'" />
             </div>
           </div>
 
           <div class="px-6 py-4 flex justify-end gap-3"
-            :style="themeStore.isDark ? 'border-top:1px solid #374151; background:#111827;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
+            :style="themeStore.isDark ? 'border-top:1px solid #3a6090; background:#1e3a5f;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
             <button @click="showPricesModal = false" class="px-5 py-2 rounded text-sm font-medium transition-all"
-              :style="themeStore.isDark ? 'color:#9ca3af' : 'color:#4a5568'">
+              :style="themeStore.isDark ? 'color:#7aaad4' : 'color:#4a5568'">
               {{ $t('Bekor qilish') }}
             </button>
             <button @click="savePrices"
-              class="px-5 py-2 rounded text-white text-sm font-semibold active:scale-[0.97] transition-all"
-              style="background:#1e3a5f;">
+              class="px-5 py-2 text-white text-sm font-bold active:scale-[0.97] transition-all"
+              style="background:#1A3A6B; border-radius:4px; letter-spacing:0.03em;">
               {{ $t('Saqlash') }}
             </button>
           </div>

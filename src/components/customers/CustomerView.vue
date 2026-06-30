@@ -4,7 +4,7 @@
 
             <!-- Loading -->
             <div v-if="loading" class="flex flex-col items-center justify-center py-32 gap-3">
-                <div class="w-8 h-8 border-2 rounded-full animate-spin" style="border-color:#d8dde6; border-top-color:#1e3a5f;"></div>
+                <div class="w-8 h-8 border-2 rounded-full animate-spin" style="border-color:#d8dde6; border-top-color:#1A3A6B;"></div>
                 <p class="text-slate-400 text-sm">{{ $t("Ma'lumotlar yuklanmoqda...") }}</p>
             </div>
 
@@ -17,7 +17,7 @@
             <div v-else class="space-y-5">
 
                 <!-- Hero Header -->
-                <div class="overflow-hidden rounded shadow-sm" style="background:#1e3a5f;">
+                <div class="overflow-hidden rounded shadow-sm" style="background:#1A3A6B;">
                     <div class="px-6 py-5 flex items-center justify-between gap-4">
                         <div class="flex items-center gap-5">
                             <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center shrink-0 text-2xl font-bold text-white">
@@ -74,7 +74,25 @@
                                 :value="`${$t(customer.surname || '')} ${$t(customer.name || '')} ${$t(customer.father_name || '')}`" icon="user" />
                             <InfoRow :label="$t('Telefon raqam')" :value="customer.phone || '-'" icon="phone" />
                             <InfoRow :label="$t('Qo\'shimcha telefon raqam')" :value="customer.phone2 || '-'" icon="phone" />
-                            <InfoRow :label="$t('Telegram')" :value="customer.telegram || '-'" icon="telegram" />
+                            <div class="flex flex-col gap-1">
+                                <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Telegram') }}</p>
+                                <div class="flex items-center gap-2">
+                                    <p class="text-sm font-semibold" :class="themeStore.isDark ? 'text-slate-200' : 'text-slate-700'">
+                                        {{ customer.telegram || '-' }}
+                                    </p>
+                                    <button
+                                        v-if="customer.telegram || customer.phone"
+                                        @click="openTelegramModal"
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold text-white transition-all hover:opacity-90 active:scale-95"
+                                        style="background:#229ED9;"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
+                                            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.4 13.893l-2.93-.918c-.638-.196-.651-.638.136-.943l11.438-4.41c.531-.197.999.131.85.599z"/>
+                                        </svg>
+                                        {{ $t('Xabar yuborish') }}
+                                    </button>
+                                </div>
+                            </div>
                             <InfoRow :label="$t('Manzil')"
                                 :value="`${$t(customer.address || '')} ${customer.region || customer.district ? `(${$t(customer.region)} ${$t(customer.district)})` : ''}`"
                                 icon="location" />
@@ -149,7 +167,7 @@
                                 </p>
                                 <div class="flex items-center gap-2">
                                     <div class="w-7 h-7 rounded flex items-center justify-center text-xs font-bold text-white"
-                                        style="background:#1e3a5f;">
+                                        style="background:#1A3A6B;">
                                         {{ (customer.assignedTo.name || '?').charAt(0).toUpperCase() }}
                                     </div>
                                     <p class="text-sm font-semibold"
@@ -187,7 +205,7 @@
                                     <button v-if="remainingDebt > 0"
                                         @click="showDebtModal = true"
                                         class="w-full mt-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-                                        style="background:#1e3a5f;">
+                                        style="background:#1A3A6B;">
                                         {{ $t("Qarz to'lash") }}
                                     </button>
                                 </div>
@@ -302,7 +320,7 @@
                                 <p class="text-xs text-slate-500 dark:text-slate-400">
                                     {{ formatDate(check.createdAt) }}
                                 </p>
-                                <p class="text-xs font-medium mt-1.5 flex items-center gap-1" style="color:#1e3a5f;">
+                                <p class="text-xs font-medium mt-1.5 flex items-center gap-1" style="color:#1A3A6B;">
                                     {{ $t('Ochish') }}
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="2" stroke="currentColor" class="w-3 h-3">
@@ -345,7 +363,7 @@
                 <div class="w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden"
                     :class="themeStore.isDark ? 'bg-[#1f2937]' : 'bg-white'">
                     <!-- Header -->
-                    <div class="px-6 py-4 flex items-center justify-between" style="background:#1e3a5f;">
+                    <div class="px-6 py-4 flex items-center justify-between" style="background:#1A3A6B;">
                         <h3 class="text-white font-bold text-base">{{ $t("Qarz to'lash") }}</h3>
                         <button @click="closeDebtModal"
                             class="w-7 h-7 rounded flex items-center justify-center text-white"
@@ -381,7 +399,7 @@
                                 type="text"
                                 inputmode="numeric"
                                 :placeholder="$t('Miqdorni kiriting')"
-                                class="w-full px-3 py-2.5 rounded-lg border text-sm transition-all focus:outline-none focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20"
+                                class="w-full px-3 py-2.5 rounded-lg border text-sm transition-all focus:outline-none focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20"
                                 :class="themeStore.isDark
                                     ? 'bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-500'
                                     : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'"
@@ -394,7 +412,7 @@
                                 {{ $t("To'lov turi") }} <span class="text-red-500">*</span>
                             </label>
                             <select v-model="debtPaymentType"
-                                class="w-full px-3 py-2.5 rounded-lg border text-sm transition-all focus:outline-none focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20 appearance-none cursor-pointer"
+                                class="w-full px-3 py-2.5 rounded-lg border text-sm transition-all focus:outline-none focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 appearance-none cursor-pointer"
                                 :class="themeStore.isDark
                                     ? 'bg-slate-700 border-slate-600 text-slate-100'
                                     : 'bg-slate-50 border-slate-200 text-slate-900'">
@@ -415,9 +433,105 @@
                         </button>
                         <button @click="payDebt" :disabled="debtSaving"
                             class="px-5 py-2 rounded text-white text-sm font-semibold transition-all active:scale-[0.97] disabled:opacity-60 flex items-center gap-2"
-                            style="background:#1e3a5f;">
+                            style="background:#1A3A6B;">
                             <div v-if="debtSaving" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                             {{ $t("To'lash") }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+    </Teleport>
+
+    <!-- Telegram Xabar Modal -->
+    <Teleport to="body">
+        <Transition name="modal-fade">
+            <div v-if="showTelegramModal"
+                class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                style="background:rgba(0,0,0,0.5);"
+                @click.self="closeTelegramModal">
+                <div class="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
+                    :class="themeStore.isDark ? 'bg-[#1f2937]' : 'bg-white'">
+                    <!-- Header -->
+                    <div class="px-6 py-4 flex items-center gap-3" style="background:#229ED9;">
+                        <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-5 h-5">
+                                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.4 13.893l-2.93-.918c-.638-.196-.651-.638.136-.943l11.438-4.41c.531-.197.999.131.85.599z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-white font-semibold text-sm">Telegram xabar</p>
+                            <p class="text-white/70 text-xs">{{ customer?.surname }} {{ customer?.name }}</p>
+                        </div>
+                        <button @click="closeTelegramModal" class="text-white/70 hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                        <!-- Kimga -->
+                        <div class="space-y-2">
+                            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Kimga yuborish</p>
+                            <div class="flex gap-2">
+                                <button v-if="customer?.telegram"
+                                    @click="telegramTarget = 'username'"
+                                    class="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-all"
+                                    :class="telegramTarget === 'username'
+                                        ? 'border-[#229ED9] bg-[#229ED9]/10 text-[#229ED9]'
+                                        : themeStore.isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'">
+                                    @{{ customer.telegram }}
+                                </button>
+                                <button v-if="customer?.phone"
+                                    @click="telegramTarget = 'phone'"
+                                    class="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-all"
+                                    :class="telegramTarget === 'phone'
+                                        ? 'border-[#229ED9] bg-[#229ED9]/10 text-[#229ED9]'
+                                        : themeStore.isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'">
+                                    📞 {{ customer.phone }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Xabar -->
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">Xabar matni</label>
+                            <textarea v-model="telegramMessage" rows="4"
+                                placeholder="Xabar yozing..."
+                                class="w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none resize-none transition-all"
+                                :class="themeStore.isDark
+                                    ? 'bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-500 focus:border-[#229ED9]'
+                                    : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#229ED9]'" />
+                        </div>
+
+                        <!-- Xato -->
+                        <p v-if="telegramError" class="text-xs text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">{{ telegramError }}</p>
+
+                        <!-- Muvaffaqiyat -->
+                        <div v-if="telegramSent" class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 shrink-0">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                            <span class="text-xs font-medium">Xabar muvaffaqiyatli yuborildi!</span>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-4 flex justify-end gap-3 border-t"
+                        :class="themeStore.isDark ? 'border-white/5 bg-black/20' : 'border-slate-100 bg-slate-50'">
+                        <button @click="closeTelegramModal"
+                            class="px-5 py-2 rounded-lg text-sm font-medium"
+                            :class="themeStore.isDark ? 'text-slate-400' : 'text-slate-500'">
+                            Yopish
+                        </button>
+                        <button @click="sendTelegramMessage" :disabled="telegramSending || !telegramMessage.trim()"
+                            class="px-5 py-2 rounded-lg text-white text-sm font-semibold transition-all active:scale-[0.97] disabled:opacity-60 flex items-center gap-2"
+                            style="background:#229ED9;">
+                            <div v-if="telegramSending" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+                            </svg>
+                            Yuborish
                         </button>
                     </div>
                 </div>
@@ -451,6 +565,60 @@ const debtAmount = ref('')
 const debtPaymentType = ref('NAQD')
 const debtSaving = ref(false)
 const debtError = ref('')
+
+// Telegram modal
+const showTelegramModal = ref(false)
+const telegramMessage = ref('')
+const telegramTarget = ref('username')
+const telegramSending = ref(false)
+const telegramError = ref('')
+const telegramSent = ref(false)
+
+const openTelegramModal = () => {
+    telegramTarget.value = customer.value?.telegram ? 'username' : 'phone'
+    telegramMessage.value = ''
+    telegramError.value = ''
+    telegramSent.value = false
+    showTelegramModal.value = true
+}
+
+const closeTelegramModal = () => {
+    showTelegramModal.value = false
+    telegramMessage.value = ''
+    telegramError.value = ''
+    telegramSent.value = false
+}
+
+const sendTelegramMessage = async () => {
+    telegramError.value = ''
+    telegramSent.value = false
+    if (!telegramMessage.value.trim()) return
+
+    const to = telegramTarget.value === 'username'
+        ? customer.value?.telegram
+        : customer.value?.phone
+
+    if (!to) {
+        telegramError.value = 'Manzil topilmadi'
+        return
+    }
+
+    telegramSending.value = true
+    try {
+        await api.post('/api/telegram/send', { to, message: telegramMessage.value })
+        telegramSent.value = true
+        telegramMessage.value = ''
+    } catch (e) {
+        const msg = e?.response?.data?.message
+        if (msg?.includes('ulanmagan') || msg?.includes('login')) {
+            telegramError.value = 'Telegram ulanmagan. Sozlamalar sahifasida login qiling.'
+        } else {
+            telegramError.value = msg || 'Xabar yuborishda xatolik yuz berdi'
+        }
+    } finally {
+        telegramSending.value = false
+    }
+}
 
 const paymentOptions = [
   { value: 'NAQD', label: 'Naqd pul' },

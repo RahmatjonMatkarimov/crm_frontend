@@ -34,29 +34,34 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center p-4 select-none" style="background: #f0f2f5;">
+  <!-- Flag stripe -->
+  <div style="height:4px; background: linear-gradient(90deg, #1A3A6B 33.3%, #ffffff 33.3%, #ffffff 66.6%, #2E8B57 66.6%);"></div>
 
-    <div class="w-full max-w-[420px]">
+  <div class="min-h-screen flex flex-col items-center justify-center p-4 select-none" style="background: #eef1f6; min-height: calc(100vh - 4px);">
+
+    <div class="w-full max-w-[440px]">
 
       <!-- Logo area -->
       <div class="flex flex-col items-center mb-8">
-        <div class="flex items-center gap-3 mb-3">
-          <img src="/logo.png" alt="Logo" class="w-12 h-12 object-contain" />
-          <div class="h-10 w-px bg-gray-300"></div>
+        <div class="flex items-center gap-4 mb-3">
+          <img src="/logo.png" alt="Logo" class="w-14 h-14 object-contain" />
+          <div class="h-12 w-px" style="background:#d0d7e3;"></div>
           <div>
-            <p class="font-bold text-xl leading-tight" style="color: #1a1f36;">Yuridik</p>
-            <p class="text-sm font-medium" style="color: #4a5568;">Maslahat <span style="color: #c53030; font-weight:700;">24</span></p>
+            <p class="font-black text-xl leading-tight tracking-wide" style="color:#1A3A6B;">YURIDIK</p>
+            <p class="text-sm font-semibold tracking-widest" style="color:#4a5568;">MASLAHAT <span style="color:#2E8B57; font-weight:900;">24</span></p>
           </div>
         </div>
-        <p class="text-xs tracking-widest uppercase" style="color: #8892a4;">Boshqaruv tizimi</p>
+        <div style="background:#1A3A6B; color:white; font-size:10px; font-weight:700; letter-spacing:0.12em; padding:4px 16px; border-radius:2px; text-transform:uppercase;">
+          Rasmiy boshqaruv tizimi
+        </div>
       </div>
 
       <!-- Card -->
-      <div style="background:#fff; border:1px solid #d8dde6; border-radius:8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+      <div style="background:#fff; border:1px solid #d0d7e3; border-radius:4px; box-shadow: 0 2px 16px rgba(26,58,107,0.1);">
 
         <!-- Header -->
-        <div style="background:#1e3a5f; border-radius:8px 8px 0 0; padding: 20px 32px;">
-          <h1 class="font-bold text-lg text-white">Tizimga kirish</h1>
+        <div style="background:#1A3A6B; border-radius:4px 4px 0 0; padding: 20px 32px; border-bottom:3px solid #2E8B57;">
+          <h1 class="font-bold text-lg text-white tracking-wide">Tizimga kirish</h1>
           <p class="text-sm mt-0.5" style="color: rgba(255,255,255,0.65);">Hisobingizga kiring</p>
         </div>
 
@@ -132,10 +137,10 @@ const handleLogin = async () => {
             <button
               type="submit"
               :disabled="authStore.loading"
-              class="w-full py-2.5 rounded text-sm font-semibold text-white flex items-center justify-center gap-2 mt-1 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-              style="background:#1e3a5f; transition: background 0.15s;"
-              onmouseover="if(!this.disabled) this.style.background='#162d4a'"
-              onmouseout="if(!this.disabled) this.style.background='#1e3a5f'"
+              class="w-full py-2.5 text-sm font-bold text-white flex items-center justify-center gap-2 mt-1 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              style="background:#1A3A6B; transition: background 0.15s; border-radius:4px; letter-spacing:0.04em;"
+              onmouseover="if(!this.disabled) this.style.background='#163060'"
+              onmouseout="if(!this.disabled) this.style.background='#1A3A6B'"
             >
               <span v-if="authStore.loading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
@@ -147,8 +152,8 @@ const handleLogin = async () => {
         </div>
       </div>
 
-      <p class="text-center mt-5 text-xs" style="color:#8892a4;">
-        © 2026 Yuridik Maslahat 24. Barcha huquqlar himoyalangan.
+      <p class="text-center mt-5 text-xs" style="color:#6b7a99;">
+        © {{ new Date().getFullYear() }} Yuridik Maslahat 24 · Barcha huquqlar himoyalangan
       </p>
     </div>
   </div>
@@ -156,8 +161,8 @@ const handleLogin = async () => {
 
 <style scoped>
 input:focus {
-  border-color: #1e3a5f !important;
-  box-shadow: 0 0 0 2px rgba(30,58,95,0.12);
+  border-color: #1A3A6B !important;
+  box-shadow: 0 0 0 2px rgba(26,58,107,0.12);
   outline: none;
 }
 </style>

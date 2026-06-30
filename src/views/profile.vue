@@ -39,6 +39,7 @@ const passwordError = ref('')
 
 onMounted(() => {
     fillForm()
+    checkTgStatus()
 })
 
 const fillForm = () => {
@@ -146,6 +147,66 @@ const removeImage = () => {
     imgPreview.value = ''
 }
 
+// Telegram login
+const tgStatus = ref('loading') // 'loading' | 'connected' | 'disconnected'
+const tgPhone = ref('')
+const tgCode = ref('')
+const tgStep = ref(1)
+const tgLoading = ref(false)
+const tgError = ref('')
+
+const checkTgStatus = async () => {
+    try {
+        const { data } = await api.get('/api/telegram/status')
+        tgStatus.value = data.connected ? 'connected' : 'disconnected'
+        if (data.phone) tgPhone.value = data.phone
+    } catch {
+        tgStatus.value = 'disconnected'
+    }
+}
+
+const tgSendCode = async () => {
+    tgError.value = ''
+    tgLoading.value = true
+    try {
+        await api.post('/api/telegram/send-code', { phone: tgPhone.value })
+        tgStep.value = 2
+    } catch (e) {
+        tgError.value = e?.response?.data?.message || 'Xatolik yuz berdi'
+    } finally {
+        tgLoading.value = false
+    }
+}
+
+const tgSignIn = async () => {
+    tgError.value = ''
+    tgLoading.value = true
+    try {
+        await api.post('/api/telegram/sign-in', { phone: tgPhone.value, code: tgCode.value })
+        tgStatus.value = 'connected'
+        tgStep.value = 1
+        tgCode.value = ''
+    } catch (e) {
+        tgError.value = e?.response?.data?.message || 'Kod noto\'g\'ri'
+    } finally {
+        tgLoading.value = false
+    }
+}
+
+const tgLogout = async () => {
+    tgLoading.value = true
+    try {
+        await api.post('/api/telegram/logout')
+        tgStatus.value = 'disconnected'
+        tgPhone.value = ''
+        tgStep.value = 1
+    } catch {
+        tgStatus.value = 'disconnected'
+    } finally {
+        tgLoading.value = false
+    }
+}
+
 const fields = computed(() => [
     { label: proxy.$t('Ism'), key: 'name', type: 'text', placeholder: proxy.$t('Ismingizni kiriting') },
     { label: proxy.$t('Familiya'), key: 'surname', type: 'text', placeholder: proxy.$t('Familiyangizni kiriting') },
@@ -215,7 +276,7 @@ const formatField = (field, e) => {
         <!-- Profile header card -->
         <div
             class="rounded p-6 flex flex-col sm:flex-row items-center sm:items-start gap-5 relative overflow-hidden"
-            style="background:#1e3a5f;">
+            style="background:#1A3A6B;">
             <div class="absolute top-0 right-0 w-0 h-0 pointer-events-none"></div>
 
             <!-- Avatar -->
@@ -313,9 +374,9 @@ const formatField = (field, e) => {
 
         <!-- Info fields card -->
         <div class="rounded overflow-hidden shadow-sm"
-            :style="themeStore.isDark ? 'background:#1f2937; border:1px solid #374151;' : 'background:#ffffff; border:1px solid #d8dde6;'">
+            :style="themeStore.isDark ? 'background:#264a75; border:1px solid #3a6090;' : 'background:#ffffff; border:1px solid #d8dde6;'">
             <div class="px-6 py-4 border-b flex items-center gap-3"
-                :style="themeStore.isDark ? 'border-color:#374151; background:#111827;' : 'border-color:#eaecf0; background:#f7f8fa;'">
+                :style="themeStore.isDark ? 'border-color:#3a6090; background:#1e3a5f;' : 'border-color:#eaecf0; background:#f7f8fa;'">
                 <div class="w-7 h-7 rounded-xl flex items-center justify-center"
                     :class="themeStore.isDark ? 'bg-blue-500/15' : 'bg-blue-50'">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -325,7 +386,7 @@ const formatField = (field, e) => {
                     </svg>
                 </div>
                 <h3 class="text-sm font-bold"
-                    :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">
+                    :style="themeStore.isDark ? 'color:#ddeaff' : 'color:#1a1f36'">
                     {{ $t("Shaxsiy ma'lumotlar") }}
                 </h3>
             </div>
@@ -333,7 +394,7 @@ const formatField = (field, e) => {
             <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div v-for="field in fields" :key="field.key" class="space-y-1.5">
                     <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                        :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">
+                        :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
                         {{ $t(field.label) }}
                     </label>
                     <template v-if="isEditing && !field.readonly">
@@ -358,9 +419,112 @@ const formatField = (field, e) => {
             </div>
         </div>
 
+        <!-- Telegram ulanish card -->
+        <div class="rounded overflow-hidden shadow-sm"
+            :style="themeStore.isDark ? 'background:#264a75; border:1px solid #3a6090;' : 'background:#ffffff; border:1px solid #d8dde6;'">
+            <div class="px-6 py-4 border-b flex items-center gap-3"
+                :style="themeStore.isDark ? 'border-color:#3a6090; background:#1e3a5f;' : 'border-color:#eaecf0; background:#f7f8fa;'">
+                <div class="w-7 h-7 rounded-xl flex items-center justify-center" style="background:#229ED9/15">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#229ED9" class="w-4 h-4">
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.4 13.893l-2.93-.918c-.638-.196-.651-.638.136-.943l11.438-4.41c.531-.197.999.131.85.599z"/>
+                    </svg>
+                </div>
+                <h3 class="text-sm font-bold" :style="themeStore.isDark ? 'color:#ddeaff' : 'color:#1a1f36'">
+                    Telegram ulanish
+                </h3>
+                <span v-if="tgStatus === 'connected'"
+                    class="ml-auto text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+                    Ulangan ✓
+                </span>
+                <span v-else-if="tgStatus === 'disconnected'"
+                    class="ml-auto text-xs font-semibold px-2.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
+                    Ulanmagan
+                </span>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <!-- Ulangan holat -->
+                <div v-if="tgStatus === 'connected'" class="space-y-3">
+                    <div class="flex items-center gap-3 p-3 rounded-xl"
+                        :class="themeStore.isDark ? 'bg-emerald-900/20 border border-emerald-800/30' : 'bg-emerald-50 border border-emerald-200'">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-emerald-500 shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                            <p class="text-sm font-semibold text-emerald-700 dark:text-emerald-400">Muvaffaqiyatli ulangan</p>
+                            <p v-if="tgPhone" class="text-xs text-emerald-600/70 dark:text-emerald-500/70">+{{ tgPhone }}</p>
+                        </div>
+                    </div>
+                    <button @click="tgLogout" :disabled="tgLoading"
+                        class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-red-500 border border-red-200 dark:border-red-800/30 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all disabled:opacity-60">
+                        <div v-if="tgLoading" class="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div>
+                        Chiqish (logout)
+                    </button>
+                </div>
+
+                <!-- Login holat -->
+                <div v-else class="space-y-4">
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                        Telegram akkauntingizni ulang — shundan keyin mijozlarga to'g'ridan-to'g'ri xabar yuborish mumkin bo'ladi.
+                    </p>
+
+                    <!-- Qadam 1: telefon -->
+                    <div v-if="tgStep === 1" class="space-y-3">
+                        <div class="space-y-1.5">
+                            <label class="block text-[11px] font-semibold uppercase tracking-widest"
+                                :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
+                                Telefon raqam (xalqaro format)
+                            </label>
+                            <input v-model="tgPhone" type="tel" placeholder="+998901234567"
+                                class="w-full px-3.5 py-2.5 rounded-xl text-sm transition-all focus:outline-none"
+                                :class="themeStore.isDark
+                                    ? 'bg-white/5 border border-white/10 text-slate-100 placeholder-slate-600 focus:border-[#229ED9]'
+                                    : 'bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#229ED9]'" />
+                        </div>
+                        <p v-if="tgError" class="text-xs text-red-500">{{ tgError }}</p>
+                        <button @click="tgSendCode" :disabled="tgLoading || !tgPhone"
+                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97] disabled:opacity-60"
+                            style="background:#229ED9;">
+                            <div v-if="tgLoading" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            SMS kod yuborish
+                        </button>
+                    </div>
+
+                    <!-- Qadam 2: kod -->
+                    <div v-if="tgStep === 2" class="space-y-3">
+                        <div class="space-y-1.5">
+                            <label class="block text-[11px] font-semibold uppercase tracking-widest"
+                                :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
+                                Telegram dan kelgan kod
+                            </label>
+                            <input v-model="tgCode" type="text" placeholder="12345" maxlength="6"
+                                class="w-full px-3.5 py-2.5 rounded-xl text-sm transition-all focus:outline-none tracking-widest font-mono"
+                                :class="themeStore.isDark
+                                    ? 'bg-white/5 border border-white/10 text-slate-100 placeholder-slate-600 focus:border-[#229ED9]'
+                                    : 'bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#229ED9]'" />
+                        </div>
+                        <p v-if="tgError" class="text-xs text-red-500">{{ tgError }}</p>
+                        <div class="flex gap-2">
+                            <button @click="tgStep = 1; tgCode = ''; tgError = ''"
+                                class="px-4 py-2.5 rounded-xl text-sm font-medium"
+                                :class="themeStore.isDark ? 'text-slate-400' : 'text-slate-500'">
+                                Orqaga
+                            </button>
+                            <button @click="tgSignIn" :disabled="tgLoading || !tgCode"
+                                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97] disabled:opacity-60"
+                                style="background:#229ED9;">
+                                <div v-if="tgLoading" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Tasdiqlash
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Password change card -->
         <div class="rounded overflow-hidden shadow-sm"
-            :style="themeStore.isDark ? 'background:#1f2937; border:1px solid #374151;' : 'background:#ffffff; border:1px solid #d8dde6;'">
+            :style="themeStore.isDark ? 'background:#264a75; border:1px solid #3a6090;' : 'background:#ffffff; border:1px solid #d8dde6;'">
             <button @click="showPasswordSection = !showPasswordSection"
                 class="w-full px-6 py-4 flex items-center justify-between transition-colors">
                 <div class="flex items-center gap-3">
@@ -373,7 +537,7 @@ const formatField = (field, e) => {
                         </svg>
                     </div>
                     <h3 class="text-sm font-bold"
-                        :style="themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36'">
+                        :style="themeStore.isDark ? 'color:#ddeaff' : 'color:#1a1f36'">
                         {{ $t("Parolni o'zgartirish") }}
                     </h3>
                 </div>
@@ -393,7 +557,7 @@ const formatField = (field, e) => {
                 leave-active-class="transition-all duration-150 ease-in"
                 leave-to-class="opacity-0 -translate-y-2">
                 <div v-if="showPasswordSection" class="px-6 pb-6 space-y-4 border-t pt-5"
-                    :style="themeStore.isDark ? 'border-color:#374151' : 'border-color:#eaecf0'">
+                    :style="themeStore.isDark ? 'border-color:#3a6090' : 'border-color:#eaecf0'">
 
                     <div v-if="passwordError"
                         class="p-3.5 rounded-xl text-xs flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400">
@@ -405,7 +569,7 @@ const formatField = (field, e) => {
 
                     <div class="space-y-1.5">
                         <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                            :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">
+                            :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
                             {{ $t('Joriy parol') }}
                         </label>
                         <input v-model="passwords.current" type="password" :placeholder="$t('Joriy parolni kiriting')"
@@ -418,7 +582,7 @@ const formatField = (field, e) => {
                     <div class="grid sm:grid-cols-2 gap-4">
                         <div class="space-y-1.5">
                             <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                                :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">
+                                :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
                                 {{ $t('Yangi parol') }}
                             </label>
                             <input v-model="passwords.new" type="password" :placeholder="$t('Yangi parol (min. 6)')"
@@ -429,7 +593,7 @@ const formatField = (field, e) => {
                         </div>
                         <div class="space-y-1.5">
                             <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                                :style="themeStore.isDark ? 'color:#6b7280' : 'color:#4a5568'">
+                                :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
                                 {{ $t('Tasdiqlash') }}
                             </label>
                             <input v-model="passwords.confirm" type="password" :placeholder="$t('Parolni qayta kiriting')"
@@ -442,7 +606,7 @@ const formatField = (field, e) => {
 
                     <button @click="saveProfile" :disabled="isSaving"
                         class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97] disabled:opacity-60"
-                        style="background:#1e3a5f;">
+                        style="background:#1A3A6B;">
                         <span v-if="isSaving"
                             class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                         <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2"
@@ -460,9 +624,9 @@ const formatField = (field, e) => {
 
 <style scoped>
 .btn-primary {
-    background: #1e3a5f;
+    background: #1A3A6B;
 }
 .btn-primary:hover {
-    background: #162d4a;
+    background: #163060;
 }
 </style>

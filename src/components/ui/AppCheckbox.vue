@@ -10,7 +10,7 @@ defineEmits(['change'])
     <button type="button" @click="$emit('change')"
         class="relative w-5 h-5 rounded flex items-center justify-center shrink-0 transition-all duration-150 focus:outline-none"
         :style="(checked || indeterminate)
-            ? 'background:#1e3a5f; border:2px solid #1e3a5f;'
+            ? 'background:#1A3A6B; border:2px solid #1A3A6B;'
             : 'background:#ffffff; border:2px solid #d8dde6;'
         ">
         <!-- Checkmark -->

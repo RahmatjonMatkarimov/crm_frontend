@@ -274,12 +274,12 @@ watch(
                 style="backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
 
                 <div class="relative w-full h-full flex flex-col overflow-hidden shadow-2xl"
-                    :style="themeStore.isDark ? 'background:#1f2937;' : 'background:#ffffff;'">
+                    :style="themeStore.isDark ? 'background:#264a75;' : 'background:#ffffff;'">
 
                     <!-- Header -->
-                    <div class="px-6 py-5 flex items-center justify-between shrink-0" style="background:#1e3a5f;">
+                    <div class="px-6 py-5 flex items-center justify-between shrink-0" style="background:#1A3A6B; border-bottom:3px solid #2E8B57;">
                         <div>
-                            <h2 class="text-white text-base font-bold">
+                            <h2 class="text-white text-base font-bold tracking-wide">
                                 {{ isEditing ? $t('Xodimni tahrirlash') : $t("Yangi xodim qo'shish") }}
                             </h2>
                             <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.55);">{{ $t("Barcha majburiy maydonlarni to'ldiring") }}</p>
@@ -376,7 +376,7 @@ watch(
                                     </span>
                                     <input v-model="newUserPassword" :type="showPassword ? 'text' : 'password'" required
                                         :placeholder="$t('Parolni kiriting')"
-                                        class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
+                                        class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
                                     <button type="button" @click="showPassword = !showPassword"
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
                                         <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -426,7 +426,7 @@ watch(
                                     </span>
                                     <input v-model="newUserTelegram" @input="handleInput" type="text"
                                         :placeholder="$t('@username yoki +998 XX XXX XX XX')"
-                                        class="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f]/20" />
+                                        class="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
                                 </div>
                             </div>
 
@@ -470,15 +470,15 @@ watch(
 
                     <!-- Footer -->
                     <div class="px-6 py-4 flex justify-end gap-3 shrink-0"
-                        :style="themeStore.isDark ? 'border-top:1px solid #374151; background:#111827;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
+                        :style="themeStore.isDark ? 'border-top:1px solid #3a6090; background:#1e3a5f;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
                         <button @click="closeModal"
                             class="px-5 py-2 rounded text-sm font-medium transition-all"
-                            :style="themeStore.isDark ? 'color:#9ca3af;' : 'color:#4a5568;'">
+                            :style="themeStore.isDark ? 'color:#7aaad4;' : 'color:#4a5568;'">
                             {{ $t('Bekor qilish') }}
                         </button>
                         <button @click="saveUser" :disabled="authStore.loading"
                             class="px-5 py-2 rounded text-white text-sm font-semibold flex items-center gap-2 active:scale-[0.97] transition-all disabled:opacity-60"
-                            style="background:#1e3a5f;">
+                            style="background:#1A3A6B;">
                             <span v-if="authStore.loading"
                                 class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                             {{ authStore.loading ? $t('Saqlanmoqda...') : (isEditing ? $t('Saqlash') : $t('Yaratish')) }}

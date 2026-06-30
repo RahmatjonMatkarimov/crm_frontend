@@ -47,8 +47,8 @@
       justify-content: center;
       gap: 16px;
     }
-    
-    .header-bg{
+
+    .header-bg {
       background: #1a2744;
       padding: 22px 30px 18px;
     }
@@ -65,7 +65,7 @@
       max-width: 500px;
     }
 
-    .header-left{
+    .header-left {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -499,7 +499,8 @@
           <div class="bureau-name">Юридик Хизматлар ва Ҳужжатлар Тайёрлаш Бюроси</div>
           <div style="display: flex; align-items: center; gap: 20px;">
             <div class="subtitle">Мижоз қабул картаси — ички ҳисоб ва қабулни рўйхатга олиш ҳужжати </div>
-            <div class="subtitle" style="background: #c8a84b; padding: 3px 5px; color: black; border-radius: 5px;" id="mijoz-id"></div>
+            <div class="subtitle" style="background: #c8a84b; padding: 3px 5px; color: black; border-radius: 5px;"
+              id="mijoz-id"></div>
           </div>
         </div>
         <!-- <div style="display: flex; align-items: center; gap: 10px; max-width: 200px;">
@@ -646,7 +647,8 @@
         </div>
         <div class="term-item">
           <div class="term-num">2</div>
-          <div class="term-text">Қабул картаси мурожаат этувчининг ҳуқуқий маслаҳат олиши учун расмий ҳужжат ҳисобланади ҳамда ундан кейинги ҳуқуқий маслаҳатлар бўйича мурожаатларда ҳам фойдаланилиши мумкин.</div>
+          <div class="term-text">Қабул картаси мурожаат этувчининг ҳуқуқий маслаҳат олиши учун расмий ҳужжат ҳисобланади
+            ҳамда ундан кейинги ҳуқуқий маслаҳатлар бўйича мурожаатларда ҳам фойдаланилиши мумкин.</div>
         </div>
         <div class="term-item">
           <div class="term-num">3</div>
@@ -760,28 +762,32 @@
       set('mijoz-id-print', p.get('id'));
       set('qabul-raqam', p.get('raqam'));
       set('qabul-yurist', p.get('yurist'));
-const sana = p.get('sana');
-const date = new Date(Number(sana));
+      const sana = p.get('sana');
+      const date = new Date(Number(sana));
 
-// Sana formatlash funksiyasi
-const formatDateTime = (d) => {
-  return (
-    String(d.getDate()).padStart(2, '0') + '.' +
-    String(d.getMonth() + 1).padStart(2, '0') + '.' +
-    d.getFullYear() + ' ' +
-    String(d.getHours()).padStart(2, '0') + ':' +
-    String(d.getMinutes()).padStart(2, '0')
-  );
-};
+      // Sana formatlash funksiyasi
+      const formatDateTime = (d) => {
+        return (
+          String(d.getDate()).padStart(2, '0') + '.' +
+          String(d.getMonth() + 1).padStart(2, '0') + '.' +
+          d.getFullYear() + ' ' +
+          String(d.getHours()).padStart(2, '0') + ':' +
+          String(d.getMinutes()).padStart(2, '0')
+        );
+      };
 
-// Berilgan sana
-set('berilgan-sana', formatDateTime(date));
+      // Berilgan sana
+      set('berilgan-sana', formatDateTime(date));
 
-// Amal qilish muddati (+8 kun)
-const expireDate = new Date(Number(sana));
-expireDate.setDate(expireDate.getDate() + 8);
+      // Amal qilish muddati (+8 kun)
+      const expireDate = new Date(Number(sana));
+      expireDate.setDate(expireDate.getDate() + 8);
 
-set('amal-qilish-muddat', formatDateTime(expireDate));
+      set('amal-qilish-muddat', formatDateTime(expireDate));
+
+      setTimeout(() => {
+        window.print();
+      }, 300);
     };
   </script>
 </body>

@@ -69,7 +69,7 @@ const sourceMap = computed(() => ({
   INSTAGRAM: { label: 'Instagram',             color: '#e1306c' },
   TELEGRAM:  { label: 'Telegram',              color: '#2ea6dd' },
   YOUTUBE:   { label: 'YouTube',               color: '#ff0000' },
-  TANISHIDAN:{ label: langStore.t('Tanishidan'), color: '#276749' },
+  TANISHIDAN:{ label: langStore.t('Tanishidan'), color: '#2E8B57' },
 }))
 
 const sourceStats = computed(() => {
@@ -84,9 +84,9 @@ const sourceStats = computed(() => {
 })
 
 const paymentTypeMap = computed(() => ({
-  NAQD:        { label: langStore.t("Naqd pul"),       color: '#1e3a5f' },
+  NAQD:        { label: langStore.t("Naqd pul"),       color: '#1A3A6B' },
   KARTA:       { label: langStore.t('Plastik karta'),  color: '#b45309' },
-  PUL_OTKAZISH:{ label: langStore.t("Pul o'tkazish"),  color: '#276749' },
+  PUL_OTKAZISH:{ label: langStore.t("Pul o'tkazish"),  color: '#2E8B57' },
 }))
 
 const paymentTypeStats = computed(() => {
@@ -212,12 +212,12 @@ const sourceTotal = computed(() => sourceStats.value.reduce((a, b) => a + b.coun
 const sourceSegments = computed(() => donutSegments(sourceStats.value, sourceTotal.value))
 
 const card = computed(() => themeStore.isDark
-  ? 'background:#1f2937; border:1px solid #374151;'
-  : 'background:#ffffff; border:1px solid #d8dde6;')
-const textPrimary = computed(() => themeStore.isDark ? 'color:#f3f4f6' : 'color:#1a1f36')
-const textSecondary = computed(() => themeStore.isDark ? 'color:#9ca3af' : 'color:#4a5568')
-const textMuted = computed(() => themeStore.isDark ? 'color:#6b7280' : 'color:#8892a4')
-const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'background:#eaecf0')
+  ? 'background:#1c3252; border:1px solid #2a4a6e;'
+  : 'background:#ffffff; border:1px solid #d0d7e3;')
+const textPrimary = computed(() => themeStore.isDark ? 'color:#e8f0ff' : 'color:#1a1f36')
+const textSecondary = computed(() => themeStore.isDark ? 'color:#90b8e0' : 'color:#4a5568')
+const textMuted = computed(() => themeStore.isDark ? 'color:#6090b8' : 'color:#8892a4')
+const divider = computed(() => themeStore.isDark ? 'background:#3a6090' : 'background:#eaecf0')
 </script>
 
 <template>
@@ -230,9 +230,9 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
         @click="selectedPeriod = p.key"
         class="px-4 py-1.5 rounded text-xs font-semibold transition-all"
         :style="selectedPeriod === p.key
-          ? 'background:#1e3a5f; color:#ffffff; border:1px solid #1e3a5f;'
+          ? 'background:#1A3A6B; color:#ffffff; border:1px solid #1A3A6B; border-radius:4px;'
           : themeStore.isDark
-            ? 'background:#374151; color:#9ca3af; border:1px solid #4b5563;'
+            ? 'background:#1c3252; color:#90b8e0; border:1px solid #2a4a6e;'
             : 'background:#ffffff; color:#4a5568; border:1px solid #d8dde6;'">
         {{ $t(p.label) }}
       </button>
@@ -242,10 +242,10 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
       <!-- Mijozlar -->
-      <div class="rounded p-5" :style="card">
+      <div class="p-5" :style="card + '; border-top:3px solid #1A3A6B; border-radius:4px;'">
         <div class="flex items-center justify-between mb-3">
-          <div class="w-9 h-9 rounded flex items-center justify-center" style="background:#eef2f7;">
-            <svg class="w-5 h-5" style="color:#1e3a5f;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <div class="w-9 h-9 rounded flex items-center justify-center" style="background:#eff3f9;">
+            <svg class="w-5 h-5" style="color:#1A3A6B;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
@@ -255,10 +255,10 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
       </div>
 
       <!-- Tushum -->
-      <div class="rounded p-5" :style="card">
+      <div class="p-5" :style="card + '; border-top:3px solid #2E8B57; border-radius:4px;'">
         <div class="flex items-center justify-between mb-3">
-          <div class="w-9 h-9 rounded flex items-center justify-center" style="background:#f0fdf4;">
-            <svg class="w-5 h-5" style="color:#276749;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <div class="w-9 h-9 rounded flex items-center justify-center" :style="themeStore.isDark ? 'background:#1a4a2a;' : 'background:#f0fdf4;'">
+            <svg class="w-5 h-5" style="color:#2E8B57;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
@@ -268,9 +268,9 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
       </div>
 
       <!-- Qarz -->
-      <div class="rounded p-5" :style="card">
+      <div class="p-5" :style="card + '; border-top:3px solid #c53030; border-radius:4px;'">
         <div class="flex items-center justify-between mb-3">
-          <div class="w-9 h-9 rounded flex items-center justify-center" style="background:#fff5f5;">
+          <div class="w-9 h-9 rounded flex items-center justify-center" :style="themeStore.isDark ? 'background:#4a1818;' : 'background:#fff5f5;'">
             <svg class="w-5 h-5" style="color:#c53030;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
             </svg>
@@ -281,9 +281,9 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
       </div>
 
       <!-- Qarzdorlar -->
-      <div class="rounded p-5" :style="card">
+      <div class="p-5" :style="card + '; border-top:3px solid #b45309; border-radius:4px;'">
         <div class="flex items-center justify-between mb-3">
-          <div class="w-9 h-9 rounded flex items-center justify-center" style="background:#fffbeb;">
+          <div class="w-9 h-9 rounded flex items-center justify-center" :style="themeStore.isDark ? 'background:#4a2800;' : 'background:#fffbeb;'">
             <svg class="w-5 h-5" style="color:#b45309;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -301,7 +301,7 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
       <div class="lg:col-span-2 rounded p-5" :style="card">
         <div class="flex items-center justify-between mb-5">
           <h3 class="text-sm font-semibold" :style="textPrimary">{{ langStore.t(chartTitle) }}</h3>
-          <span class="text-[10px] font-semibold px-2 py-1 rounded" :style="themeStore.isDark ? 'background:#374151; color:#9ca3af;' : 'background:#f0f2f5; color:#4a5568;'">{{ $t("So'm") }}</span>
+          <span class="text-[10px] font-semibold px-2 py-1 rounded" :style="themeStore.isDark ? 'background:#1c3252; color:#90b8e0;' : 'background:#f0f2f5; color:#4a5568;'">{{ $t("So'm") }}</span>
         </div>
         <div class="flex items-end gap-2 h-44">
           <div v-for="m in chartBars" :key="m.label" class="flex-1 flex flex-col items-center gap-1.5">
@@ -311,7 +311,7 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
             <div class="w-full rounded-t min-h-[4px] transition-all duration-700"
               :style="{
                 height: Math.max((m.amount / maxChartAmount) * 140, 4) + 'px',
-                background: themeStore.isDark ? '#2d5282' : '#1e3a5f'
+                background: themeStore.isDark ? '#2d5282' : '#1A3A6B'
               }">
             </div>
             <span class="text-[9px] text-center leading-tight whitespace-pre-line" :style="textMuted">{{ langStore.t(m.label)}}</span>
@@ -320,12 +320,12 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
       </div>
 
       <!-- Manba donut -->
-      <div class="rounded p-5" :style="card">
+      <div class="p-5" :style="card + '; border-radius:4px;'">
         <h3 class="text-sm font-semibold mb-5" :style="textPrimary">{{ langStore.t("Manba bo'yicha") }}</h3>
         <div class="flex flex-col items-center gap-4">
           <svg viewBox="0 0 100 100" class="w-28 h-28 shrink-0 -rotate-90">
             <circle cx="50" cy="50" r="42" fill="none"
-              :stroke="themeStore.isDark ? '#374151' : '#eaecf0'" stroke-width="14" />
+              :stroke="themeStore.isDark ? '#2a4a6e' : '#eaecf0'" stroke-width="14" />
             <template v-if="sourceTotal > 0">
               <circle v-for="seg in sourceSegments" :key="seg.key"
                 cx="50" cy="50" r="42" fill="none"
@@ -336,7 +336,7 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
             </template>
             <template v-else>
               <circle cx="50" cy="50" r="42" fill="none"
-                :stroke="themeStore.isDark ? '#374151' : '#eaecf0'" stroke-width="14" />
+                :stroke="themeStore.isDark ? '#2a4a6e' : '#eaecf0'" stroke-width="14" />
             </template>
           </svg>
           <div class="w-full space-y-2">
@@ -359,7 +359,7 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
       <!-- To'lov turi -->
-      <div class="rounded p-5" :style="card">
+      <div class="p-5" :style="card + '; border-radius:4px;'">
         <h3 class="text-sm font-semibold mb-5" :style="textPrimary">{{ langStore.t("To'lov turi") }}</h3>
         <div class="space-y-4">
           <div v-for="pt in paymentTypeStats" :key="pt.key">
@@ -370,7 +370,7 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
                 <span class="text-xs font-bold" :style="textPrimary">{{ pt.pct }}%</span>
               </div>
             </div>
-            <div class="h-1.5 rounded-full overflow-hidden" :style="themeStore.isDark ? 'background:#374151' : 'background:#eaecf0'">
+            <div class="h-1.5 rounded-full overflow-hidden" :style="themeStore.isDark ? 'background:#3a6090' : 'background:#eaecf0'">
               <div class="h-1.5 rounded-full transition-all duration-700"
                 :style="{ width: pt.pct + '%', background: pt.color }">
               </div>
@@ -380,15 +380,15 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
       </div>
 
       <!-- To'lov holati -->
-      <div class="rounded p-5" :style="card">
+      <div class="p-5" :style="card + '; border-radius:4px;'">
         <h3 class="text-sm font-semibold mb-5" :style="textPrimary">{{ langStore.t("To'lov holati") }}</h3>
         <div class="flex flex-col items-center gap-4">
           <div class="relative w-28 h-28">
             <svg viewBox="0 0 100 100" class="-rotate-90 w-full h-full">
               <circle cx="50" cy="50" r="42" fill="none"
-                :stroke="themeStore.isDark ? '#374151' : '#eaecf0'" stroke-width="14" />
+                :stroke="themeStore.isDark ? '#2a4a6e' : '#eaecf0'" stroke-width="14" />
               <circle cx="50" cy="50" r="42" fill="none"
-                stroke="#276749" stroke-width="14"
+                stroke="#2E8B57" stroke-width="14"
                 :stroke-dasharray="`${totalCustomers > 0 ? (paidCount / totalCustomers) * 263.9 : 0} 263.9`"
                 stroke-dashoffset="0" style="transition: all 0.7s ease;" />
               <circle cx="50" cy="50" r="42" fill="none"
@@ -405,14 +405,14 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
             </div>
           </div>
           <div class="w-full space-y-2">
-            <div class="flex items-center justify-between p-2.5 rounded" style="background:#f0fdf4;">
+            <div class="flex items-center justify-between p-2.5 rounded" :style="themeStore.isDark ? 'background:#1a4a2a; border:1px solid #2a6a3a;' : 'background:#f0fdf4;'">
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full" style="background:#276749;"></span>
-                <span class="text-xs font-medium" style="color:#276749;">{{ langStore.t("To'lagan") }}</span>
+                <span class="w-2 h-2 rounded-full" style="background:#2E8B57;"></span>
+                <span class="text-xs font-medium" style="color:#2E8B57;">{{ langStore.t("To'lagan") }}</span>
               </div>
-              <span class="text-sm font-bold" style="color:#276749;">{{ paidCount }}</span>
+              <span class="text-sm font-bold" style="color:#2E8B57;">{{ paidCount }}</span>
             </div>
-            <div class="flex items-center justify-between p-2.5 rounded" style="background:#fff5f5;">
+            <div class="flex items-center justify-between p-2.5 rounded" :style="themeStore.isDark ? 'background:#4a1818; border:1px solid #6a2828;' : 'background:#fff5f5;'">
               <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full" style="background:#c53030;"></span>
                 <span class="text-xs font-medium" style="color:#c53030;">{{ langStore.t('Qarzdor') }}</span>
@@ -424,25 +424,25 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
       </div>
 
       <!-- Xodimlar reytingi -->
-      <div class="rounded p-5" :style="card">
+      <div class="p-5" :style="card + '; border-radius:4px;'">
         <h3 class="text-sm font-semibold mb-5" :style="textPrimary">{{ langStore.t('Xodimlar reytingi') }}</h3>
         <div v-if="workerStats.length > 0" class="space-y-2">
           <div v-for="(w, i) in workerStats" :key="i"
             class="flex items-center gap-3 p-2.5 rounded transition-all"
-            :style="themeStore.isDark ? 'background:#374151;' : 'background:#f7f8fa;'">
+            :style="themeStore.isDark ? 'background:#305080;' : 'background:#f7f8fa;'">
             <span class="w-6 h-6 rounded text-xs font-bold flex items-center justify-center shrink-0"
               :style="i === 0
                 ? 'background:#b45309; color:#fff;'
                 : i === 1
                   ? 'background:#6b7280; color:#fff;'
-                  : themeStore.isDark ? 'background:#4b5563; color:#9ca3af;' : 'background:#eaecf0; color:#4a5568;'">
+                  : themeStore.isDark ? 'background:#3a6090; color:#90b8e0;' : 'background:#eaecf0; color:#4a5568;'">
               {{ i + 1 }}
             </span>
             <div class="flex-1 min-w-0">
               <p class="text-xs font-semibold truncate" :style="textPrimary">{{ $t(w.name) }}</p>
               <p class="text-[10px]" :style="textMuted">{{ fmt(w.revenue) }} so'm</p>
             </div>
-            <span class="text-xs font-bold px-2 py-0.5 rounded" :style="themeStore.isDark ? 'background:#4b5563; color:#9ca3af;' : 'background:#eef2f7; color:#1e3a5f;'">
+            <span class="text-xs font-bold px-2 py-0.5 rounded" :style="themeStore.isDark ? 'background:#3a6090; color:#90b8e0;' : 'background:#eff3f9; color:#1A3A6B;'">
               {{ w.count }}
             </span>
           </div>
@@ -455,10 +455,10 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
 
     <!-- SO'NGGI MIJOZLAR -->
     <div class="rounded overflow-hidden" :style="card">
-      <div class="px-5 py-3.5 flex items-center justify-between" :style="`border-bottom:1px solid ${themeStore.isDark ? '#374151' : '#eaecf0'};`">
+      <div class="px-5 py-3.5 flex items-center justify-between" :style="`border-bottom:1px solid ${themeStore.isDark ? '#2a4a6e' : '#eaecf0'};`">
         <h3 class="text-sm font-semibold" :style="textPrimary">{{ langStore.t("So'nggi mijozlar") }}</h3>
         <button @click="router.push('/customers')"
-          class="text-xs font-medium flex items-center gap-1 transition-colors" style="color:#1e3a5f;">
+          class="text-xs font-medium flex items-center gap-1 transition-colors" style="color:#1A3A6B;">
           {{ langStore.t("Barchasini ko'rish") }}
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -470,7 +470,7 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
         <p class="text-sm" :style="textMuted">{{ langStore.t("Mijozlar yo'q") }}</p>
       </div>
 
-      <div v-else class="divide-y" :style="`border-color:${themeStore.isDark ? '#374151' : '#eaecf0'};`">
+      <div v-else class="divide-y" :style="`border-color:${themeStore.isDark ? '#2a4a6e' : '#eaecf0'};`">
         <div v-for="c in recentCustomers" :key="c.id"
           class="px-5 py-3 flex items-center gap-4 cursor-pointer group transition-all"
           :style="themeStore.isDark ? '' : ''"
@@ -479,7 +479,7 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
           @click="router.push('/customer/' + c.id)">
 
           <!-- Avatar -->
-          <div class="w-8 h-8 rounded flex items-center justify-center shrink-0 text-white text-sm font-bold" style="background:#1e3a5f;">
+          <div class="w-8 h-8 rounded flex items-center justify-center shrink-0 text-white text-sm font-bold" style="background:#1A3A6B;">
             {{ ($t(c.surname) || $t(c.name) || '?')[0].toUpperCase() }}
           </div>
 
@@ -501,8 +501,8 @@ const divider = computed(() => themeStore.isDark ? 'background:#374151' : 'backg
               :style="(() => {
                 const paid = (c.payments || []).reduce((a, p) => a + (p.amount || 0), 0)
                 return (c.price || 0) - paid > 0
-                  ? 'background:#fff5f5; color:#c53030;'
-                  : 'background:#f0fdf4; color:#276749;'
+                  ? (themeStore.isDark ? 'background:#4a1818; color:#e05555; border:1px solid #6a2828;' : 'background:#fff5f5; color:#c53030;')
+                  : (themeStore.isDark ? 'background:#1a4a2a; color:#3aab6d; border:1px solid #2a6a3a;' : 'background:#f0fdf4; color:#2E8B57;')
               })()">
               {{ (() => {
                 const paid = (c.payments || []).reduce((a, p) => a + (p.amount || 0), 0)

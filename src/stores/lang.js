@@ -10,10 +10,15 @@ export const useLangStore = defineStore('lang', () => {
     localStorage.setItem('lang', isKiril.value ? 'kiril' : 'lotin')
   }
 
+  function setLang(lang) {
+    isKiril.value = lang === 'kiril'
+    localStorage.setItem('lang', lang)
+  }
+
   function t(text) {
     if (!text) return text
     return isKiril.value ? translateText(String(text)) : String(text)
   }
 
-  return { isKiril, toggleLang, t }
+  return { isKiril, toggleLang, setLang, t }
 })

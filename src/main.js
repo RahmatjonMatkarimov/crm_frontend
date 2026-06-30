@@ -21,4 +21,14 @@ app.config.globalProperties.$t = (text) => {
   }
 }
 
+app.directive('click-outside', {
+  mounted(el, binding) {
+    el._clickOutside = (e) => { if (!el.contains(e.target)) binding.value(e) }
+    document.addEventListener('mousedown', el._clickOutside)
+  },
+  unmounted(el) {
+    document.removeEventListener('mousedown', el._clickOutside)
+  }
+})
+
 app.mount('#app')
