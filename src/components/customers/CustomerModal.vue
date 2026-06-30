@@ -49,6 +49,7 @@ const selectedDistrict = ref(null)
 const error = ref('')
 const success = ref('')
 const users = ref([])
+const submitted = ref(false)
 
 const handleInputPrice = (e) => {
   const rawValue = e.target.value.replace(/\D/g, '')
@@ -653,6 +654,7 @@ watch(() => props.editing, (val) => {
 
   error.value = ''
   success.value = ''
+  submitted.value = false
 }, { immediate: true })
 const autoCapFirst = (fieldRef) => {
   if (fieldRef.value && fieldRef.value[0] !== fieldRef.value[0].toUpperCase()) {
@@ -719,34 +721,7 @@ const handleInput = () => {
   telegram.value = formatted
 }
 
-const save = async () => {
-  error.value = ''
-  const isEditing = !!props.editing?.id
-  const emptyFields = []
-  if (!name.value) emptyFields.push('Ism')
-  if (!surname.value) emptyFields.push('Familiya')
-  if (!father_name.value) emptyFields.push('Otasining ismi')
-  if (!phone.value) emptyFields.push('Telefon raqam')
-  if (!selectedRegion.value) emptyFields.push('Viloyat')
-  if (!selectedDistrict.value) emptyFields.push('Tuman')
-  if (!source.value) emptyFields.push('Manba')
-  if (!assignedToId.value) emptyFields.push('Mas\'ul xodim')
-  if (paymentType.value !== 'NASIYA' && !paymentAmount.value) emptyFields.push('To\'lov miqdori')
-  if (!paymentType.value) emptyFields.push('To\'lov turi')
-  if (!price.value) emptyFields.push('Narx')
-  if (!telegram.value) emptyFields.push('Telegram')
-  if (emptyFields.length > 0) {
-    error.value = `Quyidagi maydonlar to\'ldirilmagan: ${emptyFields.join(', ')}`
-    return
-  }
-  // Popup brauzer tomonidan bloklanmasligi uchun user gesture paytida ochib qo'yamiz
-  const isNewCash = !props.editing?.id && paymentType.value
-  let popupWindow = null
-  if (isNewCash) {
-    popupWindow = window.open('about:blank', '_blank')
-  }
-
-  // To'liq manzilni birlashtirish
+const buildFullAddress = () => {
   let fullAddress = ''
   if (selectedRegion.value) {
     const region = regions.find(r => r.id === selectedRegion.value)
@@ -761,7 +736,155 @@ const save = async () => {
     if (fullAddress) fullAddress += ', '
     fullAddress += address.value.trim()
   }
+  return fullAddress
+}
 
+const validate = () => {
+  const emptyFields = []
+  if (!name.value) emptyFields.push('Ism')
+  if (!surname.value) emptyFields.push('Familiya')
+  if (!father_name.value) emptyFields.push('Otasining ismi')
+  if (!phone.value) emptyFields.push('Telefon raqam')
+  if (!selectedRegion.value) emptyFields.push('Viloyat')
+  if (!selectedDistrict.value) emptyFields.push('Tuman')
+  if (!source.value) emptyFields.push("Qayerdan eshitib kelgan")
+  if (!assignedToId.value) emptyFields.push("Mas'ul xodim")
+  if (paymentType.value !== 'NASIYA' && !paymentAmount.value) emptyFields.push("To'lov miqdori")
+  if (!paymentType.value) emptyFields.push("To'lov turi")
+  if (!price.value) emptyFields.push('Narx')
+  if (!telegram.value) emptyFields.push('Telegram')
+  return emptyFields
+}
+
+const openPreviewWindow = (fullAddress) => {
+  const fish = `${surname.value} ${name.value} ${father_name.value}`.trim()
+  const today = new Date()
+  const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`
+
+  const yuristUser = users.value.find(u => u.id === assignedToId.value)
+  const yuristName = yuristUser ? `${yuristUser.surname} ${yuristUser.name}` : '—'
+
+  const paymentLabel = paymentType.value === 'NAQD' ? 'Naqd pul'
+    : paymentType.value === 'KARTA' ? 'Plastik karta'
+    : paymentType.value === 'ONLINE' ? "Online to'lov"
+    : paymentType.value === 'NASIYA' ? 'Nasiya'
+    : "Bank o'tkazmasi"
+
+  const amountNum = paymentType.value === 'NASIYA' ? 0
+    : (paymentAmount.value ? Number(String(paymentAmount.value).replace(/\./g, '')) : 0)
+
+  sessionStorage.setItem('previewData', JSON.stringify({
+    fish,
+    formattedDate,
+    yuristName,
+    fullAddress,
+    phone: phone.value,
+    amountNum,
+    paymentLabel,
+    price: price.value,
+  }))
+
+  const pw = window.open('/preview', '_blank')
+  return pw
+}
+
+const save = async () => {
+  error.value = ''
+  submitted.value = true
+  const isEditing = !!props.editing?.id
+
+  const emptyFields = validate()
+  if (emptyFields.length > 0) {
+    error.value = `Quyidagi maydonlar to'ldirilmagan: ${emptyFields.join(', ')}`
+    return
+  }
+
+  if (!isEditing) {
+    // Yangi mijoz: avval preview ko'rsatiladi, backend keyinroq chaqiriladi
+    const fullAddress = buildFullAddress()
+    const previewWin = openPreviewWindow(fullAddress)
+
+    window.__doSaveAndPrint = async (pw) => {
+      const fullAddress2 = buildFullAddress()
+      const data = {
+        name: name.value,
+        surname: surname.value,
+        father_name: father_name.value || null,
+        phone: phone.value,
+        phone2: phone2.value || null,
+        address: fullAddress2 || null,
+        description: description.value || null,
+        assignedToId: assignedToId.value || null,
+        source: source.value || null,
+        telegram: telegram.value || null,
+        appealType: appealType.value || '',
+        paymentAmount: paymentType.value === 'NASIYA' ? 0 : (paymentAmount.value ? Number(String(paymentAmount.value).replace(/\./g, '')) : null),
+        paymentType: paymentType.value || null,
+        price: price.value !== '' ? Number(price.value) : 0,
+      }
+
+      const result = await store.createCustomer(data)
+
+      if (!result?.success) {
+        if (pw && !pw.closed) {
+          pw.document.getElementById('confirmBtn').disabled = false
+          pw.document.getElementById('confirmBtn').textContent = 'Saqlash va Chop etish'
+          pw.document.getElementById('confirmBtn').style.background = '#2E8B57'
+          pw.alert('Xatolik: ' + (result?.error || 'Noma\'lum xato'))
+        }
+        error.value = result?.error || 'Xatolik yuz berdi'
+        return
+      }
+
+      success.value = 'Mijoz yaratildi!'
+      const createdCustomer = result.customer
+      const fish = `${surname.value} ${name.value} ${father_name.value}`.trim()
+
+      // PDF chek yaratib backendga yuborish
+      const pdfBlob = await generateReceiptPDF({
+        fullName: fish,
+        clientId: createdCustomer?.customer_id || '—',
+        queueNumber: createdCustomer?.queueNumber || '—',
+      })
+
+      if (pdfBlob) {
+        const formData = new FormData()
+        formData.append('checkFile', pdfBlob, `chek-${surname.value || 'mijoz'}-${Date.now()}.pdf`)
+        const newPayment = createdCustomer.payments?.[createdCustomer.payments?.length - 1]
+        if (newPayment?.id) formData.append('paymentId', newPayment.id)
+
+        try {
+          await api.post(ENDPOINTS.CUSTOMER_CHECK(createdCustomer.id), formData)
+        } catch (e) {
+          console.error('❌ Chek yuklashda xato:', e)
+        }
+      }
+
+      const params = new URLSearchParams({
+        fish,
+        telefon: phone.value || '',
+        manzil: fullAddress2 || '',
+        id: `MJZ-${createdCustomer?.customer_id || ''}`,
+        raqam: `A-${String(createdCustomer?.queueNumber).padStart(2, '0')}`,
+        yurist: createdCustomer.assignedTo ? `${createdCustomer.assignedTo.surname} ${createdCustomer.assignedTo.name}` : '—',
+        sana: Date.now().toString()
+      })
+
+      // Preview oynasini chek print oynasiga aylantirish
+      printReceiptFrontend({
+        fullName: fish,
+        clientId: createdCustomer?.customer_id || '—',
+        queueNumber: createdCustomer?.queueNumber || '—',
+      }, `/qabulxati.html?${params.toString()}`, pw)
+
+      emit('saved')
+      setTimeout(() => emit('close'), 1800)
+    }
+    return
+  }
+
+  // Tahrirlash rejimi — to'g'ridan backend
+  const fullAddress = buildFullAddress()
   const data = {
     name: name.value,
     surname: surname.value,
@@ -773,74 +896,15 @@ const save = async () => {
     assignedToId: assignedToId.value || null,
     source: source.value || null,
     telegram: telegram.value || null,
-    appealType: appealType.value || "",
+    appealType: appealType.value || '',
     paymentAmount: paymentType.value === 'NASIYA' ? 0 : (paymentAmount.value ? Number(String(paymentAmount.value).replace(/\./g, '')) : null),
     paymentType: paymentType.value || null,
     price: price.value !== '' ? Number(price.value) : 0,
   }
 
-  const result = props.editing?.id
-    ? await store.updateCustomer(props.editing.id, data)
-    : await store.createCustomer(data)
-
+  const result = await store.updateCustomer(props.editing.id, data)
   if (result?.success) {
-    success.value = props.editing?.id ? 'Mijoz yangilandi!' : 'Mijoz yaratildi!'
-
-    // Yangi mijoz yaratilganda — chek chiqarish
-    const isNewCustomer = !props.editing?.id && paymentType.value
-    if (isNewCustomer) {
-      const customerData = result.customer || result
-      const createdCustomer = result.customer || result
-      const fish = `${surname.value} ${name.value} ${father_name.value}`.trim()
-      const params = new URLSearchParams({
-        fish,
-        telefon: phone.value || '',
-        manzil: fullAddress || '',
-        id: `MJZ-${createdCustomer?.customer_id || ''}`,
-        raqam: `A-${String(createdCustomer?.queueNumber).padStart(2, '0')}` || '',
-        yurist: createdCustomer.assignedTo ? `${createdCustomer.assignedTo.surname} ${createdCustomer.assignedTo.name}` : '—',
-        sana: Date.now().toString()
-      })
-
-      if (paymentType.value){
-        // Naqd/karta/online: PDF yaratib backendga saqlash
-        const pdfBlob = await generateReceiptPDF({
-          fullName: fish,
-          clientId: createdCustomer?.customer_id || '—',
-          queueNumber: createdCustomer?.queueNumber || '—',
-        })
-
-        if (pdfBlob) {
-          const formData = new FormData()
-          formData.append('checkFile', pdfBlob, `chek-${surname.value || 'mijoz'}-${Date.now()}.pdf`)
-
-          const newPayment = customerData.payments?.[customerData.payments?.length - 1]
-          if (newPayment?.id) {
-            formData.append('paymentId', newPayment.id)
-          }
-
-          try {
-            const res = await api.post(ENDPOINTS.CUSTOMER_CHECK(customerData.id), formData)
-            if (res.status === 200 || res.status === 201) {
-              printReceiptFrontend({
-                fullName: fish,
-                clientId: createdCustomer?.customer_id || '—',
-                queueNumber: createdCustomer?.queueNumber || '—',
-              }, `/qabulxati.html?${params.toString()}`, popupWindow)
-            } else {
-              console.error('❌ Chek saqlanmadi:', res.status)
-              if (popupWindow) popupWindow.close()
-            }
-          } catch (e) {
-            console.error('❌ Chek yuklashda xato:', e)
-            if (popupWindow) popupWindow.close()
-          }
-        } else {
-          if (popupWindow) popupWindow.close()
-        }
-      }
-    }
-
+    success.value = 'Mijoz yangilandi!'
     emit('saved')
     setTimeout(() => emit('close'), 1800)
   } else {
@@ -920,40 +984,40 @@ const paymentOptions = ref([
             <!-- Ism -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !name ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
                   $t('Ism') }}
-                <span class="text-red-500">*</span></label>
+                <span :class="name ? 'text-green-500' : 'text-red-500'">*</span></label>
               <input v-model="name" type="text" :placeholder="$t('Ism')"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1', submitted && !name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']" />
             </div>
 
             <!-- Familiya -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !surname ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
                   $t('Familiya') }}
-                <span class="text-red-500">*</span></label>
+                <span :class="surname ? 'text-green-500' : 'text-red-500'">*</span></label>
               <input v-model="surname" type="text" :placeholder="$t('Familiya')"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1', submitted && !surname ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']" />
             </div>
 
             <!-- Otasining ismi -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
-                  $t('Otasining ismi') }} <span class="text-red-500">*</span></label>
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !father_name ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                  $t('Otasining ismi') }} <span :class="father_name ? 'text-green-500' : 'text-red-500'">*</span></label>
               <input v-model="father_name" type="text" :placeholder="$t('Otasining ismi')"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1', submitted && !father_name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']" />
             </div>
 
             <!-- Telefon -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !phone ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
                   $t('Telefon') }}
-                <span class="text-red-500">*</span></label>
+                <span :class="phone ? 'text-green-500' : 'text-red-500'">*</span></label>
               <input v-model="phone" @input="handlePhone($event, 1)" type="tel" placeholder="+998 XX XXX XX XX"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1', submitted && !phone ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']" />
               <label class="flex items-center mt-1 gap-2 text-sm cursor-pointer">
                 <input type="checkbox" v-model="phone2isTelegram" @change="handlePhone2isTelegram"
                   class="w-4 h-4 accent-blue-600">
@@ -965,9 +1029,9 @@ const paymentOptions = ref([
             <!-- Telegram -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !telegram ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
                   $t('Telegram') }}
-                <span class="text-red-500">*</span></label>
+                <span :class="telegram ? 'text-green-500' : 'text-red-500'">*</span></label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400" viewBox="0 0 24 24"
@@ -978,18 +1042,18 @@ const paymentOptions = ref([
                 </span>
                 <input v-model="telegram" @input="handleInput()" type="text"
                   :placeholder="$t('@username yoki +998 XX XXX XX XX')"
-                  class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1', submitted && !telegram ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']" />
               </div>
             </div>
 
             <!-- Viloyat -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedRegion ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
                   $t('Viloyat') }}
-                <span class="text-red-500">*</span></label>
+                <span :class="selectedRegion ? 'text-green-500' : 'text-red-500'">*</span></label>
               <select v-model="selectedRegion"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 cursor-pointer appearance-none">
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1 cursor-pointer appearance-none', submitted && !selectedRegion ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']">
                 <option value="">{{ $t('— Viloyatni tanlang —') }}</option>
                 <option v-for="r in regions" :key="r.id" :value="r.id">{{ $t(r.name_uz) }}</option>
               </select>
@@ -998,10 +1062,10 @@ const paymentOptions = ref([
             <!-- Tuman -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
-                  $t('Tuman / Shahar') }} <span class="text-red-500">*</span></label>
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedDistrict ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                  $t('Tuman / Shahar') }} <span :class="selectedDistrict ? 'text-green-500' : 'text-red-500'">*</span></label>
               <select v-model="selectedDistrict" :disabled="!selectedRegion"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 cursor-pointer appearance-none">
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1 cursor-pointer appearance-none', submitted && !selectedDistrict ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']">
                 <option value="">{{ $t('— Tuman tanlang —') }}</option>
                 <option v-for="d in filteredDistricts" :key="d.id" :value="d.id">{{ $t(d.name_uz) }}</option>
               </select>
@@ -1017,10 +1081,10 @@ const paymentOptions = ref([
             <!-- Manba -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
-                  $t('Qayerdan eshitib kelgan') }} <span class="text-red-500">*</span></label>
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !source ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                  $t('Qayerdan eshitib kelgan') }} <span :class="source ? 'text-green-500' : 'text-red-500'">*</span></label>
               <select v-model="source"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 cursor-pointer appearance-none">
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1 cursor-pointer appearance-none', submitted && !source ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']">
                 <option value="">{{ $t('— Tanlanmagan —') }}</option>
                 <option v-for="s in sourceOptions" :key="s.value" :value="s.value">{{ $t(s.label) }}</option>
               </select>
@@ -1028,16 +1092,15 @@ const paymentOptions = ref([
 
             <div class="space-y-2">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
-                  $t("Maslaxat narxi") }} <span class="text-red-500">*</span></label>
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !price ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                  $t("Maslaxat narxi") }} <span :class="price ? 'text-green-500' : 'text-red-500'">*</span></label>
 
               <div class="relative" ref="priceMenuAnchor">
                 <!-- Narx select -->
                 <div class="relative">
                   <div
                     @click="showPriceMenu = !showPriceMenu; showPaymentMenu = false"
-                    class="w-full flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm cursor-pointer transition-all hover:border-[#1A3A6B]"
-                    :class="price ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500'">
+                    :class="['w-full flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-700 border rounded-lg text-sm cursor-pointer transition-all', submitted && !price ? 'border-red-500' : 'border-slate-200 dark:border-slate-600 hover:border-[#1A3A6B]', price ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500']">
                     <span>{{ price ? formatMoney(price) + $t(" so'm") : $t("Narxni tanlang") }}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 transition-transform" :class="showPriceMenu ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -1136,10 +1199,10 @@ const paymentOptions = ref([
             <!-- Mas'ul yurist -->
             <div class="space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
-                  $t("Qabul qiluvchi mutahasis") }} <span class="text-red-500">*</span></label>
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !assignedToId ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                  $t("Qabul qiluvchi mutahasis") }} <span :class="assignedToId ? 'text-green-500' : 'text-red-500'">*</span></label>
               <select v-model="assignedToId"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 cursor-pointer appearance-none">
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1 cursor-pointer appearance-none', submitted && !assignedToId ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']">
                 <option value="">{{ $t('— Belgilanmagan —') }}</option>
                 <option v-for="u in users" :key="u.id" :value="u.id">
                   {{ $t(u.surname) }} {{ $t(u.name) }}

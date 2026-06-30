@@ -7,6 +7,7 @@ import Profile from '@/views/profile.vue'
 import Users from '@/views/users.vue'
 import Customers from '@/views/customers.vue'
 import Archive from '@/views/archive.vue'
+import PreviewPage from '@/views/PreviewPage.vue'
 
 const routes = [
   {
@@ -56,6 +57,11 @@ const routes = [
         component: () => import('@/views/permissions.vue')
       }
     ]
+  },
+  {
+    path: '/preview',
+    name: 'preview',
+    component: PreviewPage,
   },
   {
     path: '/login',

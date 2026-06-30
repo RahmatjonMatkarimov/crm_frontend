@@ -235,13 +235,6 @@ function selectLang(val) {
                 <div class="flex-1 p-5">
                     <router-view />
                 </div>
-
-                <!-- FOOTER -->
-                <footer class="flex-shrink-0 text-center text-xs py-3 px-4" :style="themeStore.isDark
-                    ? 'background:#182e4a; border-top:3px solid #2E8B57; color:#6090b8;'
-                    : 'background:#1A3A6B; color:rgba(255,255,255,0.6); border-top:3px solid #2E8B57;'">
-                    © {{ new Date().getFullYear() }} Yuridik Maslahat 24 · Barcha huquqlar himoyalangan
-                </footer>
             </main>
         </div>
 
