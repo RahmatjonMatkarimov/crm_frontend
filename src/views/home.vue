@@ -157,10 +157,9 @@ function selectLang(val) {
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M2.25 12l8.954-8.955a1.5 1.5 0 012.092 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
             </svg>
-            <span style="cursor:pointer; color:rgba(255,255,255,0.75);" @click="$router.push('/')">Bosh
-                sahifa</span>
+            <span style="cursor:pointer; color:rgba(255,255,255,0.75);" @click="$router.push('/')">{{ $t("Bosh sahifa") }}</span>
             <span>›</span>
-            <span style="font-weight:700; color:#ffffff;">{{ currentPageTitle }}</span>
+            <span :class="currentPageTitle ==='Bosh sahifa' ? 'hidden' : 'block'" style="font-weight:700; color:#ffffff;">{{ currentPageTitle }}</span>
         </div>
 
         <!-- BODY: sidebar + content -->
