@@ -274,7 +274,7 @@ watch(
                 style="backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
 
                 <div class="relative w-full h-full flex flex-col overflow-hidden shadow-2xl"
-                    :style="themeStore.isDark ? 'background:#264a75;' : 'background:#ffffff;'">
+                    :style="themeStore.isDark ? 'background:#161c2d;' : 'background:#ffffff;'">
 
                     <!-- Header -->
                     <div class="px-6 py-5 flex items-center justify-between shrink-0" style="background:#1A3A6B; border-bottom:3px solid #2E8B57;">
@@ -470,10 +470,10 @@ watch(
 
                     <!-- Footer -->
                     <div class="px-6 py-4 flex justify-end gap-3 shrink-0"
-                        :style="themeStore.isDark ? 'border-top:1px solid #3a6090; background:#1e3a5f;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
+                        :style="themeStore.isDark ? 'border-top:1px solid #1e2d42; background:#0d1117;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
                         <button @click="closeModal"
                             class="px-5 py-2 rounded text-sm font-medium transition-all"
-                            :style="themeStore.isDark ? 'color:#7aaad4;' : 'color:#4a5568;'">
+                            :style="themeStore.isDark ? 'color:#8892a4;' : 'color:#4a5568;'">
                             {{ $t('Bekor qilish') }}
                         </button>
                         <button @click="saveUser" :disabled="authStore.loading"

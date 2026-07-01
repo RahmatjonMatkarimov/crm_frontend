@@ -9,10 +9,35 @@
         <button
           class="px-5 py-2 bg-white/15 text-white border border-white/30 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-white/25 transition-colors"
           @click="goBack">← {{ $t('Orqaga') }}</button>
-        <button
-          class="px-6 py-2 bg-[#2E8B57] text-white border-none rounded-md text-[13px] font-bold cursor-pointer hover:bg-[#25734a] disabled:bg-[#6b7280] disabled:cursor-not-allowed transition-colors"
-          :disabled="saving" @click="confirmAndSave">{{ saving ? $terms('Saqlanmoqda...') : $t('Saqlash va Chop etish'
-          )}}</button>
+
+        <!-- Saqlanmagan holat: Saqlash tugmasi -->
+        <button v-if="!saved"
+          class="px-6 py-2 bg-[#2E8B57] text-white border-none rounded-md text-[13px] font-bold cursor-pointer hover:bg-[#25734a] disabled:bg-[#6b7280] disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+          :disabled="saving" @click="confirmAndSave">
+          <svg v-if="saving" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+          </svg>
+          {{ saving ? $t('Saqlanmoqda...') : $t('Saqlash va Chop etish') }}
+        </button>
+
+        <!-- Saqlangandan keyin: 2 ta print tugmasi -->
+        <template v-if="saved">
+          <button @click="printChek"
+            class="px-5 py-2 bg-[#2E8B57] text-white border-none rounded-md text-[13px] font-bold cursor-pointer hover:bg-[#25734a] transition-colors flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            {{ $t('Chekni print qilish') }}
+          </button>
+          <button @click="printQabulxat"
+            class="px-5 py-2 bg-[#c8a84b] text-[#1a2744] border-none rounded-md text-[13px] font-bold cursor-pointer hover:bg-[#b8943a] transition-colors flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            {{ $t('Qabul hatini print qilish') }}
+          </button>
+        </template>
       </div>
     </div>
 
@@ -286,6 +311,8 @@ import { ref, onMounted } from 'vue'
 
 const d = ref({})
 const saving = ref(false)
+const saved = ref(false)
+const printData = ref(null)
 
 const checkItems = [
   'Дастлабки ҳуқуқий маслаҳат ва тушунтириш берилди',
@@ -321,11 +348,60 @@ const goBack = () => window.close()
 const confirmAndSave = async () => {
   saving.value = true
   if (window.opener && window.opener.__doSaveAndPrint) {
-    await window.opener.__doSaveAndPrint(window)
+    const result = await window.opener.__doSaveAndPrint(window)
+    if (result) {
+      printData.value = result
+      saved.value = true
+      // Real ID va navbat raqamini preview'ga ko'rsatamiz
+      d.value.mijozId = `MJZ-${result.receiptData.clientId}`
+      d.value.qabulRaqam = `A-${String(result.receiptData.queueNumber).padStart(2, '0')}`
+    }
+    saving.value = false
   } else {
     alert('Xatolik: ota oyna topilmadi!')
     saving.value = false
   }
+}
+
+const printChek = () => {
+  if (!printData.value) return
+  const { receiptData } = printData.value
+  const w = window.open('about:blank', '_blank')
+  const today = new Date()
+  const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`
+  w.document.write(`<!DOCTYPE html><html><head><title>Chek</title><style>
+    @page{size:80mm auto;margin:0}*{box-sizing:border-box}
+    body{width:80mm;margin:0;padding:10mm 5mm;font-family:"Courier New",monospace;color:#000;font-size:12px}
+    .center{text-align:center}.company{font-size:13px;font-weight:bold;text-transform:uppercase;margin-bottom:2px}
+    .subtitle{font-size:11px;margin-bottom:10px}.divider{border-top:1px dashed #000;margin:8px 0}
+    .info-row{display:flex;justify-content:space-between;margin:4px 0}.label{font-weight:bold}
+    .client-name{text-align:center;font-size:15px;font-weight:bold;margin:10px 0;word-break:break-word}
+    .queue-box{border:2px solid #000;text-align:center;padding:10px 0;margin:10px 0}
+    .queue-number{font-size:42px;font-weight:bold;line-height:1}
+    .queue-text{font-size:12px;margin-top:5px;font-weight:bold}
+    .notice{text-align:center;font-size:11px;margin-top:10px;line-height:1.5}
+    .footer{text-align:center;margin-top:12px;font-size:10px}
+  </style></head><body>
+    <div class="center"><div class="company">Yuridik Xizmatlar va Hujjatlar Tayyorlash Byurosi</div><div class="subtitle">QABUL CHEKI</div></div>
+    <div class="divider"></div>
+    <div class="info-row"><span class="label">Sana:</span><span>${formattedDate}</span></div>
+    <div class="info-row"><span class="label">ID:</span><span>MJZ-${receiptData.clientId}</span></div>
+    <div class="divider"></div>
+    <div class="center"><div class="label">MIJOZ</div><div class="client-name">${receiptData.fullName}</div></div>
+    <div class="divider"></div>
+    <div class="queue-box"><div class="queue-number">A-${String(receiptData.queueNumber).padStart(2, '0')}</div><div class="queue-text">NAVBAT RAQAMI</div></div>
+    <div class="divider"></div>
+    <div class="notice"><b>Eslatma</b><br>Ushbu chekni saqlab qo'ying.<br>Navbatni tekshirish uchun ID raqamdan foydalaning.</div>
+    <div class="divider"></div>
+    <div class="footer"><br><br>Tashrifingiz uchun rahmat!</div>
+  </body></html>`)
+  w.document.close()
+  setTimeout(() => { w.focus(); w.print() }, 400)
+}
+
+const printQabulxat = () => {
+  if (!printData.value?.qabulxatUrl) return
+  window.open(printData.value.qabulxatUrl, '_blank')
 }
 
 onMounted(() => {

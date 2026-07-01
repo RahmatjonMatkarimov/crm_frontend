@@ -50,6 +50,7 @@ const error = ref('')
 const success = ref('')
 const users = ref([])
 const submitted = ref(false)
+const savedCustomerData = ref(null)
 
 const handleInputPrice = (e) => {
   const rawValue = e.target.value.replace(/\D/g, '')
@@ -606,6 +607,7 @@ watch(() => props.editing, (val) => {
     price.value = ''
     error.value = ''
     success.value = ''
+    savedCustomerData.value = null
     return
   }
 
@@ -655,6 +657,7 @@ watch(() => props.editing, (val) => {
   error.value = ''
   success.value = ''
   submitted.value = false
+  savedCustomerData.value = null
 }, { immediate: true })
 const autoCapFirst = (fieldRef) => {
   if (fieldRef.value && fieldRef.value[0] !== fieldRef.value[0].toUpperCase()) {
@@ -799,11 +802,12 @@ const save = async () => {
   }
 
   if (!isEditing) {
-    // Yangi mijoz: avval preview ko'rsatiladi, backend keyinroq chaqiriladi
+    // Preview oynasini ochamiz
     const fullAddress = buildFullAddress()
     const previewWin = openPreviewWindow(fullAddress)
 
-    window.__doSaveAndPrint = async (pw) => {
+    // Preview sahifadan chaqiriladigan funksiya
+    window.__doSaveAndPrint = async () => {
       const fullAddress2 = buildFullAddress()
       const data = {
         name: name.value,
@@ -825,14 +829,8 @@ const save = async () => {
       const result = await store.createCustomer(data)
 
       if (!result?.success) {
-        if (pw && !pw.closed) {
-          pw.document.getElementById('confirmBtn').disabled = false
-          pw.document.getElementById('confirmBtn').textContent = 'Saqlash va Chop etish'
-          pw.document.getElementById('confirmBtn').style.background = '#2E8B57'
-          pw.alert('Xatolik: ' + (result?.error || 'Noma\'lum xato'))
-        }
         error.value = result?.error || 'Xatolik yuz berdi'
-        return
+        return null
       }
 
       success.value = 'Mijoz yaratildi!'
@@ -851,7 +849,6 @@ const save = async () => {
         formData.append('checkFile', pdfBlob, `chek-${surname.value || 'mijoz'}-${Date.now()}.pdf`)
         const newPayment = createdCustomer.payments?.[createdCustomer.payments?.length - 1]
         if (newPayment?.id) formData.append('paymentId', newPayment.id)
-
         try {
           await api.post(ENDPOINTS.CUSTOMER_CHECK(createdCustomer.id), formData)
         } catch (e) {
@@ -869,18 +866,19 @@ const save = async () => {
         sana: Date.now().toString()
       })
 
-      // Preview oynasini chek print oynasiga aylantirish
-      printReceiptFrontend({
-        fullName: fish,
-        clientId: createdCustomer?.customer_id || '—',
-        queueNumber: createdCustomer?.queueNumber || '—',
-      }, `/qabulxati.html?${params.toString()}`, pw)
-
-      // Telegram xabarlar yuborish
       await sendTelegramMessages(telegram.value, name.value, `${surname.value} MJZ-${createdCustomer?.customer_id || ''}`)
-
       emit('saved')
       setTimeout(() => emit('close'), 1800)
+
+      // Preview sahifaga print ma'lumotlarini qaytaramiz
+      return {
+        receiptData: {
+          fullName: fish,
+          clientId: createdCustomer?.customer_id || '—',
+          queueNumber: createdCustomer?.queueNumber || '—',
+        },
+        qabulxatUrl: `/qabulxati.html?${params.toString()}`,
+      }
     }
     return
   }
@@ -911,6 +909,12 @@ const save = async () => {
     setTimeout(() => emit('close'), 1800)
   } else {
     error.value = result?.error || 'Xatolik yuz berdi'
+  }
+}
+
+const printQabulxat = () => {
+  if (savedCustomerData.value?.qabulxatUrl) {
+    window.open(savedCustomerData.value.qabulxatUrl, '_blank')
   }
 }
 
@@ -982,7 +986,7 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
   <Teleport to="body">
     <Transition name="modal-fade">
       <div class="fixed inset-0 z-50 flex flex-col"
-        :style="themeStore.isDark ? 'background:#264a75;' : 'background:#ffffff;'">
+        :style="themeStore.isDark ? 'background:#161c2d;' : 'background:#ffffff;'">
 
         <!-- Modal Header -->
         <div class="px-6 py-5 flex items-center justify-between shrink-0" style="background:#1A3A6B; border-bottom:3px solid #2E8B57;">
@@ -1143,11 +1147,11 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                   <Transition name="submenu-fade">
                     <div v-if="showPriceMenu"
                       class="absolute z-50 top-0 left-full ml-1 min-w-[180px] rounded-xl shadow-2xl border"
-                      :style="themeStore.isDark ? 'background:#264a75; border-color:#3a6090;' : 'background:#ffffff; border-color:#e2e8f0;'">
+                      :style="themeStore.isDark ? 'background:#161c2d; border-color:#1e2d42;' : 'background:#ffffff; border-color:#e2e8f0;'">
                       <div class="px-3 py-2 border-b rounded-t-xl overflow-hidden"
-                        :style="themeStore.isDark ? 'border-color:#3a6090;' : 'border-color:#f1f5f9;'">
+                        :style="themeStore.isDark ? 'border-color:#1e2d42;' : 'border-color:#f1f5f9;'">
                         <p class="text-[10px] font-semibold uppercase tracking-wider"
-                          :style="themeStore.isDark ? 'color:#6090b8;' : 'color:#94a3b8;'">
+                          :style="themeStore.isDark ? 'color:#4a5878;' : 'color:#94a3b8;'">
                           {{ $t("Narxni tanlang") }}
                         </p>
                       </div>
@@ -1179,11 +1183,11 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                         <Transition name="submenu-fade">
                           <div v-if="showPaymentMenu"
                             class="absolute z-50 top-0 left-full ml-1 min-w-[200px] rounded-xl shadow-2xl border overflow-hidden"
-                            :style="themeStore.isDark ? 'background:#264a75; border-color:#3a6090;' : 'background:#ffffff; border-color:#e2e8f0;'">
+                            :style="themeStore.isDark ? 'background:#161c2d; border-color:#1e2d42;' : 'background:#ffffff; border-color:#e2e8f0;'">
                             <div class="px-3 py-2 border-b"
-                              :style="themeStore.isDark ? 'border-color:#3a6090;' : 'border-color:#f1f5f9;'">
+                              :style="themeStore.isDark ? 'border-color:#1e2d42;' : 'border-color:#f1f5f9;'">
                               <p class="text-[10px] font-semibold uppercase tracking-wider"
-                                :style="themeStore.isDark ? 'color:#6090b8;' : 'color:#94a3b8;'">
+                                :style="themeStore.isDark ? 'color:#4a5878;' : 'color:#94a3b8;'">
                                 {{ $t("To'lov turini tanlang") }}
                               </p>
                             </div>
@@ -1296,12 +1300,13 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
         </div>
 
         <!-- Modal Footer -->
-        <div class="px-6 py-4 flex justify-end gap-3 shrink-0"
-          :style="themeStore.isDark ? 'border-top:1px solid #3a6090; background:#1e3a5f;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
+        <div class="px-6 py-4 flex justify-end gap-3 shrink-0 flex-wrap"
+          :style="themeStore.isDark ? 'border-top:1px solid #1e2d42; background:#0d1117;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
           <button @click="$emit('close')" class="px-5 py-2 rounded text-sm font-medium transition-all"
-            :style="themeStore.isDark ? 'color:#7aaad4;' : 'color:#4a5568;'">
+            :style="themeStore.isDark ? 'color:#8892a4;' : 'color:#4a5568;'">
             {{ $t('Bekor qilish') }}
           </button>
+
           <button @click="save"
             class="px-5 py-2 text-white text-sm font-bold active:scale-[0.97] transition-all"
             style="background:#1A3A6B; border-radius:4px; letter-spacing:0.03em;">

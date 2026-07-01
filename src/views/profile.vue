@@ -374,9 +374,9 @@ const formatField = (field, e) => {
 
         <!-- Info fields card -->
         <div class="rounded overflow-hidden shadow-sm"
-            :style="themeStore.isDark ? 'background:#264a75; border:1px solid #3a6090;' : 'background:#ffffff; border:1px solid #d8dde6;'">
+            :style="themeStore.isDark ? 'background:#161c2d; border:1px solid #1e2d42;' : 'background:#ffffff; border:1px solid #d8dde6;'">
             <div class="px-6 py-4 border-b flex items-center gap-3"
-                :style="themeStore.isDark ? 'border-color:#3a6090; background:#1e3a5f;' : 'border-color:#eaecf0; background:#f7f8fa;'">
+                :style="themeStore.isDark ? 'border-color:#1e2d42; background:#0d1117;' : 'border-color:#eaecf0; background:#f7f8fa;'">
                 <div class="w-7 h-7 rounded-xl flex items-center justify-center"
                     :class="themeStore.isDark ? 'bg-blue-500/15' : 'bg-blue-50'">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -386,7 +386,7 @@ const formatField = (field, e) => {
                     </svg>
                 </div>
                 <h3 class="text-sm font-bold"
-                    :style="themeStore.isDark ? 'color:#ddeaff' : 'color:#1a1f36'">
+                    :style="themeStore.isDark ? 'color:#e2e8f0' : 'color:#1a1f36'">
                     {{ $t("Shaxsiy ma'lumotlar") }}
                 </h3>
             </div>
@@ -394,7 +394,7 @@ const formatField = (field, e) => {
             <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div v-for="field in fields" :key="field.key" class="space-y-1.5">
                     <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                        :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
+                        :style="themeStore.isDark ? 'color:#4a5878' : 'color:#4a5568'">
                         {{ $t(field.label) }}
                     </label>
                     <template v-if="isEditing && !field.readonly">
@@ -421,15 +421,15 @@ const formatField = (field, e) => {
 
         <!-- Telegram ulanish card -->
         <div class="rounded overflow-hidden shadow-sm"
-            :style="themeStore.isDark ? 'background:#264a75; border:1px solid #3a6090;' : 'background:#ffffff; border:1px solid #d8dde6;'">
+            :style="themeStore.isDark ? 'background:#161c2d; border:1px solid #1e2d42;' : 'background:#ffffff; border:1px solid #d8dde6;'">
             <div class="px-6 py-4 border-b flex items-center gap-3"
-                :style="themeStore.isDark ? 'border-color:#3a6090; background:#1e3a5f;' : 'border-color:#eaecf0; background:#f7f8fa;'">
+                :style="themeStore.isDark ? 'border-color:#1e2d42; background:#0d1117;' : 'border-color:#eaecf0; background:#f7f8fa;'">
                 <div class="w-7 h-7 rounded-xl flex items-center justify-center" style="background:#229ED9/15">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#229ED9" class="w-4 h-4">
                         <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.4 13.893l-2.93-.918c-.638-.196-.651-.638.136-.943l11.438-4.41c.531-.197.999.131.85.599z"/>
                     </svg>
                 </div>
-                <h3 class="text-sm font-bold" :style="themeStore.isDark ? 'color:#ddeaff' : 'color:#1a1f36'">
+                <h3 class="text-sm font-bold" :style="themeStore.isDark ? 'color:#e2e8f0' : 'color:#1a1f36'">
                     Telegram ulanish
                 </h3>
                 <span v-if="tgStatus === 'connected'"
@@ -472,7 +472,7 @@ const formatField = (field, e) => {
                     <div v-if="tgStep === 1" class="space-y-3">
                         <div class="space-y-1.5">
                             <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                                :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
+                                :style="themeStore.isDark ? 'color:#4a5878' : 'color:#4a5568'">
                                 Telefon raqam (xalqaro format)
                             </label>
                             <input v-model="tgPhone" type="tel" placeholder="+998901234567"
@@ -494,7 +494,7 @@ const formatField = (field, e) => {
                     <div v-if="tgStep === 2" class="space-y-3">
                         <div class="space-y-1.5">
                             <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                                :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
+                                :style="themeStore.isDark ? 'color:#4a5878' : 'color:#4a5568'">
                                 Telegram dan kelgan kod
                             </label>
                             <input v-model="tgCode" type="text" placeholder="12345" maxlength="6"
@@ -524,7 +524,7 @@ const formatField = (field, e) => {
 
         <!-- Password change card -->
         <div class="rounded overflow-hidden shadow-sm"
-            :style="themeStore.isDark ? 'background:#264a75; border:1px solid #3a6090;' : 'background:#ffffff; border:1px solid #d8dde6;'">
+            :style="themeStore.isDark ? 'background:#161c2d; border:1px solid #1e2d42;' : 'background:#ffffff; border:1px solid #d8dde6;'">
             <button @click="showPasswordSection = !showPasswordSection"
                 class="w-full px-6 py-4 flex items-center justify-between transition-colors">
                 <div class="flex items-center gap-3">
@@ -537,7 +537,7 @@ const formatField = (field, e) => {
                         </svg>
                     </div>
                     <h3 class="text-sm font-bold"
-                        :style="themeStore.isDark ? 'color:#ddeaff' : 'color:#1a1f36'">
+                        :style="themeStore.isDark ? 'color:#e2e8f0' : 'color:#1a1f36'">
                         {{ $t("Parolni o'zgartirish") }}
                     </h3>
                 </div>
@@ -557,7 +557,7 @@ const formatField = (field, e) => {
                 leave-active-class="transition-all duration-150 ease-in"
                 leave-to-class="opacity-0 -translate-y-2">
                 <div v-if="showPasswordSection" class="px-6 pb-6 space-y-4 border-t pt-5"
-                    :style="themeStore.isDark ? 'border-color:#3a6090' : 'border-color:#eaecf0'">
+                    :style="themeStore.isDark ? 'border-color:#1e2d42' : 'border-color:#eaecf0'">
 
                     <div v-if="passwordError"
                         class="p-3.5 rounded-xl text-xs flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400">
@@ -569,7 +569,7 @@ const formatField = (field, e) => {
 
                     <div class="space-y-1.5">
                         <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                            :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
+                            :style="themeStore.isDark ? 'color:#4a5878' : 'color:#4a5568'">
                             {{ $t('Joriy parol') }}
                         </label>
                         <input v-model="passwords.current" type="password" :placeholder="$t('Joriy parolni kiriting')"
@@ -582,7 +582,7 @@ const formatField = (field, e) => {
                     <div class="grid sm:grid-cols-2 gap-4">
                         <div class="space-y-1.5">
                             <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                                :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
+                                :style="themeStore.isDark ? 'color:#4a5878' : 'color:#4a5568'">
                                 {{ $t('Yangi parol') }}
                             </label>
                             <input v-model="passwords.new" type="password" :placeholder="$t('Yangi parol (min. 6)')"
@@ -593,7 +593,7 @@ const formatField = (field, e) => {
                         </div>
                         <div class="space-y-1.5">
                             <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                                :style="themeStore.isDark ? 'color:#4d7eaa' : 'color:#4a5568'">
+                                :style="themeStore.isDark ? 'color:#4a5878' : 'color:#4a5568'">
                                 {{ $t('Tasdiqlash') }}
                             </label>
                             <input v-model="passwords.confirm" type="password" :placeholder="$t('Parolni qayta kiriting')"

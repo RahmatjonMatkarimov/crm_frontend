@@ -62,7 +62,7 @@
 
                     <!-- Main Info Card -->
                     <div class="lg:col-span-2 rounded-3xl border shadow-sm overflow-hidden"
-                        :class="themeStore.isDark ? 'bg-[#1f2937] border-[#374151]' : 'bg-white border-slate-200'">
+                        :class="themeStore.isDark ? 'bg-[#161c2d] border-[#1e2d42]' : 'bg-white border-slate-200'">
                         <div class="px-6 py-4 border-b"
                             :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
                             <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
@@ -107,7 +107,7 @@
 
                     <!-- Meta Card -->
                     <div class="rounded-3xl border shadow-sm overflow-hidden"
-                        :class="themeStore.isDark ? 'bg-[#1f2937] border-[#374151]' : 'bg-white border-slate-200'">
+                        :class="themeStore.isDark ? 'bg-[#161c2d] border-[#1e2d42]' : 'bg-white border-slate-200'">
                         <div class="px-6 py-4 border-b"
                             :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
                             <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
@@ -204,7 +204,7 @@
 
                 <!-- Payment History -->
                 <div class="rounded-3xl border shadow-sm overflow-hidden"
-                    :class="themeStore.isDark ? 'bg-[#1f2937] border-[#374151]' : 'bg-white border-slate-200'">
+                    :class="themeStore.isDark ? 'bg-[#161c2d] border-[#1e2d42]' : 'bg-white border-slate-200'">
                     <div class="px-6 py-4 border-b flex items-center justify-between"
                         :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
                         <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
@@ -273,7 +273,7 @@
 
                 <!-- Checks -->
                 <div class="rounded-3xl border shadow-sm overflow-hidden"
-                    :class="themeStore.isDark ? 'bg-[#1f2937] border-[#374151]' : 'bg-white border-slate-200'">
+                    :class="themeStore.isDark ? 'bg-[#161c2d] border-[#1e2d42]' : 'bg-white border-slate-200'">
                     <div class="px-6 py-4 border-b flex items-center justify-between"
                         :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
                         <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
@@ -349,7 +349,7 @@
                 style="background:rgba(0,0,0,0.5);"
                 @click.self="closeDebtModal">
                 <div class="w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden"
-                    :class="themeStore.isDark ? 'bg-[#1f2937]' : 'bg-white'">
+                    :class="themeStore.isDark ? 'bg-[#161c2d]' : 'bg-white'">
                     <!-- Header -->
                     <div class="px-6 py-4 flex items-center justify-between" style="background:#1A3A6B;">
                         <h3 class="text-white font-bold text-base">{{ $t("Qarz to'lash") }}</h3>

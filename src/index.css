@@ -3,52 +3,68 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --primary:       #1A3A6B;
-  --primary-hover: #163060;
-  --primary-dark:  #112850;
-  --accent:        #2E8B57;
-  --accent-hover:  #256b45;
-  --bg-page:       #eef1f6;
-  --bg-card:       #ffffff;
-  --border:        #d0d7e3;
-  --border-light:  #e8ecf2;
-  --text-1:        #1a1f36;
-  --text-2:        #4a5568;
-  --text-3:        #8892a4;
-  --success:       #2E8B57;
-  --success-bg:    #f0fff4;
-  --danger:        #c53030;
-  --danger-bg:     #fff5f5;
-  --warning:       #b45309;
-  --warning-bg:    #fffbeb;
+  --primary:        #1A3A6B;
+  --primary-hover:  #163060;
+  --primary-light:  #eff4fc;
+  --accent:         #2E8B57;
+  --accent-hover:   #256b45;
+  --accent-light:   #f0fdf4;
+  --bg-page:        #f0f2f7;
+  --bg-card:        #ffffff;
+  --bg-sidebar:     #1A3A6B;
+  --border:         #dce1ea;
+  --border-light:   #eaecf3;
+  --text-1:         #111827;
+  --text-2:         #4b5563;
+  --text-3:         #9ca3af;
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:      0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-card:    0 1px 4px rgba(26,58,107,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --success:        #16a34a;
+  --success-bg:     #f0fdf4;
+  --success-border: #bbf7d0;
+  --danger:         #dc2626;
+  --danger-bg:      #fef2f2;
+  --danger-border:  #fecaca;
+  --warning:        #d97706;
+  --warning-bg:     #fffbeb;
+  --warning-border: #fde68a;
+  --radius:         6px;
+  --radius-sm:      4px;
+  --radius-lg:      8px;
 }
 
-html {
-  background-color: var(--bg-page);
-}
+html { background-color: var(--bg-page); }
 
 html.dark {
-  --primary:       #1A3A6B;
-  --primary-hover: #163060;
-  --accent:        #2E8B57;
-  --bg-page:       #1e3a5f;
-  --bg-card:       #264a75;
-  --border:        #3a6090;
-  --border-light:  #305080;
-  --text-1:        #e8f0ff;
-  --text-2:        #90b8e0;
-  --text-3:        #6090b8;
-  --success:       #2E8B57;
-  --success-bg:    #1a4a2a;
-  --danger:        #c53030;
-  --danger-bg:     #4a1818;
-  --warning:       #b45309;
-  --warning-bg:    #4a2800;
-
-  background-color: #1e3a5f;
+  --primary:        #4f8ef7;
+  --primary-hover:  #3d7be0;
+  --primary-light:  #0d1f3c;
+  --accent:         #10b981;
+  --accent-hover:   #059669;
+  --accent-light:   #052e16;
+  --bg-page:        #0d1117;
+  --bg-card:        #161c2d;
+  --bg-sidebar:     #0f1521;
+  --border:         #1e2d42;
+  --border-light:   #172035;
+  --text-1:         #e5eaf3;
+  --text-2:         #8b95a8;
+  --text-3:         #4a5878;
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md:      0 4px 12px rgba(0,0,0,0.4);
+  --shadow-card:    0 1px 4px rgba(0,0,0,0.3);
+  --success:        #10b981;
+  --success-bg:     #052e16;
+  --success-border: #064e3b;
+  --danger:         #ef4444;
+  --danger-bg:      #1f0a0a;
+  --danger-border:  #450a0a;
+  --warning:        #f59e0b;
+  --warning-bg:     #1c1008;
+  --warning-border: #451a03;
+  background-color: #0d1117;
 }
-
-.dark ::-webkit-scrollbar-thumb { background: #3a6090; }
 
 body {
   margin: 0;
@@ -57,139 +73,292 @@ body {
   color: var(--text-1);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  width: 100vw;
 }
 
 *, *::before, *::after {
-  transition-property: background-color, border-color, color, box-shadow, opacity;
-  transition-duration: 120ms;
-  transition-timing-function: ease;
+  box-sizing: border-box;
 }
 
-::-webkit-scrollbar { width: 4px; height: 4px; }
+/* Faqat rang va opacity uchun transition — layout o'zgarmaydi */
+.transition-colors-only {
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, opacity 150ms ease;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #9badc5; border-radius: 99px; }
-.dark ::-webkit-scrollbar-thumb { background: #2a3a52; }
+::-webkit-scrollbar-thumb { background: #c8d0dc; border-radius: 99px; }
+.dark ::-webkit-scrollbar-thumb { background: #252f42; }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 34px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: none;
+  transition: background 120ms ease, box-shadow 120ms ease, transform 80ms ease;
+  white-space: nowrap;
+  user-select: none;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-primary {
   background: var(--primary);
-  color: #ffffff;
-  transition: background 0.15s;
-  border-radius: 4px;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(26,58,107,0.25);
 }
-.btn-primary:hover { background: var(--primary-hover); }
-.btn-primary:active { transform: scale(0.98); }
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  box-shadow: 0 2px 6px rgba(26,58,107,0.35);
+}
 
+.btn-success {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(22,163,74,0.25);
+}
+.btn-success:hover:not(:disabled) { background: var(--accent-hover); }
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-danger:hover:not(:disabled) { background: #b91c1c; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-page);
+  color: var(--text-1);
+}
+
+.btn-sm {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+.btn-lg {
+  height: 40px;
+  padding: 0 20px;
+  font-size: 14px;
+}
+
+/* ── Cards ── */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
 }
 
-/* Davlat uslubi: faol nav element yashil chiziq bilan */
-.nav-link-active {
-  background: rgba(46,139,87,0.18) !important;
-  color: #ffffff !important;
-  border-left: 3px solid #2E8B57 !important;
-  padding-left: calc(0.75rem - 3px) !important;
+.card-hover {
+  transition: box-shadow 150ms ease, transform 150ms ease;
+}
+.card-hover:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
-.nav-link:hover {
-  background: rgba(255,255,255,0.1);
-  color: #ffffff;
+/* ── Stat kartalar ── */
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
 }
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.stat-card-blue::after  { background: linear-gradient(90deg, #1A3A6B, #2563eb); }
+.stat-card-green::after { background: linear-gradient(90deg, #16a34a, #10b981); }
+.stat-card-red::after   { background: linear-gradient(90deg, #dc2626, #f97316); }
+.stat-card-amber::after { background: linear-gradient(90deg, #d97706, #f59e0b); }
 
-/* Davlat saytlari uchun jadval uslubi */
+/* ── Tables ── */
 .gov-table {
   width: 100%;
   border-collapse: collapse;
 }
 .gov-table thead {
-  background: #f0f4f8;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
-.dark .gov-table thead {
-  background: #0a1828;
+.gov-table thead tr {
+  background: var(--bg-page);
+}
+.dark .gov-table thead tr {
+  background: #0d1117;
 }
 .gov-table th {
   padding: 10px 14px;
   text-align: left;
   font-size: 11px;
   font-weight: 700;
-  color: #4a5568;
+  color: var(--text-3);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 2px solid #d0d7e3;
+  letter-spacing: 0.06em;
+  border-bottom: 2px solid var(--border);
   white-space: nowrap;
-}
-.dark .gov-table th {
-  color: #3e6080;
-  border-bottom-color: #19304d;
 }
 .gov-table td {
   padding: 11px 14px;
   font-size: 13px;
-  border-bottom: 1px solid #e8ecf2;
-  color: #1a1f36;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-1);
+  transition: background 100ms ease;
 }
-.dark .gov-table td {
-  border-bottom-color: #142540;
-  color: #d8e8f8;
-}
-.gov-table tr:last-child td {
-  border-bottom: none;
-}
-.gov-table tr:hover td {
-  background: #f5f7fb;
-}
-.dark .gov-table tr:hover td {
-  background: #0a1828;
-}
+.gov-table tr:last-child td { border-bottom: none; }
+.gov-table tbody tr:hover td { background: var(--primary-light); }
+.dark .gov-table tbody tr:hover td { background: #0d1f3c; }
 
-/* Davlat uslubi badge */
+/* ── Badges ── */
 .gov-badge {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 3px 10px;
-  border-radius: 3px;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 99px;
   font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
-.gov-badge-green  { background: #f0fff4; color: #2E8B57; border: 1px solid #b7e4c7; }
-.gov-badge-red    { background: #fff5f5; color: #c53030; border: 1px solid #f5c0c0; }
-.gov-badge-yellow { background: #fffbeb; color: #b45309; border: 1px solid #f5d77e; }
-.gov-badge-blue   { background: #eff6ff; color: #1A3A6B; border: 1px solid #bfdbfe; }
-.dark .gov-badge-green  { background: #082918; color: #3aab6d; border-color: #0f4a28; }
-.dark .gov-badge-red    { background: #280a0a; color: #e05555; border-color: #4a1010; }
-.dark .gov-badge-yellow { background: #281500; color: #d4890a; border-color: #4a2800; }
-.dark .gov-badge-blue   { background: #07182e; color: #5a9fd4; border-color: #102a4a; }
+.gov-badge-green  { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+.gov-badge-red    { background: var(--danger-bg);  color: var(--danger);  border: 1px solid var(--danger-border); }
+.gov-badge-yellow { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+.gov-badge-blue   { background: var(--primary-light); color: var(--primary); border: 1px solid #bfdbfe; }
+.dark .gov-badge-blue { border-color: #1e3a5f; }
 
-/* Page title with green left bar */
+/* ── Page title ── */
 .gov-page-title {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
-  color: #1A3A6B;
+  color: var(--text-1);
   display: flex;
   align-items: center;
   gap: 10px;
-}
-.dark .gov-page-title {
-  color: #d8e8f8;
+  letter-spacing: -0.02em;
 }
 .gov-page-title::before {
   content: '';
   display: block;
   width: 4px;
-  height: 20px;
-  background: #2E8B57;
-  border-radius: 2px;
+  height: 22px;
+  background: linear-gradient(180deg, var(--accent), var(--primary));
+  border-radius: 3px;
   flex-shrink: 0;
+}
+
+/* ── Forms ── */
+.form-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--text-1);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.form-input::placeholder { color: var(--text-3); }
+.form-input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(26,58,107,0.1);
+}
+.dark .form-input:focus {
+  box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px rgba(26,58,107,0.12);
+  box-shadow: 0 0 0 3px rgba(26,58,107,0.1);
+}
+.dark input:focus, .dark select:focus, .dark textarea:focus {
+  box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
+}
+
+/* ── Sidebar nav ── */
+.aside-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.65);
+  border-radius: var(--radius-sm);
+  transition: background 120ms ease, color 120ms ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.aside-link:hover {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.95);
+}
+.aside-link-active {
+  background: rgba(255,255,255,0.15) !important;
+  color: #ffffff !important;
+  font-weight: 700;
+}
+.aside-link-active .nav-dot {
+  opacity: 1;
+}
+.nav-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2E8B57;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  flex-shrink: 0;
+}
+
+/* ── Period filter tabs ── */
+.period-tab {
+  padding: 5px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+.period-tab:hover { color: var(--text-1); border-color: var(--primary); }
+.period-tab-active {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 1px 4px rgba(26,58,107,0.3);
+}
+.dark .period-tab {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-2);
+}
+.dark .period-tab-active {
+  background: var(--primary) !important;
+  color: #fff !important;
 }

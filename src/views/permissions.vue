@@ -44,14 +44,14 @@
       <div v-else class="space-y-2.5">
         <!-- Group: Foydalanuvchilar -->
         <div class="rounded overflow-hidden shadow-sm"
-          :style="themeStore.isDark ? 'background:#264a75; border:1px solid #3a6090;' : 'background:#ffffff; border:1px solid #d8dde6;'">
+          :style="themeStore.isDark ? 'background:#161c2d; border:1px solid #1e2d42;' : 'background:#ffffff; border:1px solid #d8dde6;'">
           <div class="px-5 py-3 border-b"
-            :style="themeStore.isDark ? 'border-color:#3a6090; background:#1e3a5f;' : 'border-color:#eaecf0; background:#f7f8fa;'">
+            :style="themeStore.isDark ? 'border-color:#1e2d42; background:#0d1117;' : 'border-color:#eaecf0; background:#f7f8fa;'">
             <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
               {{ $t('Ruxsatlar') }}
             </p>
           </div>
-          <div class="divide-y" :style="themeStore.isDark ? 'border-color:#3a6090' : 'border-color:#eaecf0'">
+          <div class="divide-y" :style="themeStore.isDark ? 'border-color:#1e2d42' : 'border-color:#eaecf0'">
             <div
               v-for="(value, key) in filteredPermissions"
               :key="key"
@@ -72,7 +72,7 @@
                       clip-rule="evenodd" />
                   </svg>
                 </div>
-                <span class="text-sm font-medium" :style="themeStore.isDark ? 'color:#e8f0ff' : 'color:#1a1f36'">
+                <span class="text-sm font-medium" :style="themeStore.isDark ? 'color:#e2e8f0' : 'color:#1a1f36'">
                   {{ formatLabel(key) }}
                 </span>
               </div>
@@ -95,14 +95,14 @@
 
         <!-- Stats bar -->
         <div class="px-5 py-4 rounded flex items-center justify-between"
-          :style="themeStore.isDark ? 'background:#264a75; border:1px solid #3a6090;' : 'background:#ffffff; border:1px solid #d8dde6;'">
-          <div class="flex items-center gap-2 text-sm" :style="themeStore.isDark ? 'color:#7aaad4' : 'color:#4a5568'">
+          :style="themeStore.isDark ? 'background:#161c2d; border:1px solid #1e2d42;' : 'background:#ffffff; border:1px solid #d8dde6;'">
+          <div class="flex items-center gap-2 text-sm" :style="themeStore.isDark ? 'color:#8892a4' : 'color:#4a5568'">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
               stroke="currentColor" class="w-4 h-4">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
             </svg>
-            {{ $t('Jami') }}: <span class="font-semibold" :style="themeStore.isDark ? 'color:#ddeaff' : 'color:#1a1f36'">{{ totalCount }}</span>
+            {{ $t('Jami') }}: <span class="font-semibold" :style="themeStore.isDark ? 'color:#e2e8f0' : 'color:#1a1f36'">{{ totalCount }}</span>
           </div>
           <div class="flex items-center gap-4 text-sm">
             <span class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
