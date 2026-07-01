@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, getCurrentInstance } from 'vue'
 import { useCustomersStore } from '@/stores/customers'
 import CustomerModal from '@/components/customers/CustomerModal.vue'
-import AppCheckbox from '@/components/ui/AppCheckbox.vue'
 import { useAuthStore } from '@/stores/auth'
 import { usePricesStore } from '@/stores/prices'
 import { useThemeStore } from '@/stores/theme'
@@ -21,7 +20,6 @@ const showModal = ref(false)
 const editing = ref(null)
 const selected = ref([])
 const filterTab = ref('all') // 'all' or 'debtors'
-const statusFilter = ref('all') // 'all' | CustomerStatus
 const dateFilter = ref('today') // 'today' | 'monthly' | 'yearly' | 'all' | 'range'
 const dateFrom = ref('')
 const dateTo = ref('')
@@ -138,60 +136,12 @@ const filtered = computed(() => {
       }
     }
 
-    // Status
-    if (
-      statusFilter.value !== "all" &&
-      c.status !== statusFilter.value
-    ) {
-      return false
-    }
-
     return true
   })
 })
-// Faqat sana bo'yicha filterlangan (status select sonlari uchun)
-const byDateOnly = computed(() => {
-  const now = new Date()
-  return store.customers.filter(c => {
-    if (dateFilter.value === 'all') return true
-    const created = new Date(c.createdAt)
-    if (dateFilter.value === 'today') {
-      return created.getFullYear() === now.getFullYear() &&
-        created.getMonth() === now.getMonth() &&
-        created.getDate() === now.getDate()
-    } else if (dateFilter.value === 'monthly') {
-      return created.getFullYear() === now.getFullYear() &&
-        created.getMonth() === now.getMonth()
-    } else if (dateFilter.value === 'yearly') {
-      return created.getFullYear() === now.getFullYear()
-    } else if (dateFilter.value === 'my') {
-      return c.assignedTo?.id === authStore.user.id
-    } else if (dateFilter.value === 'range') {
-      if (dateFrom.value) {
-        const from = new Date(dateFrom.value)
-        from.setHours(0, 0, 0, 0)
-        if (created < from) return false
-      }
-      if (dateTo.value) {
-        const to = new Date(dateTo.value)
-        to.setHours(23, 59, 59, 999)
-        if (created > to) return false
-      }
-      return true
-    }
-    return true
-  })
-})
-
-// Faqat status bo'yicha filterlangan (date tab sonlari uchun)
-const byStatusOnly = computed(() => {
-  if (statusFilter.value === 'all') return store.customers
-  return store.customers.filter(c => c.status === statusFilter.value)
-})
-
 const countByDate = (dateKey) => {
   const now = new Date()
-  const base = statusFilter.value === 'all' ? store.customers : store.customers.filter(c => c.status === statusFilter.value)
+  const base = store.customers
   return base.filter(c => {
     const created = new Date(c.createdAt)
     if (dateKey === 'today') {
@@ -261,12 +211,66 @@ const archiveSelected = async () => {
 }
 
 const statusInlineColors = {
-  NAVBATDA: { bg: '#dbeafe', color: '#1d4ed8' },
-  YURISTDA: { bg: '#ede9fe', color: '#7c3aed' },
-  KORIB_CHIQILDI: { bg: '#fef3c7', color: '#d97706' },
-  JARAYONDA: { bg: '#ffedd5', color: '#ea580c' },
-  YAKUNLANDI: { bg: '#d1fae5', color: '#059669' },
-  BEKOR_QILINDI: { bg: '#fee2e2', color: '#dc2626' },
+  NAVBATDA: { bg: 'var(--border-light)', color: 'var(--text-2)' },
+  YURISTDA: { bg: 'var(--warning-bg)', color: 'var(--warning)' },
+  KORIB_CHIQILDI: { bg: 'var(--primary-light)', color: '#2563eb' },
+  JARAYONDA: { bg: 'var(--primary-light)', color: '#ea580c' },
+  YAKUNLANDI: { bg: 'var(--success-bg)', color: 'var(--success)' },
+  BEKOR_QILINDI: { bg: 'var(--danger-bg)', color: 'var(--danger)' },
+}
+
+// Navbat doskasi (Kanban) ustunlari — kartalar shu tartibda status bo'yicha guruhlanadi
+const KANBAN_STATUS_ORDER = ['NAVBATDA', 'KORIB_CHIQILDI', 'YAKUNLANDI', 'YURISTDA']
+const kanbanStatusLabels = {
+  NAVBATDA: 'Navbatda',
+  KORIB_CHIQILDI: "Ko'rib chiqildi",
+  YAKUNLANDI: 'Maslahat berildi',
+  YURISTDA: 'Maslahat berildi va shartnoma tuzildi',
+}
+
+const appealTypeLabels = {
+  NIKOH_AJRALISH: 'Nikohdan ajralish',
+  UY_JOY: 'Uy-joy masalalari',
+  MEROS: 'Meros ishlari',
+  BIZNES: 'Biznesga oid muammolar',
+  JINOIY_ISH: 'Jinoiy ishlar',
+  BOSHQA: 'Boshqa masalalar',
+}
+
+const groupedByStatus = computed(() => KANBAN_STATUS_ORDER.map(key => ({
+  key,
+  label: kanbanStatusLabels[key],
+  colors: statusInlineColors[key],
+  items: filtered.value.filter(c => c.status === key),
+})))
+
+const nextStatus = (status) => {
+  const idx = KANBAN_STATUS_ORDER.indexOf(status)
+  return idx >= 0 && idx < KANBAN_STATUS_ORDER.length - 1 ? KANBAN_STATUS_ORDER[idx + 1] : null
+}
+
+const moveNext = async (c) => {
+  const next = nextStatus(c.status)
+  if (!next) return
+  await store.updateCustomer(c.id, { status: next })
+}
+
+const rejectCustomer = async (c) => {
+  if (!confirm(`"${c.surname} ${c.name}" ${proxy.$t("ni bekor qilmoqchimisiz?")}`)) return
+  await store.updateCustomer(c.id, { status: 'BEKOR_QILINDI' })
+}
+
+const printCustomer = (c) => {
+  const params = new URLSearchParams({
+    fish: `${c.surname || ''} ${c.name || ''}`.trim(),
+    telefon: c.phone || '',
+    manzil: c.address || '',
+    id: `MJZ-${c.customer_id || ''}`,
+    raqam: c.queueNumber ? `A-${String(c.queueNumber).padStart(2, '0')}` : '—',
+    yurist: c.assignedTo ? `${c.assignedTo.surname} ${c.assignedTo.name}` : '—',
+    sana: (c.createdAt ? new Date(c.createdAt) : new Date()).getTime().toString(),
+  })
+  window.open(`/qabulxati.html?${params.toString()}`, '_blank')
 }
 
 const openCustomer = (id) => {
@@ -284,30 +288,16 @@ const formatMoney = (amount) => {
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="gov-page-title text-xl font-bold" :style="themeStore.isDark ? 'color:#e2e8f0' : 'color:#1A3A6B'">{{
-          $t('Mijozlar') }}</h1>
-        <p class="text-sm mt-1" :style="themeStore.isDark ? 'color:#4a5878' : 'color:#4a5568'">
+        <h1 class="gov-page-title">{{ $t('Mijozlar') }}</h1>
+        <p class="text-sm mt-1" style="color:var(--text-2);">
           {{ $t('Faol mijozlar') }} — {{ $t('Jami') }}
-          <span class="font-bold" :style="themeStore.isDark ? 'color:#e2e8f0' : 'color:#1A3A6B'">{{
+          <span class="font-bold" style="color:var(--text-1);">{{
             store.customers.length }}</span>
           {{ $t('ta') }}
         </p>
       </div>
       <div class="flex items-center gap-2">
-        <button @click="openCreate" v-if="authStore.permission.add_customers"
-          class="flex items-center gap-2 px-4 py-2.5 text-white text-sm font-bold active:scale-[0.98] transition-all cursor-pointer"
-          style="background:#1A3A6B; border-radius:4px; letter-spacing:0.03em;">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-            stroke="currentColor" class="w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          {{ $t('Yangi mijoz') }}
-        </button>
-        <button @click="openPricesModal" v-if="authStore.permission.edit_prices"
-          class="flex items-center gap-2 px-4 py-2.5 rounded text-sm font-medium transition-all cursor-pointer active:scale-[0.98]"
-          :style="themeStore.isDark
-            ? 'background:#161c2d; border:1px solid #1e2d42; color:#8892a4;'
-            : 'background:#ffffff; border:1px solid #d8dde6; color:#4a5568;'">
+        <button @click="openPricesModal" v-if="authStore.permission.edit_prices" class="btn btn-ghost">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
             stroke="currentColor" class="w-4 h-4">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -322,16 +312,14 @@ const formatMoney = (amount) => {
 
     <!-- Search -->
     <div class="relative">
-      <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none" style="color:#8892a4;">
+      <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none" style="color:var(--text-3);">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M21 21l-6-6m2-5a7 7 0 01-14 0 7 7 0 0114 0z" />
         </svg>
       </span>
       <input v-model="search" type="text" :placeholder="$t('Ism, familiya, telefon, manzil yoki') + ' MJZ-ID...'"
-        class="w-full pl-11 pr-4 py-3 rounded text-sm transition-all focus:outline-none" :style="themeStore.isDark
-          ? 'background:#161c2d; border:1px solid #1e2d42; color:#e2e8f0;'
-          : 'background:#ffffff; border:1px solid #d8dde6; color:#1a1f36;'" />
+        class="form-input pl-11" />
     </div>
 
     <!-- Date Filter Tabs -->
@@ -344,48 +332,13 @@ const formatMoney = (amount) => {
         { key: 'my', label: $t('Menga biriktirilgan') },
         { key: 'range', label: $t('Sana oralig\'i') },
       ]" :key="tab.key" @click="dateFilter = tab.key"
-        class="px-4 py-2 rounded text-sm font-semibold transition-all cursor-pointer" :style="dateFilter === tab.key
-          ? 'background:#1A3A6B; color:#ffffff;'
-          : themeStore.isDark
-            ? 'background:#161c2d; border:1px solid #1e2d42; color:#8892a4;'
-            : 'background:#ffffff; border:1px solid #d8dde6; color:#4a5568;'">
+        :class="['period-tab', dateFilter === tab.key ? 'period-tab-active' : '']">
         {{ tab.label }}
-        <span v-if="tab.key !== 'range'" class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded"
-          :style="dateFilter === tab.key ? 'background:rgba(255,255,255,0.2); color:#ffffff;' : themeStore.isDark ? 'background:#1e2d42; color:#8892a4;' : 'background:#eef2f7; color:#1A3A6B;'">
-          {{ tab.key === 'all' ? byStatusOnly.length : countByDate(tab.key) }}
+        <span v-if="tab.key !== 'range'" class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+          :style="dateFilter === tab.key ? 'background:rgba(255,255,255,0.2); color:inherit;' : 'background:var(--border-light); color:var(--text-2);'">
+          {{ tab.key === 'all' ? store.customers.length : countByDate(tab.key) }}
         </span>
       </button>
-      <!-- Status Filter -->
-      <div class="flex items-center gap-3">
-
-        <div class="relative">
-          <select v-model="statusFilter"
-            class="pl-3 pr-8 py-2 rounded text-sm font-medium transition-all focus:outline-none appearance-none cursor-pointer"
-            :style="statusFilter !== 'all'
-              ? `background:${statusInlineColors[statusFilter]?.bg}; color:${statusInlineColors[statusFilter]?.color}; border:1px solid ${statusInlineColors[statusFilter]?.color}40;`
-              : themeStore.isDark
-                ? 'background:#161c2d; border:1px solid #1e2d42; color:#e2e8f0;'
-                : 'background:#ffffff; border:1px solid #d8dde6; color:#1a1f36;'">
-            <option value="all">{{ $t('Barchasi') }} ({{ byDateOnly.length }})</option>
-            <option value="NAVBATDA">{{ $t('Navbatda') }} ({{byDateOnly.filter(c => c.status === 'NAVBATDA').length}})
-            </option>
-            <option value="KORIB_CHIQILDI">{{ $t("Ko'rib chiqildi") }} ({{byDateOnly.filter(c => c.status ===
-              'KORIB_CHIQILDI').length}})</option>
-            <option value="JARAYONDA">{{ $t('Shartnoma tuzildi') }} ({{byDateOnly.filter(c => c.status ===
-              'JARAYONDA').length}})</option>
-            <option value="YAKUNLANDI">{{ $t('Maslahat berildi') }} ({{byDateOnly.filter(c => c.status ===
-              'YAKUNLANDI').length}})</option>
-            <option value="YURISTDA">{{ $t('Maslahat berildi va shartnoma tuzildiz') }} ({{byDateOnly.filter(c =>
-              c.status === 'YURISTDA').length}})</option>
-            <!-- <option value="BEKOR_QILINDI">{{ $t('Bekor qilindi') }} ({{ byDateOnly.filter(c => c.status === 'BEKOR_QILINDI').length }})</option> -->
-          </select>
-          <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none" fill="none"
-            viewBox="0 0 24 24" stroke="currentColor"
-            :style="statusFilter !== 'all' ? `color:${statusInlineColors[statusFilter]?.color}` : themeStore.isDark ? 'color:#4a5878' : 'color:#8892a4'">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-      </div>
     </div>
 
 
@@ -395,24 +348,14 @@ const formatMoney = (amount) => {
       leave-active-class="transition-all duration-150" leave-to-class="opacity-0 -translate-y-2">
       <div v-if="dateFilter === 'range'" class="flex items-center gap-3 flex-wrap">
         <div class="flex items-center gap-2 flex-1 min-w-0">
-          <label class="text-xs font-semibold shrink-0"
-            :style="themeStore.isDark ? 'color:#4a5878' : 'color:#4a5568'">{{ $t('Dan') }}:</label>
-          <input v-model="dateFrom" type="date"
-            class="flex-1 px-3 py-2 rounded text-sm transition-all focus:outline-none" :style="themeStore.isDark
-              ? 'background:#161c2d; border:1px solid #1e2d42; color:#e2e8f0;'
-              : 'background:#ffffff; border:1px solid #d8dde6; color:#1a1f36;'" />
+          <label class="text-xs font-semibold shrink-0" style="color:var(--text-2);">{{ $t('Dan') }}:</label>
+          <input v-model="dateFrom" type="date" class="form-input flex-1" />
         </div>
         <div class="flex items-center gap-2 flex-1 min-w-0">
-          <label class="text-xs font-semibold shrink-0"
-            :style="themeStore.isDark ? 'color:#4a5878' : 'color:#4a5568'">{{ $t('Gacha') }}:</label>
-          <input v-model="dateTo" type="date" class="flex-1 px-3 py-2 rounded text-sm transition-all focus:outline-none"
-            :style="themeStore.isDark
-              ? 'background:#161c2d; border:1px solid #1e2d42; color:#e2e8f0;'
-              : 'background:#ffffff; border:1px solid #d8dde6; color:#1a1f36;'" />
+          <label class="text-xs font-semibold shrink-0" style="color:var(--text-2);">{{ $t('Gacha') }}:</label>
+          <input v-model="dateTo" type="date" class="form-input flex-1" />
         </div>
-        <button v-if="dateFrom || dateTo" @click="dateFrom = ''; dateTo = ''"
-          class="px-3 py-2 rounded-xl text-xs font-medium transition-all"
-          :class="themeStore.isDark ? 'bg-rose-900/20 text-rose-400 border border-rose-500/20 hover:bg-rose-900/40' : 'bg-rose-50 text-rose-500 border border-rose-200 hover:bg-rose-100'">
+        <button v-if="dateFrom || dateTo" @click="dateFrom = ''; dateTo = ''" class="btn btn-sm btn-danger">
           {{ $t('Tozalash') }}
         </button>
       </div>
@@ -421,18 +364,17 @@ const formatMoney = (amount) => {
     <!-- Bulk bar -->
     <Transition enter-active-class="transition-all duration-200" enter-from-class="opacity-0 -translate-y-2"
       leave-active-class="transition-all duration-150" leave-to-class="opacity-0 -translate-y-2">
-      <div v-if="selected.length > 0" class="flex items-center justify-between px-5 py-3 rounded"
-        :style="themeStore.isDark ? 'background:#161c2d; border:1px solid #1e2d42;' : 'background:#eef2f7; border:1px solid #d8dde6;'">
-        <span class="text-sm font-semibold" :style="themeStore.isDark ? 'color:#e2e8f0' : 'color:#1a1f36'">
+      <div v-if="selected.length > 0" class="flex items-center justify-between px-5 py-3 rounded-lg"
+        style="background:var(--border-light); border:1px solid var(--border);">
+        <span class="text-sm font-semibold" style="color:var(--text-1);">
           {{ selected.length }} {{ $t('ta tanlandi') }}
         </span>
         <div class="flex gap-2">
-          <button @click="selected = []" class="px-4 py-1.5 rounded text-sm font-medium transition-colors"
-            :style="themeStore.isDark ? 'color:#8892a4' : 'color:#4a5568'">
+          <button @click="selected = []" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+            style="color:var(--text-2);">
             {{ $t('Bekor qilish') }}
           </button>
-          <button @click="archiveSelected"
-            class="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-sm font-medium bg-red-500/15 text-red-500 hover:bg-red-500/25 border border-red-500/20 transition-colors">
+          <button @click="archiveSelected" class="btn btn-sm btn-danger">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -445,119 +387,174 @@ const formatMoney = (amount) => {
     </Transition>
 
     <!-- Loading -->
-    <div v-if="store.loading" class="flex items-center justify-center py-16 gap-3"
-      :style="themeStore.isDark ? 'color:#4a5878' : 'color:#8892a4'">
+    <div v-if="store.loading" class="flex items-center justify-center py-16 gap-3" style="color:var(--text-2);">
       <div class="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin opacity-60"></div>
       <span class="text-sm">{{ $t('Yuklanmoqda...') }}</span>
     </div>
 
-    <!-- Cards grid -->
-    <div v-else-if="filtered.length > 0"
-      class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 bg-[#1A3A6B1e] p-5 border-2 border-[#1A3A6B7e] gap-4">
-      <div v-for="c in filtered" :key="c.id" class="relative rounded p-5 cursor-pointer transition-all group" :style="themeStore.isDark
-        ? 'background:#161c2d; border:1px solid ' + (selected.includes(c.id) ? '#1A3A6B' : '#1e2d42') + ';'
-        : 'background:#ffffff; border:1px solid ' + (selected.includes(c.id) ? '#1A3A6B' : '#d8dde6') + ';'"
-        @click="openCustomer(c.id)">
-<!--
-        <div v-if="authStore.permission.delete_customers" class="absolute top-3 right-3 z-10" @click.stop>
-          <AppCheckbox :checked="selected.includes(c.id)" @change="toggleOne(c.id)" />
+
+    <div class="grid grid-cols-1 md:grid-cols-3 border-4 border-[var(--border)] rounded-lg p-4 gap-3 mb-5">
+      <button @click="openCreate" v-if="authStore.permission.add_customers" class="btn btn-primary h-[80px] flex justify-center items-center text-[15px] font-bold gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+          stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        {{ $t('Yangi mijoz yaratish') }}
+      </button>
+    </div>
+
+    <!-- Kanban board: Table-grid layout -->
+    <div v-if="filtered.length > 0"
+      class="border-4 border-[var(--border)] rounded-xl bg-[var(--bg-card)] overflow-hidden flex flex-col">
+      
+      <!-- Table Header Row -->
+      <div class="flex border-b-4 border-[var(--border)] divide-x-4 divide-[var(--border)] overflow-x-auto select-none">
+        <div v-for="col in groupedByStatus" :key="'h-' + col.key" 
+          class="flex-1 min-w-[280px] px-5 py-3.5 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full shrink-0" :style="{ background: col.colors.color }"></span>
+          <h3 class="text-xs font-bold uppercase tracking-wider" style="color:var(--text-1);">{{ $t(col.label) }}</h3>
+          <span class="text-xs font-semibold" style="color:var(--text-3);">({{ col.items.length }})</span>
         </div>
--->
+      </div>
 
+      <!-- Table Body Columns -->
+      <div class="flex divide-x-4 divide-[var(--border)] overflow-x-auto bg-[var(--bg-page)]/20 min-h-[600px]">
+        <div v-for="col in groupedByStatus" :key="'col-' + col.key" 
+          class="flex-1 min-w-[280px] p-4 flex flex-col gap-3">
+          
+          <!-- Cards -->
+          <div v-for="c in col.items" :key="c.id" class="card card-hover group p-4 cursor-pointer transition-all bg-[var(--bg-card)]"
+            @click="openCustomer(c.id)">
 
-        <!-- Top: Avatar + Name + Source -->
-        <div class="flex items-start gap-3 mb-4">
-          <div class="w-11 h-11 rounded flex items-center justify-center text-white font-bold text-base shrink-0"
-            style="background:#1A3A6B;">
-            {{ ($t(c.surname) || $t(c.name) || '?')[0].toUpperCase() }}
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex justify-between">
-              <p class="font-bold text-sm truncate leading-tight"
-              :style="themeStore.isDark ? 'color:#e2e8f0' : 'color:#1a1f36'">
+            <!-- Top row: MJZ id + source icon -->
+            <div class="flex items-start justify-between gap-2 mb-3">
+              <span v-if="c.customer_id"
+                class="text-[10px] font-semibold tracking-wide pill-selected px-2 py-1 rounded-lg">
+                MJZ-{{ c.customer_id }}
+              </span>
+              <span v-if="c.source" class="shrink-0" style="color:var(--text-3);" :title="c.source">
+                <!-- Instagram -->
+                <svg v-if="c.source === 'INSTAGRAM'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="1.8">
+                  <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="16.7" cy="7.3" r="0.6" fill="currentColor" stroke="none" />
+                </svg>
+                <!-- YouTube -->
+                <svg v-else-if="c.source === 'YOUTUBE'" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="1.8">
+                  <rect x="2.5" y="5.5" width="19" height="13" rx="3.5" />
+                  <path d="M10.5 9.5l4.5 2.5-4.5 2.5v-5z" fill="currentColor" stroke="none" />
+                </svg>
+                <!-- Telegram -->
+                <svg v-else-if="c.source === 'TELEGRAM'" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M21 4.5L2.5 11.5l6 2m12.5-9l-3.5 15-9-6m12.5-9l-12.5 9" />
+                </svg>
+                <!-- Tanishidan -->
+                <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="10" cy="8" r="3.25" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.5 20a6.5 6.5 0 0113 0" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 11.5l1.5 1.5 3-3" />
+                </svg>
+              </span>
+            </div>
+
+            <p class="font-bold text-sm mb-2 truncate" style="color:var(--text-1);">
               {{ $t(c.surname) }} {{ $t(c.name) }}
             </p>
-            <p v-if="c.customer_id" class="text-[10px] mt-0.5 font-semibold tracking-wide bg-[#1A3A6B] px-2 rounded-xl text-white py-1">
-              MJZ-{{ c.customer_id }}
-            </p>
+
+            <!-- Contact info -->
+            <div class="space-y-1.5 mb-3">
+              <div class="flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 shrink-0" style="color:var(--text-2);" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                </svg>
+                <span class="text-xs" style="color:var(--text-2);">{{ c.phone }}</span>
+              </div>
+              <div v-if="c.address" class="flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 shrink-0" style="color:var(--text-2);" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+                <span class="text-xs truncate" style="color:var(--text-2);">{{ $t(c.address) }}</span>
+              </div>
             </div>
-            <p class="text-xs mt-0.5 truncate" :style="themeStore.isDark ? 'color:#4a5878' : 'color:#8892a4'">
-              {{ $t(c.father_name) || '' }}
-            </p>
-          </div>
-        </div>
 
-        <!-- Contact info -->
-        <div class="space-y-1.5 mb-4">
-          <div class="flex items-center gap-2">
-            <svg class="w-3.5 h-3.5 shrink-0" style="color:#8892a4;" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
-            </svg>
-            <span class="text-xs" :style="themeStore.isDark ? 'color:#8892a4' : 'color:#4a5568'">{{ c.phone }}</span>
-            <span v-if="c.phone2" class="text-[10px]" :style="themeStore.isDark ? 'color:#4a5878' : 'color:#8892a4'">/
-              {{ c.phone2 }}</span>
-          </div>
-          <div v-if="c.assignedTo" class="flex items-center gap-2">
-            <svg class="w-3.5 h-3.5 shrink-0" style="color:#8892a4;" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span class="text-xs truncate" :style="themeStore.isDark ? 'color:#8892a4' : 'color:#4a5568'">
-              {{ $t(c.assignedTo.surname) }} {{ $t(c.assignedTo.name) }}
+            <!-- Category tag -->
+            <span v-if="c.appealType" class="inline-block text-[11px] font-medium px-2.5 py-1 rounded-lg mb-3"
+              style="border:1px solid var(--border); color:var(--text-2);">
+              {{ $t(appealTypeLabels[c.appealType] || c.appealType) }}
             </span>
-          </div>
-          <div v-if="c.address" class="flex items-center gap-2">
-            <svg class="w-3.5 h-3.5 shrink-0" style="color:#8892a4;" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-            </svg>
-            <span class="text-xs truncate" :style="themeStore.isDark ? 'color:#4a5878' : 'color:#8892a4'">{{
-              $t(c.address) }}</span>
-          </div>
-        </div>
 
-
-        <!-- Bottom: Status + Actions -->
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold px-2.5 py-1 rounded-xl" :class="(() => {
-            const paid = c.payments.reduce((a, b) => a + b.amount, 0)
-            const debt = (c.price || 0) - paid
-            return debt > 0
-              ? themeStore.isDark ? 'bg-rose-900/25 text-rose-400' : 'bg-rose-50 text-rose-600'
-              : themeStore.isDark ? 'bg-emerald-900/25 text-emerald-400' : 'bg-emerald-50 text-emerald-600'
-          })()">
-            {{(() => {
+            <!-- Debt / paid -->
+            <p class="text-sm font-bold mb-0.5" :style="(() => {
               const paid = c.payments.reduce((a, b) => a + b.amount, 0)
               const debt = (c.price || 0) - paid
-              return debt > 0 ? $t('Qarz') + ': ' + formatMoney(debt) : $t("To'langan")
-            })()}}
-          </span>
+              return debt > 0 ? 'color:var(--danger)' : 'color:var(--success)'
+            })()">
+              {{(() => {
+                const paid = c.payments.reduce((a, b) => a + b.amount, 0)
+                const debt = (c.price || 0) - paid
+                return debt > 0 ? $t('Qarz') + ': ' + formatMoney(debt) : $t("To'liq to'langan")
+              })()}}
+            </p>
+            <p v-if="c.assignedTo" class="text-xs mb-3" style="color:var(--text-3);">
+              {{ $t('Yurist') }}: {{ $t(c.assignedTo.surname) }} {{ $t(c.assignedTo.name) }}
+            </p>
 
-          <!-- Actions -->
-          <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" @click.stop>
-            <button v-if="authStore.permission.edit_customers" @click="openEdit(c)" class="p-1.5 rounded transition-all"
-              :style="themeStore.isDark ? 'color:#4a5878' : 'color:#8892a4'" title="Tahrirlash">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 5.232z" />
-              </svg>
-            </button>
-            <button v-if="authStore.permission.delete_customers" @click="archive(c)"
-              class="p-1.5 rounded-lg transition-all"
-              :class="themeStore.isDark ? 'text-rose-400/50 hover:text-rose-400 hover:bg-rose-900/20' : 'text-rose-300 hover:text-rose-500 hover:bg-rose-50'"
-              :title="$t('Arxivga o\'tkazish')">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-              </svg>
-            </button>
+            <!-- Status workflow actions -->
+            <div v-if="authStore.permission.edit_customers && nextStatus(c.status)" class="flex items-center gap-2 mb-2"
+              @click.stop>
+              <button @click="moveNext(c)" class="btn btn-primary btn-sm flex-1 justify-center">
+                {{ $t('Keyingi') }}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                  stroke="currentColor" class="w-3 h-3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Utility row: print / edit / archive -->
+            <div class="flex items-center justify-between" @click.stop>
+              <button @click="printCustomer(c)" class="flex items-center gap-1.5 text-xs transition-colors"
+                style="color:var(--text-3);">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6.72 13.83A2.25 2.25 0 004.5 16.08v3.42a.75.75 0 00.75.75h13.5a.75.75 0 00.75-.75v-3.42a2.25 2.25 0 00-2.22-2.25M6.72 13.83V8.25a.75.75 0 01.75-.75h9.06a.75.75 0 01.75.75v5.58M6.72 13.83h10.56" />
+                </svg>
+                {{ $t('Chop etish') }}
+              </button>
+              <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button v-if="authStore.permission.edit_customers" @click="openEdit(c)"
+                  class="p-1.5 rounded-lg transition-all" style="color:var(--text-2);" :title="$t('Tahrirlash')">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 5.232z" />
+                  </svg>
+                </button>
+                <button v-if="authStore.permission.delete_customers" @click="archive(c)"
+                  class="p-1.5 rounded-lg transition-all" style="color:var(--danger);" :title="$t('Arxivga o\'tkazish')">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="col.items.length === 0" class="text-xs text-center py-6 rounded-lg bg-[var(--bg-card)]/50"
+            style="color:var(--text-3); border:1px dashed var(--border);">
+            {{ $t("Mijoz yo'q") }}
           </div>
         </div>
       </div>
@@ -565,18 +562,16 @@ const formatMoney = (amount) => {
 
     <!-- Empty state -->
     <div v-else-if="!store.loading" class="flex flex-col items-center justify-center py-20 gap-4">
-      <div class="w-20 h-20 rounded flex items-center justify-center"
-        :style="themeStore.isDark ? 'background:#1e2d42' : 'background:#eaecf0'">
-        <svg class="w-10 h-10" :style="themeStore.isDark ? 'color:#1e2d42' : 'color:#c1c9d6'" fill="none"
-          viewBox="0 0 24 24" stroke="currentColor">
+      <div class="w-20 h-20 rounded-lg flex items-center justify-center" style="background:var(--border-light);">
+        <svg class="w-10 h-10" style="color:var(--text-3);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       </div>
       <div class="text-center">
-        <p class="font-semibold" :style="themeStore.isDark ? 'color:#4a5878' : 'color:#8892a4'">{{ $t('Mijoz topilmadi')
-          }}</p>
-        <p class="text-sm mt-1" :style="themeStore.isDark ? 'color:#1e2d42' : 'color:#c1c9d6'">
+        <p class="font-semibold" style="color:var(--text-2);">{{ $t('Mijoz topilmadi')
+        }}</p>
+        <p class="text-sm mt-1" style="color:var(--text-3);">
           {{ $t('Qidiruv natijasi bo\'sh') }}</p>
       </div>
     </div>
@@ -589,19 +584,17 @@ const formatMoney = (amount) => {
   <Teleport to="body">
     <Transition name="modal-fade">
       <div v-if="showPricesModal" class="fixed inset-0 z-50 flex"
-        :class="themeStore.isDark ? 'bg-black/70' : 'bg-black/40'" style="backdrop-filter: blur(4px);"
-        @click.self="showPricesModal = false">
-        <div class="m-auto w-full max-w-md rounded overflow-hidden flex flex-col shadow-2xl"
-          :style="themeStore.isDark ? 'background:#161c2d;' : 'background:#ffffff;'">
-          <div class="px-6 py-5 flex items-center justify-between"
-            style="background:#1A3A6B; border-bottom:3px solid #2E8B57;">
+        style="background:rgba(0,0,0,0.5); backdrop-filter: blur(4px);" @click.self="showPricesModal = false">
+        <div class="m-auto w-full max-w-md rounded-lg overflow-hidden flex flex-col shadow-2xl card">
+          <div class="px-6 py-5 flex items-center justify-between border-b" style="border-color:var(--border);">
             <div>
-              <h2 class="text-white text-base font-bold tracking-wide">{{ $t("Xizmat narxlarini o'zgartirish") }}</h2>
-              <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.55);">{{ $t("Narxlarni o'zgartiring") }}</p>
+              <h2 class="text-base font-bold tracking-wide" style="color:var(--text-1);">
+                {{ $t("Xizmat narxlarini o'zgartirish") }}</h2>
+              <p class="text-sm mt-0.5" style="color:var(--text-2);">{{ $t("Narxlarni o'zgartiring") }}</p>
             </div>
             <button @click="showPricesModal = false"
-              class="w-8 h-8 rounded flex items-center justify-center text-white transition-all"
-              style="background:rgba(255,255,255,0.12);">
+              class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+              style="background:var(--border-light); color:var(--text-2);">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                 stroke="currentColor" class="w-4 h-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -611,30 +604,23 @@ const formatMoney = (amount) => {
 
           <div class="p-6 space-y-4 flex-1">
             <div class="space-y-1.5">
-              <label class="block text-[11px] font-semibold uppercase tracking-wider"
-                :style="themeStore.isDark ? 'color:#4a5878' : 'color:#4a5568'">{{ $t('1-narx (so\'mda)') }}</label>
-              <input v-model="editingPriceOne" type="number"
-                class="w-full px-3 py-2.5 rounded text-sm transition-all focus:outline-none"
-                :style="themeStore.isDark ? 'background:#0d1117; border:1px solid #1e2d42; color:#e2e8f0;' : 'background:#f7f8fa; border:1px solid #d8dde6; color:#1a1f36;'" />
+              <label class="block text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-2);">{{
+                $t('1-narx (so\'mda)') }}</label>
+              <input v-model="editingPriceOne" type="number" class="form-input bg-slate-50 dark:bg-[var(--border-light)]" />
             </div>
             <div class="space-y-1.5">
-              <label class="block text-[11px] font-semibold uppercase tracking-wider"
-                :style="themeStore.isDark ? 'color:#4a5878' : 'color:#4a5568'">{{ $t('2-narx (so\'mda)') }}</label>
-              <input v-model="editingPriceTwo" type="number"
-                class="w-full px-3 py-2.5 rounded text-sm transition-all focus:outline-none"
-                :style="themeStore.isDark ? 'background:#0d1117; border:1px solid #1e2d42; color:#e2e8f0;' : 'background:#f7f8fa; border:1px solid #d8dde6; color:#1a1f36;'" />
+              <label class="block text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-2);">{{
+                $t('2-narx (so\'mda)') }}</label>
+              <input v-model="editingPriceTwo" type="number" class="form-input bg-slate-50 dark:bg-[var(--border-light)]" />
             </div>
           </div>
 
-          <div class="px-6 py-4 flex justify-end gap-3"
-            :style="themeStore.isDark ? 'border-top:1px solid #1e2d42; background:#0d1117;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
-            <button @click="showPricesModal = false" class="px-5 py-2 rounded text-sm font-medium transition-all"
-              :style="themeStore.isDark ? 'color:#8892a4' : 'color:#4a5568'">
+          <div class="px-6 py-4 flex justify-end gap-3 border-t"
+            style="border-color:var(--border); background:var(--border-light);">
+            <button @click="showPricesModal = false" class="btn btn-ghost btn-sm">
               {{ $t('Bekor qilish') }}
             </button>
-            <button @click="savePrices"
-              class="px-5 py-2 text-white text-sm font-bold active:scale-[0.97] transition-all"
-              style="background:#1A3A6B; border-radius:4px; letter-spacing:0.03em;">
+            <button @click="savePrices" class="btn btn-primary btn-sm">
               {{ $t('Saqlash') }}
             </button>
           </div>

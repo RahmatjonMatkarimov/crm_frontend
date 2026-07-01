@@ -985,21 +985,20 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
 <template>
   <Teleport to="body">
     <Transition name="modal-fade">
-      <div class="fixed inset-0 z-50 flex flex-col"
-        :style="themeStore.isDark ? 'background:#161c2d;' : 'background:#ffffff;'">
+      <div class="fixed inset-0 z-50 flex flex-col" style="background:var(--bg-card);">
 
         <!-- Modal Header -->
-        <div class="px-6 py-5 flex items-center justify-between shrink-0" style="background:#1A3A6B; border-bottom:3px solid #2E8B57;">
+        <div class="px-6 py-5 flex items-center justify-between shrink-0 border-b" style="border-color:var(--border);">
           <div>
-            <h2 class="text-white text-base font-bold tracking-wide">
+            <h2 class="text-base font-bold tracking-wide" style="color:var(--text-1);">
               {{ props.editing?.id ? $t('Mijozni tahrirlash') : $t("Yangi mijoz qo'shish") }}
             </h2>
-            <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.55);">{{ $t("Majburiy maydonlarni to'ldiring") }}
+            <p class="text-sm mt-0.5" style="color:var(--text-2);">{{ $t("Majburiy maydonlarni to'ldiring") }}
             </p>
           </div>
           <button @click="$emit('close')"
-            class="w-8 h-8 rounded flex items-center justify-center text-white transition-all"
-            style="background:rgba(255,255,255,0.12);">
+            class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+            style="background:var(--border-light); color:var(--text-2);">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
               stroke="currentColor" class="w-4 h-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -1020,44 +1019,44 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
             <!-- Ism -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !name ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !name ? 'text-red-500' : 'text-[var(--text-2)]']">{{
                   $t('Ism') }}
                 <span :class="name ? 'text-green-500' : 'text-red-500'">*</span></label>
               <input v-model="name" type="text" :placeholder="$t('Ism')"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1', submitted && !name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']" />
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1', submitted && !name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
             </div>
 
             <!-- Familiya -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !surname ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !surname ? 'text-red-500' : 'text-[var(--text-2)]']">{{
                   $t('Familiya') }}
                 <span :class="surname ? 'text-green-500' : 'text-red-500'">*</span></label>
               <input v-model="surname" type="text" :placeholder="$t('Familiya')"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1', submitted && !surname ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']" />
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1', submitted && !surname ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
             </div>
 
             <!-- Otasining ismi -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !father_name ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !father_name ? 'text-red-500' : 'text-[var(--text-2)]']">{{
                   $t('Otasining ismi') }} <span :class="father_name ? 'text-green-500' : 'text-red-500'">*</span></label>
               <input v-model="father_name" type="text" :placeholder="$t('Otasining ismi')"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1', submitted && !father_name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']" />
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1', submitted && !father_name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
             </div>
 
             <!-- Telefon -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !phone ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !phone ? 'text-red-500' : 'text-[var(--text-2)]']">{{
                   $t('Telefon') }}
                 <span :class="phone ? 'text-green-500' : 'text-red-500'">*</span></label>
               <input v-model="phone" @input="handlePhone($event, 1)" type="tel" placeholder="+998 XX XXX XX XX"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1', submitted && !phone ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']" />
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1', submitted && !phone ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
               <label class="flex items-center mt-1 gap-2 text-sm cursor-pointer">
                 <input type="checkbox" v-model="phone2isTelegram" @change="handlePhone2isTelegram"
                   class="w-4 h-4 accent-blue-600">
-                <span class="text-slate-600 dark:text-slate-400">{{ $t('Bu raqamda Telegram bormi?') }}</span>
+                <span class="text-[var(--text-3)]">{{ $t('Bu raqamda Telegram bormi?') }}</span>
               </label>
             </div>
 
@@ -1065,7 +1064,7 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
             <!-- Telegram -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !telegram ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !telegram ? 'text-red-500' : 'text-[var(--text-2)]']">{{
                   $t('Telegram') }}
                 <span :class="telegram ? 'text-green-500' : 'text-red-500'">*</span></label>
               <div class="relative">
@@ -1078,18 +1077,18 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                 </span>
                 <input v-model="telegram" @input="handleInput()" type="text"
                   :placeholder="$t('@username yoki +998 XX XXX XX XX')"
-                  :class="['w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1', submitted && !telegram ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']" />
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1', submitted && !telegram ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
               </div>
             </div>
 
             <!-- Viloyat -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedRegion ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedRegion ? 'text-red-500' : 'text-[var(--text-2)]']">{{
                   $t('Viloyat') }}
                 <span :class="selectedRegion ? 'text-green-500' : 'text-red-500'">*</span></label>
               <select v-model="selectedRegion"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1 cursor-pointer appearance-none', submitted && !selectedRegion ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']">
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1 cursor-pointer appearance-none', submitted && !selectedRegion ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
                 <option value="">{{ $t('— Viloyatni tanlang —') }}</option>
                 <option v-for="r in regions" :key="r.id" :value="r.id">{{ $t(r.name_uz) }}</option>
               </select>
@@ -1098,10 +1097,10 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
             <!-- Tuman -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedDistrict ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedDistrict ? 'text-red-500' : 'text-[var(--text-2)]']">{{
                   $t('Tuman / Shahar') }} <span :class="selectedDistrict ? 'text-green-500' : 'text-red-500'">*</span></label>
               <select v-model="selectedDistrict" :disabled="!selectedRegion"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1 cursor-pointer appearance-none', submitted && !selectedDistrict ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']">
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1 cursor-pointer appearance-none', submitted && !selectedDistrict ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
                 <option value="">{{ $t('— Tuman tanlang —') }}</option>
                 <option v-for="d in filteredDistricts" :key="d.id" :value="d.id">{{ $t(d.name_uz) }}</option>
               </select>
@@ -1109,18 +1108,18 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
 
             <!-- 
             <div class="sm:col-span-2 space-y-1">
-              <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Qo'shimcha manzil (ko'cha, mahalla, uy va h.k.)</label>
+              <label class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">Qo'shimcha manzil (ko'cha, mahalla, uy va h.k.)</label>
               <input v-model="address" type="text" :placeholder="$t(\"Ko'cha, mahalla, uy raqami, qo'shimcha ma'lumot\")"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
+                class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
             </div> -->
 
             <!-- Manba -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !source ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !source ? 'text-red-500' : 'text-[var(--text-2)]']">{{
                   $t('Qayerdan eshitib kelgan') }} <span :class="source ? 'text-green-500' : 'text-red-500'">*</span></label>
               <select v-model="source"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1 cursor-pointer appearance-none', submitted && !source ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']">
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1 cursor-pointer appearance-none', submitted && !source ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
                 <option value="">{{ $t('— Tanlanmagan —') }}</option>
                 <option v-for="s in sourceOptions" :key="s.value" :value="s.value">{{ $t(s.label) }}</option>
               </select>
@@ -1128,7 +1127,7 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
 
             <div class="space-y-2">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !price ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !price ? 'text-red-500' : 'text-[var(--text-2)]']">{{
                   $t("Maslaxat narxi") }} <span :class="price ? 'text-green-500' : 'text-red-500'">*</span></label>
 
               <div class="relative" ref="priceMenuAnchor">
@@ -1136,9 +1135,9 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                 <div class="relative">
                   <div
                     @click="showPriceMenu = !showPriceMenu; showPaymentMenu = false"
-                    :class="['w-full flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-700 border rounded-lg text-sm cursor-pointer transition-all', submitted && !price ? 'border-red-500' : 'border-slate-200 dark:border-slate-600 hover:border-[#1A3A6B]', price ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500']">
+                    :class="['w-full flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-sm cursor-pointer transition-all', submitted && !price ? 'border-red-500' : 'border-[var(--border)] hover:border-[var(--primary)]', price ? 'text-[var(--text-1)]' : 'text-[var(--text-2)]']">
                     <span>{{ price ? formatMoney(price) + $t(" so'm") : $t("Narxni tanlang") }}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 transition-transform" :class="showPriceMenu ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[var(--text-2)] transition-transform" :class="showPriceMenu ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
@@ -1147,11 +1146,11 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                   <Transition name="submenu-fade">
                     <div v-if="showPriceMenu"
                       class="absolute z-50 top-0 left-full ml-1 min-w-[180px] rounded-xl shadow-2xl border"
-                      :style="themeStore.isDark ? 'background:#161c2d; border-color:#1e2d42;' : 'background:#ffffff; border-color:#e2e8f0;'">
+                      style="background:var(--bg-card); border-color:var(--border);">
                       <div class="px-3 py-2 border-b rounded-t-xl overflow-hidden"
-                        :style="themeStore.isDark ? 'border-color:#1e2d42;' : 'border-color:#f1f5f9;'">
+                        style="border-color:var(--border-light);">
                         <p class="text-[10px] font-semibold uppercase tracking-wider"
-                          :style="themeStore.isDark ? 'color:#4a5878;' : 'color:#94a3b8;'">
+                          style="color:var(--text-3);">
                           {{ $t("Narxni tanlang") }}
                         </p>
                       </div>
@@ -1160,8 +1159,8 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                           @click.stop="price = pricesStore.prices.price_one; paymentAmount = String(pricesStore.prices.price_one).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); showPaymentMenu = true"
                           class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
                           :class="Number(price) === pricesStore.prices.price_one
-                            ? 'bg-[#1A3A6B] text-white'
-                            : themeStore.isDark ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'">
+                            ? 'pill-selected'
+                            : 'text-[var(--text-1)] hover:bg-[var(--border-light)]'">
                           {{ formatMoney(pricesStore.prices.price_one) + $t(" so'm") }}
                           <svg v-if="Number(price) === pricesStore.prices.price_one" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -1171,8 +1170,8 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                           @click.stop="price = pricesStore.prices.price_two; paymentAmount = String(pricesStore.prices.price_two).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); showPaymentMenu = true"
                           class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
                           :class="Number(price) === pricesStore.prices.price_two
-                            ? 'bg-[#1A3A6B] text-white'
-                            : themeStore.isDark ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'">
+                            ? 'pill-selected'
+                            : 'text-[var(--text-1)] hover:bg-[var(--border-light)]'">
                           {{ formatMoney(pricesStore.prices.price_two) + $t(" so'm") }}
                           <svg v-if="Number(price) === pricesStore.prices.price_two" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -1183,11 +1182,11 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                         <Transition name="submenu-fade">
                           <div v-if="showPaymentMenu"
                             class="absolute z-50 top-0 left-full ml-1 min-w-[200px] rounded-xl shadow-2xl border overflow-hidden"
-                            :style="themeStore.isDark ? 'background:#161c2d; border-color:#1e2d42;' : 'background:#ffffff; border-color:#e2e8f0;'">
+                            style="background:var(--bg-card); border-color:var(--border);">
                             <div class="px-3 py-2 border-b"
-                              :style="themeStore.isDark ? 'border-color:#1e2d42;' : 'border-color:#f1f5f9;'">
+                              style="border-color:var(--border-light);">
                               <p class="text-[10px] font-semibold uppercase tracking-wider"
-                                :style="themeStore.isDark ? 'color:#4a5878;' : 'color:#94a3b8;'">
+                                style="color:var(--text-3);">
                                 {{ $t("To'lov turini tanlang") }}
                               </p>
                             </div>
@@ -1197,8 +1196,8 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                                 @click.stop="paymentType = opt.value; showPaymentMenu = false; showPriceMenu = false"
                                 class="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all text-left"
                                 :class="paymentType === opt.value
-                                  ? 'bg-[#1A3A6B] text-white'
-                                  : themeStore.isDark ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'">
+                                  ? 'pill-selected'
+                                  : 'text-[var(--text-1)] hover:bg-[var(--border-light)]'">
                                 <span class="font-medium text-[13px]">{{ $t(opt.label) }}</span>
                                 <svg v-if="paymentType === opt.value" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -1215,7 +1214,7 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                 <!-- Tanlangan narx va to'lov turi ko'rsatkich -->
                 <div v-if="price && paymentType && !showPriceMenu && !showPaymentMenu" class="mt-2 flex items-center gap-2 flex-wrap">
                   <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
-                    style="background:#e8f0fe; color:#1A3A6B;"
+                    style="background:#e8f0fe; color:var(--primary);"
                     @click="showPriceMenu = true">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -1235,10 +1234,10 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
             <!-- Mas'ul yurist -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !assignedToId ? 'text-red-500' : 'text-slate-500 dark:text-slate-400']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !assignedToId ? 'text-red-500' : 'text-[var(--text-2)]']">{{
                   $t("Qabul qiluvchi mutahasis") }} <span :class="assignedToId ? 'text-green-500' : 'text-red-500'">*</span></label>
               <select v-model="assignedToId"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border rounded-lg text-slate-900 dark:text-slate-100 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-1 cursor-pointer appearance-none', submitted && !assignedToId ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-slate-600 focus:border-[#1A3A6B] focus:ring-[#1A3A6B]/20']">
+                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1 cursor-pointer appearance-none', submitted && !assignedToId ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
                 <option value="">{{ $t('— Belgilanmagan —') }}</option>
                 <option v-for="u in users" :key="u.id" :value="u.id">
                   {{ $t(u.surname) }} {{ $t(u.name) }}
@@ -1250,7 +1249,7 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
 
             <!-- Telegram shablon xabarlar (faqat yangi mijozda) -->
             <div v-if="!props.editing?.id" class="sm:col-span-2 space-y-2">
-              <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+              <label class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider flex items-center gap-1.5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
                 </svg>
@@ -1259,18 +1258,18 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
               <div class="space-y-2">
                 <div v-for="tmpl in telegramTemplates" :key="tmpl.id"
                   @click="tmpl.selected = !tmpl.selected"
-                  :class="['flex items-start gap-3 px-3 py-2.5 rounded-lg border cursor-pointer transition-all select-none', tmpl.selected ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700']">
-                  <div :class="['mt-0.5 w-4 h-4 rounded flex items-center justify-center shrink-0 border-2 transition-all', tmpl.selected ? 'bg-blue-500 border-blue-500' : 'border-slate-300 dark:border-slate-500']">
+                  :class="['flex items-start gap-3 px-3 py-2.5 rounded-lg border cursor-pointer transition-all select-none', tmpl.selected ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20' : 'border-[var(--border)] bg-[var(--border-light)]']">
+                  <div :class="['mt-0.5 w-4 h-4 rounded-lg flex items-center justify-center shrink-0 border-2 transition-all', tmpl.selected ? 'bg-blue-500 border-blue-500' : 'border-[var(--border)]']">
                     <svg v-if="tmpl.selected" xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span class="text-xs leading-relaxed" :class="tmpl.selected ? 'text-blue-800 dark:text-blue-200' : 'text-slate-600 dark:text-slate-300'">
+                  <span class="text-xs leading-relaxed" :class="tmpl.selected ? 'text-blue-800 dark:text-blue-200' : 'text-[var(--text-3)]'">
                     {{ tmpl.text }}
                   </span>
                 </div>
               </div>
-              <p class="text-[10px] text-slate-400">
+              <p class="text-[10px] text-[var(--text-2)]">
                 {{ $t('Tanlangan shablonlar mijoz tasdiqlangandan so\'ng avtomatik yuboriladi') }}
               </p>
             </div>
@@ -1278,38 +1277,35 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
             <!-- Izoh -->
             <div class="sm:col-span-2 space-y-1">
               <label
-                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
                   $t('Murojaatning qisqacha mazmuni') }}</label>
               <textarea v-model="description" rows="3" :placeholder="$t('Murojaatning qisqacha mazmuni...')"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 resize-none"></textarea>
+                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 resize-none"></textarea>
             </div>
 
             <!-- Yaratilgan sana -->
             <div v-if="props.editing?.id"
-              class="sm:col-span-2 flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-700/50 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24"
+              class="sm:col-span-2 flex items-center gap-2 px-3 py-2 bg-[var(--border-light)]/50 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-[var(--text-2)]" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span class="text-[11px] text-slate-500 dark:text-slate-400">{{ $t('Yaratilgan sana:') }}</span>
-              <span class="text-[11px] font-medium text-slate-700 dark:text-slate-300">{{
+              <span class="text-[11px] text-[var(--text-2)]">{{ $t('Yaratilgan sana:') }}</span>
+              <span class="text-[11px] font-medium text-[var(--text-1)]">{{
                 formatDate(props.editing?.createdAt) }}</span>
             </div>
           </div>
         </div>
 
         <!-- Modal Footer -->
-        <div class="px-6 py-4 flex justify-end gap-3 shrink-0 flex-wrap"
-          :style="themeStore.isDark ? 'border-top:1px solid #1e2d42; background:#0d1117;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
-          <button @click="$emit('close')" class="px-5 py-2 rounded text-sm font-medium transition-all"
-            :style="themeStore.isDark ? 'color:#8892a4;' : 'color:#4a5568;'">
+        <div class="px-6 py-4 flex justify-end gap-3 shrink-0 flex-wrap border-t"
+          style="border-color:var(--border); background:var(--border-light);">
+          <button @click="$emit('close')" class="btn btn-ghost">
             {{ $t('Bekor qilish') }}
           </button>
 
-          <button @click="save"
-            class="px-5 py-2 text-white text-sm font-bold active:scale-[0.97] transition-all"
-            style="background:#1A3A6B; border-radius:4px; letter-spacing:0.03em;">
+          <button @click="save" class="btn btn-primary">
             {{ props.editing?.id ? $t('Saqlash') : $t('Yaratish') }}
           </button>
         </div>

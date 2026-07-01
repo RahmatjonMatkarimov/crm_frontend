@@ -4,31 +4,33 @@
 
             <!-- Loading -->
             <div v-if="loading" class="flex flex-col items-center justify-center py-32 gap-3">
-                <div class="w-8 h-8 border-2 rounded-full animate-spin" style="border-color:#d8dde6; border-top-color:#1A3A6B;"></div>
-                <p class="text-slate-400 text-sm">{{ $t("Ma'lumotlar yuklanmoqda...") }}</p>
+                <div class="w-8 h-8 border-2 rounded-full animate-spin" style="border-color:var(--border); border-top-color:var(--primary);"></div>
+                <p class="text-[var(--text-2)] text-sm">{{ $t("Ma'lumotlar yuklanmoqda...") }}</p>
             </div>
 
             <!-- Not found -->
             <div v-else-if="!customer"
-                class="p-8 rounded-3xl text-center bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/30">
-                <p class="text-red-500 text-lg font-medium">{{ $t('Mijoz topilmadi') }}</p>
+                class="p-8 rounded-xl text-center"
+                style="background:var(--danger-bg); border:1px solid var(--danger-border);">
+                <p class="text-lg font-medium" style="color:var(--danger);">{{ $t('Mijoz topilmadi') }}</p>
             </div>
 
             <div v-else class="space-y-5">
 
                 <!-- Hero Header -->
-                <div class="overflow-hidden rounded shadow-sm" style="background:#1A3A6B;">
+                <div class="overflow-hidden card">
                     <div class="px-6 py-5 flex items-center justify-between gap-4">
                         <div class="flex items-center gap-5">
-                            <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center shrink-0 text-2xl font-bold text-white">
+                            <div class="w-16 h-16 rounded-lg flex items-center justify-center shrink-0 text-2xl font-bold text-white"
+                                style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
                                 {{ (customer.surname || customer.name || '?').charAt(0).toUpperCase() }}
                             </div>
                             <div>
-                                <h1 class="text-white text-xl font-bold leading-tight">
+                                <h1 class="text-xl font-bold leading-tight" style="color:var(--text-1);">
                                     {{ $t(customer.surname) }} {{ $t(customer.name) }} {{ $t(customer.father_name || '') }}
                                 </h1>
                                 <div class="flex items-center gap-2 mt-1 flex-wrap">
-                                    <span class="inline-flex items-center gap-1 text-xs text-white/60">
+                                    <span class="inline-flex items-center gap-1 text-xs" style="color:var(--text-2);">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             stroke-width="1.8" stroke="currentColor" class="w-3.5 h-3.5">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -36,18 +38,17 @@
                                         </svg>
                                         {{ customer.phone || '-' }}
                                     </span>
-                                    <span v-if="customer.customer_id" class="text-white/40 text-xs">•</span>
-                                    <span v-if="customer.customer_id" class="inline-flex items-center gap-1 text-xs font-semibold bg-white/15 text-white px-2 py-0.5 rounded-lg">
+                                    <span v-if="customer.customer_id" class="text-xs" style="color:var(--text-3);">•</span>
+                                    <span v-if="customer.customer_id" class="gov-badge gov-badge-blue">
                                         ID: MJZ-{{ customer.customer_id }}
                                     </span>
-                                    <span v-if="customer.queueNumber" class="inline-flex items-center gap-1 text-xs font-semibold bg-white/15 text-white px-2 py-0.5 rounded-lg">
+                                    <span v-if="customer.queueNumber" class="gov-badge gov-badge-blue">
                                         {{ $t("Navbat") }}: A-{{ String(customer.queueNumber).padStart(2, '0') }}
                                     </span>
                                 </div>
                             </div>
                         </div>
-                        <button @click="goBack"
-                            class="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all">
+                        <button @click="goBack" class="btn btn-ghost">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-4 h-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -61,11 +62,11 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
                     <!-- Main Info Card -->
-                    <div class="lg:col-span-2 rounded-3xl border shadow-sm overflow-hidden"
-                        :class="themeStore.isDark ? 'bg-[#161c2d] border-[#1e2d42]' : 'bg-white border-slate-200'">
+                    <div class="lg:col-span-2 rounded-xl border shadow-sm overflow-hidden"
+                        :class="'bg-[var(--bg-card)] border-[var(--border)]'">
                         <div class="px-6 py-4 border-b"
-                            :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
-                            <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                            :class="'border-[var(--border)] bg-[var(--border-light)]'">
+                            <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
                                 {{ $t('Mijoz haqida') }}
                             </p>
                         </div>
@@ -74,9 +75,9 @@
                                 :value="`${$t(customer.surname || '')} ${$t(customer.name || '')} ${$t(customer.father_name || '')}`" icon="user" />
                             <InfoRow :label="$t('Telefon raqam')" :value="customer.phone || '-'" icon="phone" />
                             <div class="flex flex-col gap-1">
-                                <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">{{ $t('Telegram') }}</p>
+                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Telegram') }}</p>
                                 <div class="flex items-center gap-2">
-                                    <p class="text-sm font-semibold" :class="themeStore.isDark ? 'text-slate-200' : 'text-slate-700'">
+                                    <p class="text-sm font-semibold" :class="'text-[var(--text-1)]'">
                                         {{ customer.telegram || '-' }}
                                     </p>
                                 </div>
@@ -90,15 +91,15 @@
                         </div>
 
                         <!-- Description -->
-                        <div v-if="authStore.userRole === 'YURIST' || authStore.userRole === 'RAHBAR'"
+                        <div v-if="authStore.userRole === 'YURIST'"
                             class="px-6 pb-6">
-                            <div class="rounded-2xl p-4"
-                                :class="themeStore.isDark ? 'bg-white/3 border border-white/5' : 'bg-slate-50 border border-slate-100'">
-                                <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
+                            <div class="rounded-lg p-4"
+                                :class="'bg-[var(--border-light)] border border-[var(--border)]'">
+                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)] mb-2">
                                     {{ $t('Izoh / Tavsif') }}
                                 </p>
                                 <p class="text-sm whitespace-pre-wrap"
-                                    :class="themeStore.isDark ? 'text-slate-300' : 'text-slate-700'">
+                                    :class="themeStore.isDark ? 'text-[var(--text-2)]' : 'text-[var(--text-1)]'">
                                     {{ $t(customer.description) || $t("Izoh yo'q") }}
                                 </p>
                             </div>
@@ -106,18 +107,18 @@
                     </div>
 
                     <!-- Meta Card -->
-                    <div class="rounded-3xl border shadow-sm overflow-hidden"
-                        :class="themeStore.isDark ? 'bg-[#161c2d] border-[#1e2d42]' : 'bg-white border-slate-200'">
+                    <div class="rounded-xl border shadow-sm overflow-hidden"
+                        :class="'bg-[var(--bg-card)] border-[var(--border)]'">
                         <div class="px-6 py-4 border-b"
-                            :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
-                            <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                            :class="'border-[var(--border)] bg-[var(--border-light)]'">
+                            <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
                                 {{ $t("Qo'shimcha") }}
                             </p>
                         </div>
                         <div class="p-6 space-y-5">
                             <!-- Status -->
                             <div>
-                                <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
+                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-2">
                                     {{ $t('Ish jarayoni') }}
                                 </p>
                                 <div class="relative">
@@ -141,25 +142,25 @@
                             </div>
 
                             <div>
-                                <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-1">
                                     {{ $t('Yaratilgan sana') }}
                                 </p>
                                 <p class="text-sm font-semibold"
-                                    :class="themeStore.isDark ? 'text-slate-200' : 'text-slate-700'">
+                                    :class="'text-[var(--text-1)]'">
                                     {{ formatDate(customer.createdAt) }}
                                 </p>
                             </div>
                             <div v-if="customer.assignedTo">
-                                <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-1">
                                     {{ $t("Mas'ul") }}
                                 </p>
                                 <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 rounded flex items-center justify-center text-xs font-bold text-white"
-                                        style="background:#1A3A6B;">
+                                    <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white"
+                                        style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
                                         {{ (customer.assignedTo.name || '?').charAt(0).toUpperCase() }}
                                     </div>
                                     <p class="text-sm font-semibold"
-                                        :class="themeStore.isDark ? 'text-slate-200' : 'text-slate-700'">
+                                        :class="'text-[var(--text-1)]'">
                                         {{ $t(customer.assignedTo.name) }} {{ $t(customer.assignedTo.surname) }}
                                     </p>
                                 </div>
@@ -167,8 +168,8 @@
 
                             <!-- Payment summary -->
                             <div class="pt-4 border-t"
-                                :class="themeStore.isDark ? 'border-white/5' : 'border-slate-100'">
-                                <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">
+                                :class="'border-[var(--border)]'">
+                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-3">
                                     {{ $t("To'lovlar") }}
                                 </p>
                                 <div class="space-y-2">
@@ -192,8 +193,7 @@
                                     </div>
                                     <button v-if="remainingDebt > 0"
                                         @click="showDebtModal = true"
-                                        class="w-full mt-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-                                        style="background:#1A3A6B;">
+                                        class="btn btn-primary w-full mt-1 justify-center">
                                         {{ $t("Qarz to'lash") }}
                                     </button>
                                 </div>
@@ -203,37 +203,37 @@
                 </div>
 
                 <!-- Payment History -->
-                <div class="rounded-3xl border shadow-sm overflow-hidden"
-                    :class="themeStore.isDark ? 'bg-[#161c2d] border-[#1e2d42]' : 'bg-white border-slate-200'">
+                <div class="rounded-xl border shadow-sm overflow-hidden"
+                    :class="'bg-[var(--bg-card)] border-[var(--border)]'">
                     <div class="px-6 py-4 border-b flex items-center justify-between"
-                        :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
-                        <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                        :class="'border-[var(--border)] bg-[var(--border-light)]'">
+                        <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
                             {{ $t("To'lov Tarixi") }}
                         </p>
                         <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
-                            :class="themeStore.isDark ? 'bg-white/5 text-slate-400' : 'bg-slate-100 text-slate-500'">
+                            :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
                             {{ payments.length }} {{ $t('ta') }}
                         </span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead>
-                                <tr :class="themeStore.isDark ? 'border-b border-white/5' : 'border-b border-slate-100'">
-                                    <th class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                                <tr :class="'border-b border-[var(--border)]'">
+                                    <th class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--text-2)]">
                                         {{ $t('Sana') }}
                                     </th>
-                                    <th class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                                    <th class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--text-2)]">
                                         {{ $t('Summa') }}
                                     </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y"
-                                :class="themeStore.isDark ? 'divide-white/5' : 'divide-slate-100'">
+                                :class="'divide-[var(--border)]'">
                                 <tr v-for="payment in payments" :key="payment.id"
                                     class="transition-colors"
-                                    :class="themeStore.isDark ? 'hover:bg-white/3' : 'hover:bg-slate-50/80'">
+                                    :class="'hover:bg-[var(--border-light)]'">
                                     <td class="px-6 py-4 text-sm"
-                                        :class="themeStore.isDark ? 'text-slate-300' : 'text-slate-600'">
+                                        :class="themeStore.isDark ? 'text-[var(--text-2)]' : 'text-[var(--text-3)]'">
                                         {{ formatDate(payment.createdAt) }}
                                     </td>
                                     <td class="px-6 py-4">
@@ -251,16 +251,16 @@
                                 <tr v-if="payments.length === 0">
                                     <td colspan="2" class="px-6 py-16 text-center">
                                         <div class="flex flex-col items-center gap-3">
-                                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center"
-                                                :class="themeStore.isDark ? 'bg-white/5' : 'bg-slate-100'">
+                                            <div class="w-12 h-12 rounded-lg flex items-center justify-center"
+                                                :class="'bg-[var(--border-light)]'">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                     stroke-width="1.5" stroke="currentColor"
-                                                    class="w-6 h-6 text-slate-400">
+                                                    class="w-6 h-6 text-[var(--text-2)]">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
                                                 </svg>
                                             </div>
-                                            <p class="text-sm text-slate-400 dark:text-slate-500">
+                                            <p class="text-sm text-[var(--text-2)]">
                                                 {{ $t("Hali hech qanday to'lov yo'q") }}
                                             </p>
                                         </div>
@@ -272,15 +272,15 @@
                 </div>
 
                 <!-- Checks -->
-                <div class="rounded-3xl border shadow-sm overflow-hidden"
-                    :class="themeStore.isDark ? 'bg-[#161c2d] border-[#1e2d42]' : 'bg-white border-slate-200'">
+                <div class="rounded-xl border shadow-sm overflow-hidden"
+                    :class="'bg-[var(--bg-card)] border-[var(--border)]'">
                     <div class="px-6 py-4 border-b flex items-center justify-between"
-                        :class="themeStore.isDark ? 'border-white/5 bg-white/3' : 'border-slate-100 bg-slate-50'">
-                        <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                        :class="'border-[var(--border)] bg-[var(--border-light)]'">
+                        <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
                             {{ $t('Cheklar') }}
                         </p>
                         <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
-                            :class="themeStore.isDark ? 'bg-white/5 text-slate-400' : 'bg-slate-100 text-slate-500'">
+                            :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
                             {{ checks.length }} {{ $t('ta') }}
                         </span>
                     </div>
@@ -288,27 +288,25 @@
                     <div v-if="checks.length > 0" class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         <div v-for="check in checks" :key="check.id"
                             @click="openCheck(check)"
-                            class="group cursor-pointer rounded-2xl overflow-hidden border transition-all hover:shadow-lg hover:-translate-y-0.5"
-                            :class="themeStore.isDark
-                                ? 'bg-white/5 border-white/8 hover:border-white/15'
-                                : 'bg-slate-50 border-slate-200 hover:border-slate-300'">
+                            class="group cursor-pointer rounded-lg overflow-hidden border transition-all hover:shadow-lg hover:-translate-y-0.5"
+                            style="background:var(--border-light); border-color:var(--border);">
                             <div class="aspect-video flex items-center justify-center overflow-hidden"
-                                :class="themeStore.isDark ? 'bg-white/3' : 'bg-slate-100'">
+                                :class="'bg-[var(--border-light)]'">
                                 <img v-if="isImage(check.checkUrl)" :src="check.checkUrl"
                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     alt="Check" />
                                 <div v-else-if="isPDF(check.checkUrl)"
                                     class="flex flex-col items-center justify-center gap-2">
                                     <span class="text-4xl">📕</span>
-                                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400">PDF</span>
+                                    <span class="text-xs font-medium text-[var(--text-2)]">PDF</span>
                                 </div>
                                 <span v-else class="text-5xl opacity-50">📄</span>
                             </div>
                             <div class="p-3">
-                                <p class="text-xs text-slate-500 dark:text-slate-400">
+                                <p class="text-xs text-[var(--text-2)]">
                                     {{ formatDate(check.createdAt) }}
                                 </p>
-                                <p class="text-xs font-medium mt-1.5 flex items-center gap-1" style="color:#1A3A6B;">
+                                <p class="text-xs font-medium mt-1.5 flex items-center gap-1" style="color:var(--primary);">
                                     {{ $t('Ochish') }}
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="2" stroke="currentColor" class="w-3 h-3">
@@ -322,15 +320,15 @@
 
                     <div v-else class="p-16 text-center">
                         <div class="flex flex-col items-center gap-3">
-                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center"
-                                :class="themeStore.isDark ? 'bg-white/5' : 'bg-slate-100'">
+                            <div class="w-14 h-14 rounded-lg flex items-center justify-center"
+                                :class="'bg-[var(--border-light)]'">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-slate-400">
+                                    stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-[var(--text-2)]">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                                 </svg>
                             </div>
-                            <p class="text-sm text-slate-400 dark:text-slate-500">
+                            <p class="text-sm text-[var(--text-2)]">
                                 {{ $t('Bu mijoz uchun hali check yuklanmagan') }}
                             </p>
                         </div>
@@ -348,14 +346,14 @@
                 class="fixed inset-0 z-50 flex items-center justify-center p-4"
                 style="background:rgba(0,0,0,0.5);"
                 @click.self="closeDebtModal">
-                <div class="w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden"
-                    :class="themeStore.isDark ? 'bg-[#161c2d]' : 'bg-white'">
+                <div class="w-full max-w-sm rounded-lg shadow-2xl overflow-hidden"
+                    :class="'bg-[var(--bg-card)]'">
                     <!-- Header -->
-                    <div class="px-6 py-4 flex items-center justify-between" style="background:#1A3A6B;">
-                        <h3 class="text-white font-bold text-base">{{ $t("Qarz to'lash") }}</h3>
+                    <div class="px-6 py-4 flex items-center justify-between border-b" style="border-color:var(--border);">
+                        <h3 class="font-bold text-base" style="color:var(--text-1);">{{ $t("Qarz to'lash") }}</h3>
                         <button @click="closeDebtModal"
-                            class="w-7 h-7 rounded flex items-center justify-center text-white"
-                            style="background:rgba(255,255,255,0.15);">
+                            class="w-7 h-7 rounded-lg flex items-center justify-center"
+                            style="background:var(--border-light); color:var(--text-2);">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -378,7 +376,7 @@
 
                         <!-- Miqdor -->
                         <div class="space-y-1">
-                            <label class="block text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                            <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
                                 {{ $t("To'lov miqdori") }} <span class="text-red-500">*</span>
                             </label>
                             <input
@@ -387,23 +385,19 @@
                                 type="text"
                                 inputmode="numeric"
                                 :placeholder="$t('Miqdorni kiriting')"
-                                class="w-full px-3 py-2.5 rounded-lg border text-sm transition-all focus:outline-none focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20"
-                                :class="themeStore.isDark
-                                    ? 'bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-500'
-                                    : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'"
+                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20"
+                                style="border-color:var(--border); color:var(--text-1);"
                             />
                         </div>
 
                         <!-- To'lov turi -->
                         <div class="space-y-1">
-                            <label class="block text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                            <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
                                 {{ $t("To'lov turi") }} <span class="text-red-500">*</span>
                             </label>
                             <select v-model="debtPaymentType"
-                                class="w-full px-3 py-2.5 rounded-lg border text-sm transition-all focus:outline-none focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20 appearance-none cursor-pointer"
-                                :class="themeStore.isDark
-                                    ? 'bg-slate-700 border-slate-600 text-slate-100'
-                                    : 'bg-slate-50 border-slate-200 text-slate-900'">
+                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 appearance-none cursor-pointer"
+                                style="border-color:var(--border); color:var(--text-1);">
                                 <option v-for="opt in paymentOptions" :key="opt.value" :value="opt.value">
                                     {{ $t(opt.label) }}
                                 </option>
@@ -413,16 +407,14 @@
 
                     <!-- Footer -->
                     <div class="px-6 py-4 flex justify-end gap-3 border-t"
-                        :class="themeStore.isDark ? 'border-white/5 bg-black/20' : 'border-slate-100 bg-slate-50'">
+                        style="border-color:var(--border); background:var(--border-light);">
                         <button @click="closeDebtModal"
-                            class="px-5 py-2 rounded text-sm font-medium"
-                            :class="themeStore.isDark ? 'text-slate-400' : 'text-slate-500'">
+                            class="px-5 py-2 rounded-lg text-sm font-medium"
+                            :class="'text-[var(--text-2)]'">
                             {{ $t('Bekor qilish') }}
                         </button>
-                        <button @click="payDebt" :disabled="debtSaving"
-                            class="px-5 py-2 rounded text-white text-sm font-semibold transition-all active:scale-[0.97] disabled:opacity-60 flex items-center gap-2"
-                            style="background:#1A3A6B;">
-                            <div v-if="debtSaving" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <button @click="payDebt" :disabled="debtSaving" class="btn btn-primary">
+                            <div v-if="debtSaving" class="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70"></div>
                             {{ $t("To'lash") }}
                         </button>
                     </div>
@@ -560,19 +552,17 @@ const payDebt = async () => {
 const statusLabels = computed(() => ({
   NAVBATDA: langStore.t('Navbatda'),
   KORIB_CHIQILDI: langStore.t("Ko'rib chiqildi"),
-  JARAYONDA: langStore.t('Maslahat berildi'),
-  YAKUNLANDI: langStore.t('Shartnoma tushuldi'),
+  YAKUNLANDI: langStore.t('Maslahat berildi'),
   YURISTDA: langStore.t('Maslahat berildi va shartnoma tuzildi'),
-//   BEKOR_QILINDI: langStore.t('Bekor qilindi'),
 }))
 
 const statusInlineColors = {
-  NAVBATDA: { bg: '#dbeafe', color: '#1d4ed8' },
-  YURISTDA: { bg: '#ede9fe', color: '#7c3aed' },
-  KORIB_CHIQILDI: { bg: '#fef3c7', color: '#d97706' },
-  JARAYONDA: { bg: '#ffedd5', color: '#ea580c' },
-  YAKUNLANDI: { bg: '#d1fae5', color: '#059669' },
-  BEKOR_QILINDI: { bg: '#fee2e2', color: '#dc2626' },
+  NAVBATDA: { bg: 'var(--border-light)', color: 'var(--text-2)' },
+  YURISTDA: { bg: 'var(--success-bg)', color: 'var(--success)' },
+  KORIB_CHIQILDI: { bg: 'var(--warning-bg)', color: 'var(--warning)' },
+  JARAYONDA: { bg: 'var(--primary-light)', color: 'var(--text-1)' },
+  YAKUNLANDI: { bg: 'var(--success-bg)', color: 'var(--success)' },
+  BEKOR_QILINDI: { bg: 'var(--danger-bg)', color: 'var(--danger)' },
 }
 
 const changeStatus = async (newStatus) => {
@@ -656,11 +646,11 @@ export default defineComponent({
                     money: 'M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z',
                 }
                 return () => h('div', { class: 'flex flex-col gap-1' }, [
-                    h('p', { class: 'text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider' }, props.label),
+                    h('p', { class: 'text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider' }, props.label),
                     h('p', {
                         class: `text-sm font-semibold ${props.highlight
                             ? 'text-emerald-600 dark:text-emerald-400'
-                            : themeStore.isDark ? 'text-slate-200' : 'text-slate-700'}`
+                            : 'text-[var(--text-1)]'}`
                     }, props.value || '-')
                 ])
             }

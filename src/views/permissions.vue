@@ -3,21 +3,21 @@
     <div class="max-w-2xl mx-auto">
 
       <!-- Header Card -->
-      <div class="mb-5 overflow-hidden" style="background:#1A3A6B; border-radius:4px; border-bottom:3px solid #2E8B57;">
+      <div class="mb-5 overflow-hidden card">
         <div class="px-6 py-5 flex items-center gap-4">
-          <div class="w-10 h-10 flex items-center justify-center shrink-0" style="background:rgba(255,255,255,0.12); border-radius:4px;">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:var(--primary-light);">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
-              stroke="currentColor" class="w-5 h-5 text-white">
+              stroke="currentColor" class="w-5 h-5" style="color:var(--primary);">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
             </svg>
           </div>
           <div>
-            <h1 class="text-white text-base font-bold tracking-wide">{{ $t('Ruxsatlar') }}</h1>
-            <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.6);">{{ $t('Foydalanuvchi uchun ruxsatlarni sozlash') }}</p>
+            <h1 class="text-base font-bold tracking-wide" style="color:var(--text-1);">{{ $t('Ruxsatlar') }}</h1>
+            <p class="text-sm mt-0.5" style="color:var(--text-2);">{{ $t('Foydalanuvchi uchun ruxsatlarni sozlash') }}</p>
           </div>
-          <div v-if="saving" class="ml-auto flex items-center gap-2 text-sm" style="color:rgba(255,255,255,0.6);">
-            <div class="w-4 h-4 border-2 rounded-full animate-spin" style="border-color:rgba(255,255,255,0.3); border-top-color:white;"></div>
+          <div v-if="saving" class="ml-auto flex items-center gap-2 text-sm" style="color:var(--text-2);">
+            <div class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70"></div>
             {{ $t('Saqlanmoqda...') }}
           </div>
         </div>
@@ -25,13 +25,14 @@
 
       <!-- Loading -->
       <div v-if="loading" class="flex flex-col items-center justify-center py-20 gap-3">
-        <div class="w-8 h-8 border-2 rounded-full animate-spin" style="border-color:#d8dde6; border-top-color:#1A3A6B;"></div>
-        <p class="text-slate-400 text-sm">{{ $t('Yuklanmoqda...') }}</p>
+        <div class="w-8 h-8 border-2 rounded-full animate-spin" style="border-color:var(--border); border-top-color:var(--primary);"></div>
+        <p class="text-[var(--text-2)] text-sm">{{ $t('Yuklanmoqda...') }}</p>
       </div>
 
       <!-- Error -->
       <div v-else-if="error"
-        class="p-5 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 flex items-center gap-3">
+        class="p-5 rounded-lg flex items-center gap-3"
+        style="background:var(--danger-bg); border:1px solid var(--danger-border); color:var(--danger);">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 shrink-0">
           <path fill-rule="evenodd"
             d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
@@ -43,26 +44,24 @@
       <!-- Permissions List -->
       <div v-else class="space-y-2.5">
         <!-- Group: Foydalanuvchilar -->
-        <div class="rounded overflow-hidden shadow-sm"
-          :style="themeStore.isDark ? 'background:#161c2d; border:1px solid #1e2d42;' : 'background:#ffffff; border:1px solid #d8dde6;'">
-          <div class="px-5 py-3 border-b"
-            :style="themeStore.isDark ? 'border-color:#1e2d42; background:#0d1117;' : 'border-color:#eaecf0; background:#f7f8fa;'">
-            <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+        <div class="rounded-lg overflow-hidden card">
+          <div class="px-5 py-3 border-b" style="border-color:var(--border-light); background:var(--border-light);">
+            <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
               {{ $t('Ruxsatlar') }}
             </p>
           </div>
-          <div class="divide-y" :style="themeStore.isDark ? 'border-color:#1e2d42' : 'border-color:#eaecf0'">
+          <div class="divide-y" style="border-color:var(--border-light);">
             <div
               v-for="(value, key) in filteredPermissions"
               :key="key"
               class="px-5 py-3.5 flex items-center justify-between group transition-colors"
-              :style="themeStore.isDark ? '' : ''"
+              :style="''"
             >
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
                   :class="value
                     ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                    : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-600'">
+                    : 'bg-[var(--border-light)] text-[var(--text-2)]'">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
                     <path v-if="value" fill-rule="evenodd"
                       d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
@@ -72,7 +71,7 @@
                       clip-rule="evenodd" />
                   </svg>
                 </div>
-                <span class="text-sm font-medium" :style="themeStore.isDark ? 'color:#e2e8f0' : 'color:#1a1f36'">
+                <span class="text-sm font-medium" :style="'color:var(--text-1)'">
                   {{ formatLabel(key) }}
                 </span>
               </div>
@@ -81,12 +80,12 @@
               <label class="relative inline-flex items-center cursor-pointer shrink-0">
                 <input type="checkbox" :checked="value" @change="toggleAndSave(key)" class="sr-only peer" />
                 <div
-                  class="w-11 h-6 transition-colors peer bg-slate-200 dark:bg-slate-700"
-                  :style="value ? 'background:#2E8B57; border-radius:3px;' : 'border-radius:3px;'">
+                  class="w-11 h-6 rounded-full transition-colors peer"
+                  :style="value ? 'background:var(--success);' : 'background:var(--border);'">
                 </div>
                 <div
-                  class="absolute left-0.5 top-0.5 w-5 h-5 bg-white shadow-sm transition-all peer-checked:translate-x-5"
-                  style="border-radius:2px;">
+                  class="absolute left-0.5 top-0.5 w-5 h-5 rounded-full shadow-sm transition-all peer-checked:translate-x-5"
+                  style="background:#ffffff;">
                 </div>
               </label>
             </div>
@@ -94,23 +93,22 @@
         </div>
 
         <!-- Stats bar -->
-        <div class="px-5 py-4 rounded flex items-center justify-between"
-          :style="themeStore.isDark ? 'background:#161c2d; border:1px solid #1e2d42;' : 'background:#ffffff; border:1px solid #d8dde6;'">
-          <div class="flex items-center gap-2 text-sm" :style="themeStore.isDark ? 'color:#8892a4' : 'color:#4a5568'">
+        <div class="px-5 py-4 rounded-lg flex items-center justify-between card">
+          <div class="flex items-center gap-2 text-sm" :style="'color:var(--text-2)'">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
               stroke="currentColor" class="w-4 h-4">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
             </svg>
-            {{ $t('Jami') }}: <span class="font-semibold" :style="themeStore.isDark ? 'color:#e2e8f0' : 'color:#1a1f36'">{{ totalCount }}</span>
+            {{ $t('Jami') }}: <span class="font-semibold" :style="'color:var(--text-1)'">{{ totalCount }}</span>
           </div>
           <div class="flex items-center gap-4 text-sm">
             <span class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
               <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
               {{ $t('Faol') }}: <b>{{ activeCount }}</b>
             </span>
-            <span class="flex items-center gap-1.5 text-slate-400 dark:text-slate-500">
-              <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+            <span class="flex items-center gap-1.5 text-[var(--text-2)]">
+              <span class="w-2 h-2 rounded-full" style="background:var(--border);"></span>
               {{ $t('Nofaol') }}: <b>{{ totalCount - activeCount }}</b>
             </span>
           </div>

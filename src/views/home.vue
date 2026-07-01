@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import { useLangStore } from '@/stores/lang'
 import { BASE_URL } from '@/api'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -68,29 +68,31 @@ function selectLang(val) {
 </script>
 
 <template>
-    <div class="flex h-screen overflow-hidden"
-        :style="themeStore.isDark ? 'background:#0d1117;' : 'background:#f0f2f7;'">
+    <div class="flex h-screen overflow-hidden" style="background:var(--bg-page);">
 
         <!-- ═══ SIDEBAR ═══ -->
-        <aside :style="[
-            themeStore.isDark ? 'background:#0f1521; border-right:1px solid #1e2d42;' : 'background:#1A3A6B;',
-            sidebarCollapsed ? 'width:64px;' : 'width:240px;',
+        <aside class="app-sidebar" :style="[
+            'background:var(--bg-sidebar); border-right:1px solid var(--border);',
+            sidebarCollapsed ? 'width:68px;' : 'width:250px;',
             'flex-shrink:0; display:flex; flex-direction:column; transition:width 220ms cubic-bezier(0.4,0,0.2,1); overflow:hidden;'
         ].join('')">
 
             <!-- Logo -->
             <div class="flex items-center justify-between px-4 flex-shrink-0"
-                style="height:60px; border-bottom:1px solid rgba(255,255,255,0.08);">
-                <div class="flex items-center gap-3 overflow-hidden">
-                    <img v-if="!sidebarCollapsed" src="../../public/logo-white.png" alt="Logo"
-                        class="w-30 object-contain" />
+                style="height:64px; border-bottom:1px solid var(--border);">
+                <div class="flex items-center gap-2.5 overflow-hidden">
+                    <img v-if="!sidebarCollapsed" src="../../public/logo.png" alt="Logo"
+                        class="w-8 h-8 object-contain rounded-md shrink-0" />
+                    <span v-if="!sidebarCollapsed" class="text-sm font-bold truncate" style="color:var(--text-1);">
+                        Yuridik Maslahat
+                    </span>
                 </div>
 
-                <button @click="sidebarCollapsed = !sidebarCollapsed" class="w-8 h-8 flex items-center justify-center rounded transition-all 
-           bg-[#1A3A6B] dark:bg-[#161c2d] 
-           border-2 border-[rgba(255,255,255,0.1)] dark:border-gray-700 
-           text-gray-300 dark:text-gray-300 
-           hover:cursor-pointer">
+                <button @click="sidebarCollapsed = !sidebarCollapsed"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg transition-all shrink-0 cursor-pointer"
+                    style="color:var(--text-3);"
+                    @mouseover="e => { e.currentTarget.style.background = 'var(--border-light)'; e.currentTarget.style.color = 'var(--text-1)' }"
+                    @mouseleave="e => { e.currentTarget.style.background = ''; e.currentTarget.style.color = 'var(--text-3)' }">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -100,8 +102,10 @@ function selectLang(val) {
             </div>
 
             <!-- Nav -->
-            <nav class="flex-1 p-2 space-y-0.5 overflow-y-auto overflow-x-hidden">
-
+            <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto overflow-x-hidden">
+                <p v-if="!sidebarCollapsed" class="px-2.5 pb-2 pt-1 text-[10px] font-bold uppercase tracking-wider" style="color:var(--text-2);">
+                    {{ langStore.t('Menyu') }}
+                </p>
 
                 <router-link v-for="r in routerList" :key="r.path" :to="r.path"
                     :class="[r.permission ? '' : 'hidden', 'aside-link']" :title="sidebarCollapsed ? r.name : ''"
@@ -118,13 +122,11 @@ function selectLang(val) {
             </nav>
 
             <!-- Bottom: user + logout -->
-            <div class="flex items-center justify-center gap-2 border-t border-white/10 px-3 py-3 pb-4 shrink-0">
-
-                <!-- Logout -->
+            <div class="flex items-center justify-center gap-2 border-t px-3 py-3 shrink-0" style="border-color:var(--border);">
                 <button @click="handleLogout" :title="sidebarCollapsed ? langStore.t('Chiqish') : ''"
-                    class="w-full flex items-center gap-2.5 px-2 py-2 mt-1 rounded transition-all"
-                    style="color:rgba(248,113,113,0.8); border-radius:6px;"
-                    @mouseover="e => e.currentTarget.style.background = 'rgba(248,113,113,0.1)'"
+                    class="w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg transition-all cursor-pointer"
+                    style="color:var(--danger);"
+                    @mouseover="e => e.currentTarget.style.background = 'var(--danger-bg)'"
                     @mouseleave="e => e.currentTarget.style.background = ''">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
                         stroke="currentColor" style="width:18px;height:18px;flex-shrink:0;">
@@ -144,22 +146,17 @@ function selectLang(val) {
         <div class="flex flex-col flex-1 overflow-hidden">
 
             <!-- HEADER -->
-            <header class="flex items-center justify-between flex-shrink-0 px-5" :style="[
-                themeStore.isDark ? 'background:#0f1521; border-right:1px solid #1e2d42;' : 'background:#1A3A6B;',
-                'height:60px; z-index:20;',
-                'box-shadow: 0 1px 3px rgba(0,0,0,0.06);'
-            ].join('')">
+            <header class="flex items-center justify-between flex-shrink-0 px-6"
+                style="height:64px; background:var(--bg-card); border-bottom:1px solid var(--border); z-index:20;">
 
                 <!-- Left: collapse btn + breadcrumb -->
                 <div class="flex items-center gap-3">
-                    <img v-if="sidebarCollapsed" src="../../public/logo-white.png" alt="Logo"
-                        class="w-30 mr-2 object-contain" />
+                    <img v-if="sidebarCollapsed" src="../../public/logo.png" alt="Logo"
+                        class="w-8 h-8 mr-1 object-contain rounded-md" />
 
                     <!-- Breadcrumb -->
-                    <nav class="flex items-center gap-1.5 text-xs"
-                        :style="themeStore.isDark ? 'color:#4a5878' : 'color:#9ca3af'">
-                        <span class="cursor-pointer transition-colors hover:text-blue-600"
-                            :style="themeStore.isDark ? '' : ''" @click="$router.push('/')">
+                    <nav class="flex items-center gap-1.5 text-xs" style="color:var(--text-2);">
+                        <span class="cursor-pointer transition-colors hover:text-[var(--primary)]" @click="$router.push('/')">
                             {{ langStore.t('Bosh sahifa') }}
                         </span>
                         <template v-if="currentPageTitle !== langStore.t('Bosh sahifa')">
@@ -167,7 +164,7 @@ function selectLang(val) {
                                 stroke="currentColor" class="w-3 h-3 flex-shrink-0">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                             </svg>
-                            <span class="font-semibold">
+                            <span class="font-semibold" style="color:var(--text-1);">
                                 {{ currentPageTitle }}
                             </span>
                         </template>
@@ -179,10 +176,9 @@ function selectLang(val) {
 
                     <!-- Lang dropdown -->
                     <div class="relative" v-click-outside="() => langDropdownOpen = false">
-                        <button @click="langDropdownOpen = !langDropdownOpen" class="flex items-center gap-1.5 h-8 px-3 text-xs font-bold rounded transition-all bg-[#1A3A6B] dark:bg-[#161c2d] 
-           border-2 border-[rgba(255,255,255,0.1)] dark:border-gray-700 
-           text-gray-300 dark:text-gray-300 
-           hover:cursor-pointer">
+                        <button @click="langDropdownOpen = !langDropdownOpen"
+                            class="flex items-center gap-1.5 h-9 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer"
+                            style="background:var(--bg-page); border:1px solid var(--border); color:var(--text-2);">
                             {{ currentLang.label }}
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                                 stroke="currentColor" class="w-3 h-3"
@@ -194,15 +190,13 @@ function selectLang(val) {
                             enter-from-class="opacity-0 -translate-y-1" enter-to-class="opacity-100 translate-y-0"
                             leave-active-class="transition-all duration-100" leave-from-class="opacity-100"
                             leave-to-class="opacity-0">
-                            <div v-if="langDropdownOpen" class="absolute right-0 mt-1 w-32 overflow-hidden z-50"
-                                style="background:#fff; border:1px solid #dce1ea; border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,0.12);">
+                            <div v-if="langDropdownOpen" class="absolute right-0 mt-1.5 w-32 overflow-hidden z-50 rounded-xl"
+                                style="background:var(--bg-card); border:1px solid var(--border); box-shadow:var(--shadow-md);">
                                 <button v-for="opt in langOptions" :key="opt.value" @click="selectLang(opt.value)"
-                                    class="w-full flex items-center gap-2 px-3 py-2 text-left text-xs transition-all"
+                                    class="w-full flex items-center gap-2 px-3 py-2.5 text-left text-xs transition-all cursor-pointer"
                                     :style="currentLang.value === opt.value
-                                        ? 'background:#eff4fc; color:#1A3A6B; font-weight:700;'
-                                        : 'color:#4b5563;'"
-                                    @mouseover="e => { if (currentLang.value !== opt.value) e.currentTarget.style.background = '#f9fafb' }"
-                                    @mouseleave="e => { if (currentLang.value !== opt.value) e.currentTarget.style.background = '' }">
+                                        ? 'background:var(--primary-light); color:var(--primary); font-weight:700;'
+                                        : 'color:var(--text-2);'">
                                     <span class="font-bold w-8">{{ opt.label }}</span>
                                     <span style="opacity:0.55">{{ opt.sub }}</span>
                                 </button>
@@ -211,10 +205,9 @@ function selectLang(val) {
                     </div>
 
                     <!-- Theme toggle -->
-                    <button @click="themeStore.toggleTheme()" class="w-8 h-8 flex items-center justify-center rounded transition-all bg-[#1A3A6B] dark:bg-[#161c2d] 
-           border-2 border-[rgba(255,255,255,0.1)] dark:border-gray-700 
-           text-gray-300 dark:text-gray-300 
-           hover:cursor-pointer"
+                    <button @click="themeStore.toggleTheme()"
+                        class="w-9 h-9 flex items-center justify-center rounded-lg transition-all cursor-pointer"
+                        style="background:var(--bg-page); border:1px solid var(--border); color:var(--text-2);"
                         :title="themeStore.isDark ? langStore.t('Yorug\' rejim') : langStore.t('Qorong\'u rejim')">
                         <svg v-if="themeStore.isDark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
@@ -229,17 +222,15 @@ function selectLang(val) {
                     </button>
 
                     <!-- User avatar link -->
-                    <router-link to="/profile" class="flex items-center gap-2 h-8 px-2.5 rounded transition-all bg-[#1A3A6B] dark:bg-[#161c2d] 
-           border-2 border-[rgba(255,255,255,0.1)] dark:border-gray-700 
-           text-gray-300 dark:text-gray-300 
-           hover:cursor-pointer" style="text-decoration:none;">
-                        <div class="w-5 h-5 rounded-full overflow-hidden flex-shrink-0"
-                            style="border:1.5px solid rgba(26,58,107,0.2);">
+                    <router-link to="/profile"
+                        class="flex items-center gap-2.5 h-9 pl-1 pr-3 rounded-lg transition-all cursor-pointer"
+                        style="background:var(--bg-page); border:1px solid var(--border); text-decoration:none;">
+                        <div class="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
                             <img v-if="authStore.user?.img" :src="`${BASE_URL}${authStore.user.img}`"
                                 class="w-full h-full object-cover" />
                             <img v-else src="/User-avatar.svg.png" class="w-full h-full object-cover" />
                         </div>
-                        <span class="text-xs font-semibold">
+                        <span class="text-xs font-semibold" style="color:var(--text-1);">
                             {{ authStore.user?.name || authStore.user?.username }}
                         </span>
                     </router-link>

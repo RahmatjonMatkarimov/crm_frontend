@@ -270,23 +270,22 @@ watch(
         <Transition name="modal">
             <div v-if="userModalStore.isUserEditingModalVisible" @click.self="closeModal"
                 class="fixed inset-0 z-50 flex"
-                :class="themeStore.isDark ? 'bg-black/70' : 'bg-black/40'"
-                style="backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+                style="background:rgba(0,0,0,0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
 
                 <div class="relative w-full h-full flex flex-col overflow-hidden shadow-2xl"
-                    :style="themeStore.isDark ? 'background:#161c2d;' : 'background:#ffffff;'">
+                    style="background:var(--bg-card);">
 
                     <!-- Header -->
-                    <div class="px-6 py-5 flex items-center justify-between shrink-0" style="background:#1A3A6B; border-bottom:3px solid #2E8B57;">
+                    <div class="px-6 py-5 flex items-center justify-between shrink-0" style="border-bottom:1px solid var(--border);">
                         <div>
-                            <h2 class="text-white text-base font-bold tracking-wide">
+                            <h2 class="text-base font-bold tracking-wide" style="color:var(--text-1);">
                                 {{ isEditing ? $t('Xodimni tahrirlash') : $t("Yangi xodim qo'shish") }}
                             </h2>
-                            <p class="text-sm mt-0.5" style="color:rgba(255,255,255,0.55);">{{ $t("Barcha majburiy maydonlarni to'ldiring") }}</p>
+                            <p class="text-sm mt-0.5" style="color:var(--text-2);">{{ $t("Barcha majburiy maydonlarni to'ldiring") }}</p>
                         </div>
                         <button @click="closeModal"
-                            class="w-8 h-8 rounded flex items-center justify-center text-white transition-all"
-                            style="background:rgba(255,255,255,0.12);">
+                            class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                            style="background:var(--border-light); color:var(--text-2);">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -310,12 +309,12 @@ watch(
                         <!-- Avatar -->
                         <div>
                             <label
-                                class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">{{ $t('Profil rasmi') }}</label>
+                                class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-2">{{ $t('Profil rasmi') }}</label>
                             <label class="cursor-pointer inline-block">
                                 <div
-                                    class="w-24 h-24 border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-2xl overflow-hidden flex items-center justify-center hover:border-[#1a2e7a] bg-slate-50 dark:bg-slate-700">
+                                    class="w-24 h-24 border-2 border-dashed border-[var(--border)] rounded-2xl overflow-hidden flex items-center justify-center hover:border-[var(--text-1)] bg-[var(--border-light)]">
                                     <img v-if="imgPreview" :src="imgPreview" class="w-full h-full object-cover" />
-                                    <div v-else class="flex flex-col items-center gap-1 text-slate-400">
+                                    <div v-else class="flex flex-col items-center gap-1 text-[var(--text-2)]">
                                         <span class="text-3xl">+</span>
                                         <span class="text-xs">{{ $t('Rasm') }}</span>
                                     </div>
@@ -332,53 +331,53 @@ watch(
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Ism') }}
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Ism') }}
                                     </label>
                                 <input v-model="newUserName" type="text" :placeholder="$t('Ismni kiriting')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
                             </div>
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Familiya') }}
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Familiya') }}
                                     </label>
                                 <input v-model="newUserSurname" type="text" :placeholder="$t('Familiyani kiriting')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
                             </div>
                             <div class="space-y-1 sm:col-span-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Otasining ismi') }}</label>
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Otasining ismi') }}</label>
                                 <input v-model="newUserFatherName" type="text" :placeholder="$t('Otasining ismini kiriting')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
                             </div>
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Login') }}
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Login') }}
                                    </label>
                                 <input v-model="newUserUsername" type="text" :placeholder="$t('Loginni kiriting')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1a2e7a]" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
                             </div>
 
                             <!-- Parol -->
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">
                                     {{ isEditing ? $t('Yangi parol (ixtiyoriy)') : $t('Parol') }}
                                     
                                 </label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="1.8" stroke="currentColor" class="w-4 h-4 text-slate-400">
+                                            stroke-width="1.8" stroke="currentColor" class="w-4 h-4 text-[var(--text-2)]">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                                         </svg>
                                     </span>
                                     <input v-model="newUserPassword" :type="showPassword ? 'text' : 'password'" required
                                         :placeholder="$t('Parolni kiriting')"
-                                        class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
+                                        class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                                     <button type="button" @click="showPassword = !showPassword"
-                                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
+                                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-[var(--text-2)] hover:text-[var(--text-3)] transition-colors">
                                         <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
                                             viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"
                                             class="w-4 h-4">
@@ -399,22 +398,22 @@ watch(
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Telefon') }}</label>
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Telefon') }}</label>
                                 <input v-model="newUserPhone" @input="handlePhoneInput" type="tel"
                                     placeholder="+998 XX XXX XX XX"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
                             </div>
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t("Qo'shimcha telefon") }}</label>
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t("Qo'shimcha telefon") }}</label>
                                 <input v-model="newUserPhone2" @input="handlePhoneInput2" type="tel"
                                     placeholder="+998 XX XXX XX XX"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
                             </div>
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
                                     $t('Telegram') }} <span class="text-red-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -426,40 +425,40 @@ watch(
                                     </span>
                                     <input v-model="newUserTelegram" @input="handleInput" type="text"
                                         :placeholder="$t('@username yoki +998 XX XXX XX XX')"
-                                        class="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm transition-all focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-[#1A3A6B] focus:ring-1 focus:ring-[#1A3A6B]/20" />
+                                        class="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                                 </div>
                             </div>
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t("Tug'ilgan sana") }}</label>
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t("Tug'ilgan sana") }}</label>
                                 <input v-model="newUserBirthDate" type="date"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
                             </div>
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Pasport seriya') }}</label>
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Pasport seriya') }}</label>
                                 <input v-model="newUserUserCode" @input="handlePassportInput" type="text"
                                     :placeholder="$t('AA1234567')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
                             </div>
 
                             <div class="space-y-1">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('JSHSHIR') }}
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('JSHSHIR') }}
                                 </label>
                                 <input v-model="newUserUniqueCode" type="text" maxlength="14" :placeholder="$t('14 raqam')"
                                     @input="newUserUniqueCode = $event.target.value.replace(/\D/g, '').slice(0, 14)"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]" />
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
                             </div>
 
                             <div class="space-y-1 sm:col-span-2">
                                 <label
-                                    class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $t('Lavozim') }}
+                                    class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Lavozim') }}
                                     </label>
                                 <select v-model="newUserRole"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#1a2e7a]">
+                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]">
                                     <option v-for="role in availableRoles" :key="role.value" :value="role.value">
                                         {{ role.label }}
                                     </option>
@@ -470,17 +469,13 @@ watch(
 
                     <!-- Footer -->
                     <div class="px-6 py-4 flex justify-end gap-3 shrink-0"
-                        :style="themeStore.isDark ? 'border-top:1px solid #1e2d42; background:#0d1117;' : 'border-top:1px solid #eaecf0; background:#f7f8fa;'">
-                        <button @click="closeModal"
-                            class="px-5 py-2 rounded text-sm font-medium transition-all"
-                            :style="themeStore.isDark ? 'color:#8892a4;' : 'color:#4a5568;'">
+                        style="border-top:1px solid var(--border); background:var(--border-light);">
+                        <button @click="closeModal" class="btn btn-ghost">
                             {{ $t('Bekor qilish') }}
                         </button>
-                        <button @click="saveUser" :disabled="authStore.loading"
-                            class="px-5 py-2 rounded text-white text-sm font-semibold flex items-center gap-2 active:scale-[0.97] transition-all disabled:opacity-60"
-                            style="background:#1A3A6B;">
+                        <button @click="saveUser" :disabled="authStore.loading" class="btn btn-primary">
                             <span v-if="authStore.loading"
-                                class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70"></span>
                             {{ authStore.loading ? $t('Saqlanmoqda...') : (isEditing ? $t('Saqlash') : $t('Yaratish')) }}
                         </button>
                     </div>
