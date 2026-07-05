@@ -417,7 +417,7 @@ watch(
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
-                                    $t('Telegram') }} <span class="text-[var(--danger)]">*</span></label>
+                                    $t('Telegram') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[var(--info)]"

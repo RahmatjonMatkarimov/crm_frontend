@@ -457,7 +457,7 @@
                         <!-- Miqdor -->
                         <div class="space-y-1">
                             <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
-                                {{ $t("To'lov miqdori") }} <span class="text-[var(--danger)]">*</span>
+                                {{ $t("To'lov miqdori") }} <span class="text-[var(--danger)] text-[16px]">*</span>
                             </label>
                             <input
                                 :value="debtAmount"
@@ -473,7 +473,7 @@
                         <!-- To'lov turi -->
                         <div class="space-y-1">
                             <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
-                                {{ $t("To'lov turi") }} <span class="text-[var(--danger)]">*</span>
+                                {{ $t("To'lov turi") }} <span class="text-[var(--danger)] text-[16px]">*</span>
                             </label>
                             <select v-model="debtPaymentType"
                                 class="w-full px-3 py-2.5 bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 appearance-none cursor-pointer"

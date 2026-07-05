@@ -311,7 +311,7 @@ const closeModal = () => {
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
-                                    $t('Ism') }} <span class="text-[var(--danger)]">*</span></label>
+                                    $t('Ism') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserName" type="text" :placeholder="$t('Ismni kiriting')"
                                     class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                             </div>
@@ -320,7 +320,7 @@ const closeModal = () => {
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
-                                    $t('Familiya') }} <span class="text-[var(--danger)]">*</span></label>
+                                    $t('Familiya') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserSurname" type="text" :placeholder="$t('Familiyani kiriting')"
                                     class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                             </div>
@@ -329,7 +329,7 @@ const closeModal = () => {
                             <div class="space-y-1 sm:col-span-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
-                                    $t('Otasining ismi') }} <span class="text-[var(--danger)]">*</span></label>
+                                    $t('Otasining ismi') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserFatherName" type="text"
                                     :placeholder="$t('Otasining ismini kiriting')"
                                     class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
@@ -339,7 +339,7 @@ const closeModal = () => {
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">
-                                    {{ $t('Login') }} <span class="text-[var(--danger)]">*</span>
+                                    {{ $t('Login') }} <span class="text-[var(--danger)] text-[16px]">*</span>
                                 </label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -359,7 +359,7 @@ const closeModal = () => {
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">
-                                    {{ $t('Parol') }} <span class="text-[var(--danger)]">*</span>
+                                    {{ $t('Parol') }} <span class="text-[var(--danger)] text-[16px]">*</span>
                                 </label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -395,7 +395,7 @@ const closeModal = () => {
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
-                                    $t('Telefon') }} <span class="text-[var(--danger)]">*</span></label>
+                                    $t('Telefon') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserPhone" @input="handlePhoneInput" type="tel"
                                     placeholder="+998 XX XXX XX XX"
                                     class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
@@ -415,7 +415,7 @@ const closeModal = () => {
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
-                                    $t('Telegram') }} <span class="text-[var(--danger)]">*</span></label>
+                                    $t('Telegram') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[var(--text-2)]"
@@ -434,7 +434,7 @@ const closeModal = () => {
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
-                                    $t("Tug'ilgan sana") }} <span class="text-[var(--danger)]">*</span></label>
+                                    $t("Tug'ilgan sana") }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserBirthDate" type="date"
                                     class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                             </div>
@@ -443,7 +443,7 @@ const closeModal = () => {
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
-                                    $t('Pasport seriya raqami') }} <span class="text-[var(--danger)]">*</span></label>
+                                    $t('Pasport seriya raqami') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserUserCode" @input="handlePassportInput" type="text"
                                     :placeholder="$t('AA1234567')"
                                     class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
@@ -454,7 +454,7 @@ const closeModal = () => {
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
                                     $t('JSHSHIR') }}
-                                    <span class="text-[var(--danger)]">*</span></label>
+                                    <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserUniqueCode" type="text" inputmode="numeric"
                                     :placeholder="$t('14 raqam')" maxlength="14"
                                     @input="newUserUniqueCode = $event.target.value.replace(/\D/g, '').slice(0, 14)"
@@ -464,7 +464,7 @@ const closeModal = () => {
                             <div class="space-y-1 sm:col-span-2">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
-                                    $t('Lavozim') }} <span class="text-[var(--danger)]">*</span></label>
+                                    $t('Lavozim') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <select v-model="newUserRole"
                                     class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 cursor-pointer">
                                     <option v-for="role in availableRoles" :key="role.value" :value="role.value">

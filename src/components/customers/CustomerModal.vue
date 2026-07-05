@@ -33,6 +33,7 @@ const description = ref('')
 const assignedToId = ref('')
 const source = ref('MUSTAQIL_MUROJAAT')
 const telegram = ref('')
+const phoneIsTelegram = ref('yoq')
 const appealType = ref('')
 const paymentAmount = ref('')
 const paymentType = ref('')
@@ -628,6 +629,7 @@ watch(() => props.editing, (val) => {
     father_name.value = ''
     phone.value = ''
     phone2.value = ''
+    phoneIsTelegram.value = 'yoq'
     address.value = ''
     description.value = ''
     assignedToId.value = ''
@@ -654,6 +656,7 @@ watch(() => props.editing, (val) => {
   assignedToId.value = val.assignedToId || val.assignedTo?.id || ''
   source.value = val.source || ''
   telegram.value = val.telegram || ''
+  phoneIsTelegram.value = (val.telegram && val.telegram === val.phone) ? 'ha' : 'yoq'
   appealType.value = val.appealType || ''
   price.value = val.price || ''
 
@@ -962,10 +965,8 @@ const printQabulxat = () => {
   }
 }
 
-const phone2isTelegram = ref(false)
-
-watch(phone2, (newVal) => {
-  if (phone2isTelegram.value && newVal) {
+watch(phone, (newVal) => {
+  if (phoneIsTelegram.value === 'ha') {
     telegram.value = newVal
   }
 })
@@ -978,10 +979,11 @@ watch(paymentType, (val) => {
   }
 })
 
-const handlePhone2isTelegram = () => {
-  if (phone2isTelegram.value && phone.value) {
+const setPhoneIsTelegram = (val) => {
+  phoneIsTelegram.value = val
+  if (val === 'ha') {
     telegram.value = phone.value
-  } else if (!phone2isTelegram.value) {
+  } else {
     telegram.value = ''
   }
 }
@@ -1175,7 +1177,7 @@ const copyTemplate = (tmpl) => {
               <label
                 :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !name ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">
                 {{ $t('Ism') }}
-                <span :class="name ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+                <span :class="name ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1193,7 +1195,7 @@ const copyTemplate = (tmpl) => {
               <label
                 :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !surname ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
                   $t('Familiya') }}
-                <span :class="surname ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+                <span :class="surname ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1211,7 +1213,7 @@ const copyTemplate = (tmpl) => {
           <div class="space-y-1">
             <label
               :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !father_name ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
-                $t('Otasining ismi') }} <span :class="father_name ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+                $t('Otasining ismi') }} <span :class="father_name ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1230,7 +1232,7 @@ const copyTemplate = (tmpl) => {
               <label
                 :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !phone ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
                   $t('Telefon') }}
-                <span :class="phone ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+                <span :class="phone ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1240,11 +1242,19 @@ const copyTemplate = (tmpl) => {
                 <input v-model="phone" @input="handlePhone($event, 1)" type="tel" placeholder="+998 XX XXX XX XX"
                   :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !phone ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
               </div>
-              <label class="flex items-center mt-1 gap-2 text-sm cursor-pointer">
-                <input type="checkbox" v-model="phone2isTelegram" @change="handlePhone2isTelegram"
-                  class="w-4 h-4 accent-[var(--primary)]">
-                <span class="text-[11px]" style="color:var(--text-3);">{{ $t('Bu raqamda Telegram bormi?') }}</span>
-              </label>
+              <div class="flex items-center mt-3 gap-3 text-sm">
+                <span class="text-[11px]" style="color:var(--text-2);">{{ $t('Bu raqamda Telegram bormi?') }}</span>
+                <label class="flex items-center gap-1 cursor-pointer">
+                  <input type="radio" name="phoneIsTelegram" :checked="phoneIsTelegram === 'ha'"
+                    @change="setPhoneIsTelegram('ha')" class="w-4 h-4 accent-[var(--primary)]">
+                  <span class="text-[11px]" style="color:var(--text-3);">{{ $t('Ha') }}</span>
+                </label>
+                <label class="flex items-center gap-1 cursor-pointer">
+                  <input type="radio" name="phoneIsTelegram" :checked="phoneIsTelegram === 'yoq'"
+                    @change="setPhoneIsTelegram('yoq')" class="w-4 h-4 accent-[var(--primary)]">
+                  <span class="text-[11px]" style="color:var(--text-3);">{{ $t("Yo'q") }}</span>
+                </label>
+              </div>
             </div>
 
             <!-- Telegram -->
@@ -1252,7 +1262,7 @@ const copyTemplate = (tmpl) => {
               <label
                 :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !telegram ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
                   $t('Telegram') }}
-                <span :class="telegram ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+                <span :class="telegram ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[var(--info)]" viewBox="0 0 24 24"
@@ -1283,7 +1293,7 @@ const copyTemplate = (tmpl) => {
               <label
                 :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedRegion ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
                   $t('Viloyat') }}
-                <span :class="selectedRegion ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+                <span :class="selectedRegion ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1307,7 +1317,7 @@ const copyTemplate = (tmpl) => {
             <div class="space-y-1">
               <label
                 :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedDistrict ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
-                  $t('Tuman / Shahar') }} <span :class="selectedDistrict ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+                  $t('Tuman / Shahar') }} <span :class="selectedDistrict ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1357,7 +1367,7 @@ const copyTemplate = (tmpl) => {
           <div class="space-y-1">
             <label
               :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !source ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
-                $t('Qayerdan eshitib keldi yoki kim yubordi') }} <span :class="source ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+                $t('Qayerdan eshitib keldi yoki kim yubordi') }} <span :class="source ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" viewBox="0 0 24 24" fill="currentColor">
@@ -1378,7 +1388,7 @@ const copyTemplate = (tmpl) => {
             <div class="space-y-1">
               <label
                 :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !assignedToId ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
-                  $t("Qabul qiluvchi mutahasis") }} <span :class="assignedToId ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+                  $t("Qabul qiluvchi mutahasis") }} <span :class="assignedToId ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1400,7 +1410,7 @@ const copyTemplate = (tmpl) => {
             <div class="space-y-1">
               <label
                 :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !price ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
-                  $t("Maslaxat narxi") }} <span :class="price ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+                  $t("Maslaxat narxi") }} <span :class="price ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
 
               <div class="relative" ref="priceMenuAnchor">
                 <div class="relative">
@@ -1520,7 +1530,7 @@ const copyTemplate = (tmpl) => {
 
           <div class="space-y-1 flex-1 flex flex-col">
             <label class="block text-[11px] font-medium uppercase tracking-wider" style="color:var(--text-2);">
-              {{ $t('Murojaatning qisqacha mazmuni') }} <span :class="description ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span>
+              {{ $t('Murojaatning qisqacha mazmuni') }} <span :class="description ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span>
             </label>
             <div class="relative flex-1 flex flex-col">
               <textarea v-model="description" maxlength="500" :placeholder="$t('Murojaatning qisqacha mazmunini yozing...')"
