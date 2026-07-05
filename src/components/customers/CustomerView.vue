@@ -22,7 +22,7 @@
                     <div class="px-6 py-5 flex items-center justify-between gap-4">
                         <div class="flex items-center gap-5">
                             <div class="w-16 h-16 rounded-lg flex items-center justify-center shrink-0 text-2xl font-bold text-white"
-                                style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
+                                style="background:linear-gradient(135deg,var(--primary),var(--primary-hover));">
                                 {{ (customer.surname || customer.name || '?').charAt(0).toUpperCase() }}
                             </div>
                             <div>
@@ -141,6 +141,14 @@
                                 </div>
                             </div>
 
+                            <!-- Konsultatsiya vaqti (faqat YURIST va RAHBAR) -->
+                            <div v-if="canSeeTimer && (customer.calledAt || customer.consultationSeconds != null)">
+                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-1">
+                                    {{ $t('Konsultatsiya vaqti') }}
+                                </p>
+                                <ConsultationTimer :called-at="customer.calledAt" :seconds="customer.consultationSeconds" />
+                            </div>
+
                             <div>
                                 <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-1">
                                     {{ $t('Yaratilgan sana') }}
@@ -156,7 +164,7 @@
                                 </p>
                                 <div class="flex items-center gap-2">
                                     <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white"
-                                        style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
+                                        style="background:linear-gradient(135deg,var(--primary),var(--primary-hover));">
                                         {{ (customer.assignedTo.name || '?').charAt(0).toUpperCase() }}
                                     </div>
                                     <p class="text-sm font-semibold"
@@ -174,20 +182,20 @@
                                 </p>
                                 <div class="space-y-2">
                                     <div class="rounded-xl px-4 py-3 flex items-center justify-between"
-                                        :class="themeStore.isDark ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-200'">
-                                        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                        style="background:var(--success-bg); border:1px solid var(--success-border);">
+                                        <span class="text-xs text-[var(--success)] font-medium">
                                             {{ $t('Jami to\'langan') }}
                                         </span>
-                                        <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                                        <span class="text-sm font-bold text-[var(--success)]">
                                             {{ totalPaid.toLocaleString() }} {{ $t("so'm") }}
                                         </span>
                                     </div>
                                     <div v-if="remainingDebt > 0" class="rounded-xl px-4 py-3 flex items-center justify-between"
-                                        :class="themeStore.isDark ? 'bg-red-500/10 border border-red-500/20' : 'bg-red-50 border border-red-200'">
-                                        <span class="text-xs text-red-600 dark:text-red-400 font-medium">
+                                        style="background:var(--danger-bg); border:1px solid var(--danger-border);">
+                                        <span class="text-xs text-[var(--danger)] font-medium">
                                             {{ $t('Qarz') }}
                                         </span>
-                                        <span class="text-sm font-bold text-red-600 dark:text-red-400">
+                                        <span class="text-sm font-bold text-[var(--danger)]">
                                             {{ remainingDebt.toLocaleString() }} {{ $t("so'm") }}
                                         </span>
                                     </div>
@@ -238,7 +246,7 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         <span
-                                            class="inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                                            class="inline-flex items-center gap-1 text-sm font-semibold text-[var(--success)]">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                 stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -335,6 +343,78 @@
                     </div>
                 </div>
 
+                <!-- Hujjatlar -->
+                <div class="rounded-xl border shadow-sm overflow-hidden"
+                    :class="'bg-[var(--bg-card)] border-[var(--border)]'">
+                    <div class="px-6 py-4 border-b flex items-center justify-between"
+                        :class="'border-[var(--border)] bg-[var(--border-light)]'">
+                        <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
+                            {{ $t('Hujjatlar') }}
+                        </p>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
+                                :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
+                                {{ documents.length }} {{ $t('ta') }}
+                            </span>
+                            <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all"
+                                style="background:var(--primary-light); color:var(--primary);">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
+                                </svg>
+                                {{ $t('Fayl yuklash') }}
+                                <input type="file" multiple class="hidden" @change="handleUploadDocuments" />
+                            </label>
+                        </div>
+                    </div>
+                    <p v-if="documentUploadError" class="px-6 pt-3 text-xs" style="color:var(--danger);">
+                        {{ documentUploadError }}
+                    </p>
+
+                    <div v-if="documents.length > 0" class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div v-for="doc in documents" :key="doc.id"
+                            @click="openDocument(doc)"
+                            class="group cursor-pointer rounded-lg overflow-hidden border transition-all hover:shadow-lg hover:-translate-y-0.5"
+                            style="background:var(--border-light); border-color:var(--border);">
+                            <div class="aspect-video flex items-center justify-center overflow-hidden"
+                                :class="'bg-[var(--border-light)]'">
+                                <img v-if="isImage(doc.url)" :src="`${BASE_URL}${doc.url}`"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                    alt="Hujjat" />
+                                <div v-else-if="isPDF(doc.url)"
+                                    class="flex flex-col items-center justify-center gap-2">
+                                    <span class="text-4xl">📕</span>
+                                    <span class="text-xs font-medium text-[var(--text-2)]">PDF</span>
+                                </div>
+                                <span v-else class="text-5xl opacity-50">📄</span>
+                            </div>
+                            <div class="p-3">
+                                <p class="text-xs truncate" style="color:var(--text-1);" :title="doc.originalName">
+                                    {{ doc.originalName }}
+                                </p>
+                                <p class="text-xs text-[var(--text-2)] mt-1">
+                                    {{ formatDate(doc.createdAt) }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-else class="p-16 text-center">
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="w-14 h-14 rounded-lg flex items-center justify-center"
+                                :class="'bg-[var(--border-light)]'">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-[var(--text-2)]">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                </svg>
+                            </div>
+                            <p class="text-sm text-[var(--text-2)]">
+                                {{ $t('Bu mijoz uchun hali hujjat yuklanmagan') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -344,7 +424,7 @@
         <Transition name="modal-fade">
             <div v-if="showDebtModal"
                 class="fixed inset-0 z-50 flex items-center justify-center p-4"
-                style="background:rgba(0,0,0,0.5);"
+                style="background:var(--overlay);"
                 @click.self="closeDebtModal">
                 <div class="w-full max-w-sm rounded-lg shadow-2xl overflow-hidden"
                     :class="'bg-[var(--bg-card)]'">
@@ -364,20 +444,20 @@
                     <div class="p-6 space-y-4">
                         <!-- Qarz ma'lumoti -->
                         <div class="rounded-xl px-4 py-3 flex items-center justify-between"
-                            :class="themeStore.isDark ? 'bg-red-500/10 border border-red-500/20' : 'bg-red-50 border border-red-200'">
-                            <span class="text-xs font-medium text-red-600 dark:text-red-400">{{ $t('Qolgan qarz') }}</span>
-                            <span class="text-sm font-bold text-red-600 dark:text-red-400">
+                            style="background:var(--danger-bg); border:1px solid var(--danger-border);">
+                            <span class="text-xs font-medium text-[var(--danger)]">{{ $t('Qolgan qarz') }}</span>
+                            <span class="text-sm font-bold text-[var(--danger)]">
                                 {{ remainingDebt.toLocaleString() }} {{ $t("so'm") }}
                             </span>
                         </div>
 
                         <!-- Xato -->
-                        <div v-if="debtError" class="text-xs text-red-500 px-1">{{ debtError }}</div>
+                        <div v-if="debtError" class="text-xs text-[var(--danger)] px-1">{{ debtError }}</div>
 
                         <!-- Miqdor -->
                         <div class="space-y-1">
                             <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
-                                {{ $t("To'lov miqdori") }} <span class="text-red-500">*</span>
+                                {{ $t("To'lov miqdori") }} <span class="text-[var(--danger)]">*</span>
                             </label>
                             <input
                                 :value="debtAmount"
@@ -385,7 +465,7 @@
                                 type="text"
                                 inputmode="numeric"
                                 :placeholder="$t('Miqdorni kiriting')"
-                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20"
+                                class="w-full px-3 py-2.5 bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20"
                                 style="border-color:var(--border); color:var(--text-1);"
                             />
                         </div>
@@ -393,10 +473,10 @@
                         <!-- To'lov turi -->
                         <div class="space-y-1">
                             <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
-                                {{ $t("To'lov turi") }} <span class="text-red-500">*</span>
+                                {{ $t("To'lov turi") }} <span class="text-[var(--danger)]">*</span>
                             </label>
                             <select v-model="debtPaymentType"
-                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 appearance-none cursor-pointer"
+                                class="w-full px-3 py-2.5 bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 appearance-none cursor-pointer"
                                 style="border-color:var(--border); color:var(--text-1);">
                                 <option v-for="opt in paymentOptions" :key="opt.value" :value="opt.value">
                                     {{ $t(opt.label) }}
@@ -428,19 +508,23 @@
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import { useLangStore } from '@/stores/lang'
+import { useNavHistoryStore } from '@/stores/navHistory'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api, { ENDPOINTS, BASE_URL } from '@/api'
+import ConsultationTimer from '@/components/customers/ConsultationTimer.vue'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
 const langStore = useLangStore()
+const navHistoryStore = useNavHistoryStore()
 
 const customer = ref(null)
 const payments = ref([])
 const checks = ref([])
+const documents = ref([])
 const loading = ref(false)
 const statusSaving = ref(false)
 
@@ -551,9 +635,10 @@ const payDebt = async () => {
 
 const statusLabels = computed(() => ({
   NAVBATDA: langStore.t('Navbatda'),
-  KORIB_CHIQILDI: langStore.t("Ko'rib chiqildi"),
+  KORIB_CHIQILDI: langStore.t("Qabulga kiritildi"),
   YAKUNLANDI: langStore.t('Maslahat berildi'),
   YURISTDA: langStore.t('Maslahat berildi va shartnoma tuzildi'),
+  BEKOR_QILINDI: langStore.t('Rad etildi'),
 }))
 
 const statusInlineColors = {
@@ -565,12 +650,16 @@ const statusInlineColors = {
   BEKOR_QILINDI: { bg: 'var(--danger-bg)', color: 'var(--danger)' },
 }
 
+// Konsultatsiya taymeri faqat YURIST va RAHBAR uchun ko'rinadi
+const canSeeTimer = computed(() => ['YURIST', 'RAHBAR'].includes(authStore.user?.role))
+
 const changeStatus = async (newStatus) => {
   if (!customer.value || statusSaving.value) return
   statusSaving.value = true
   try {
     const { data } = await api.put(ENDPOINTS.CUSTOMER(customer.value.id), { status: newStatus })
-    customer.value = { ...customer.value, status: data.status }
+    // To'liq javobni merge qilamiz — consultationSeconds ham darhol yangilanadi
+    customer.value = { ...customer.value, ...data }
   } finally {
     statusSaving.value = false
   }
@@ -590,13 +679,15 @@ const fetchCustomerData = async () => {
     if (!id) return
     loading.value = true
     try {
-        const [{ data: cust }, { data: ch }] = await Promise.all([
+        const [{ data: cust }, { data: ch }, { data: docs }] = await Promise.all([
             api.get(ENDPOINTS.CUSTOMER(id)),
             api.get(`${ENDPOINTS.CUSTOMER(id)}/checks`),
+            api.get(ENDPOINTS.CUSTOMER_DOCUMENTS(id)),
         ])
         customer.value = cust
         payments.value = cust.payments || []
         checks.value = ch
+        documents.value = docs
     } catch (error) {
         console.error('Xatolik:', error)
         alert("Ma'lumotlarni yuklashda xatolik yuz berdi")
@@ -625,7 +716,37 @@ const openCheck = (check) => {
     window.location.href = `${BASE_URL}/${filterUrl(check.check_url)}`
 }
 
-const goBack = () => router.push('/customers')
+const documentUploadError = ref('')
+
+const handleUploadDocuments = async (e) => {
+    const files = Array.from(e.target.files || [])
+    e.target.value = ''
+    if (files.length === 0) return
+
+    documentUploadError.value = ''
+    const formData = new FormData()
+    files.forEach((file) => formData.append('files', file))
+
+    try {
+        const { data } = await api.post(ENDPOINTS.CUSTOMER_DOCUMENTS(customer.value.id), formData)
+        documents.value = data
+    } catch (err) {
+        documentUploadError.value = err?.response?.data?.message || "Hujjatlarni yuklashda xatolik yuz berdi"
+    }
+}
+
+const openDocument = (doc) => {
+    const filterUrl = (url) => {
+        if (!url) return url
+        return url.replace(/^\/*uploads\//i, '/').replace(/^uploads\//i, '/')
+    }
+    window.open(`${BASE_URL}/${filterUrl(doc.url)}`, '_blank')
+}
+
+const goBack = () => {
+    if (navHistoryStore.canGoBack) router.back()
+    else router.push('/customers')
+}
 </script>
 
 <script>
@@ -649,7 +770,7 @@ export default defineComponent({
                     h('p', { class: 'text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider' }, props.label),
                     h('p', {
                         class: `text-sm font-semibold ${props.highlight
-                            ? 'text-emerald-600 dark:text-emerald-400'
+                            ? 'text-[var(--success)]'
                             : 'text-[var(--text-1)]'}`
                     }, props.value || '-')
                 ])

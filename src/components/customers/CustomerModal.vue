@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import api, { ENDPOINTS } from '@/api'
 import { usePricesStore } from '@/stores/prices'
+import { useHistoryBack } from '@/composables/useHistoryBack'
 
 const pricesStore = usePricesStore()
 
@@ -13,6 +14,8 @@ import districts from "../../utils/districts.json"
 
 const props = defineProps({ editing: Object })
 const emit = defineEmits(['close', 'saved'])
+
+useHistoryBack(() => true, () => emit('close'))
 
 const { proxy } = getCurrentInstance()
 const store = useCustomersStore()
@@ -28,7 +31,7 @@ const phone2 = ref('')
 const address = ref('')
 const description = ref('')
 const assignedToId = ref('')
-const source = ref('')
+const source = ref('MUSTAQIL_MUROJAAT')
 const telegram = ref('')
 const appealType = ref('')
 const paymentAmount = ref('')
@@ -51,6 +54,32 @@ const success = ref('')
 const users = ref([])
 const submitted = ref(false)
 const savedCustomerData = ref(null)
+
+// Mijoz hujjatlari (ixtiyoriy, bir nechta fayl)
+const documentFiles = ref([])
+const documentsInputKey = ref(0)
+const documentsInputRef = ref(null)
+
+const handleDocumentFiles = (e) => {
+  const newFiles = Array.from(e.target.files || [])
+  documentFiles.value = [...documentFiles.value, ...newFiles]
+  documentsInputKey.value++
+}
+
+const triggerDocumentsInput = () => {
+  documentsInputRef.value?.click()
+}
+
+const removeDocumentFile = (index) => {
+  documentFiles.value = documentFiles.value.filter((_, i) => i !== index)
+}
+
+const formatFileSize = (bytes) => {
+  if (!bytes) return '0 KB'
+  const kb = bytes / 1024
+  if (kb < 1024) return `${kb.toFixed(0)} KB`
+  return `${(kb / 1024).toFixed(1)} MB`
+}
 
 const handleInputPrice = (e) => {
   const rawValue = e.target.value.replace(/\D/g, '')
@@ -140,10 +169,13 @@ const appealTypeOptions = computed(() => [
 ])
 
 const sourceOptions = computed(() => [
+  { value: 'MUSTAQIL_MUROJAAT', label: proxy.$t('Mustaqil murojaat qildi') },
   { value: 'INSTAGRAM', label: proxy.$t('Instagram') },
   { value: 'TELEGRAM', label: proxy.$t('Telegram') },
   { value: 'YOUTUBE', label: proxy.$t('YouTube') },
   { value: 'TANISHIDAN', label: proxy.$t('Tanishidan') },
+  { value: 'TASHQI_REKLAMA', label: proxy.$t('Tashqi reklama orqali') },
+  { value: 'AVVALGI_MIJOZ', label: proxy.$t('Avvalgi mijoz') },
 ])
 
 // Filtrlangan tumanlar
@@ -599,7 +631,7 @@ watch(() => props.editing, (val) => {
     address.value = ''
     description.value = ''
     assignedToId.value = ''
-    source.value = ''
+    source.value = 'MUSTAQIL_MUROJAAT'
     telegram.value = ''
     appealType.value = ''
     paymentAmount.value = ''
@@ -608,6 +640,7 @@ watch(() => props.editing, (val) => {
     error.value = ''
     success.value = ''
     savedCustomerData.value = null
+    documentFiles.value = []
     return
   }
 
@@ -856,6 +889,18 @@ const save = async () => {
         }
       }
 
+      // Ixtiyoriy hujjatlarni yuklash (bir nechta fayl bo'lishi mumkin)
+      if (documentFiles.value.length > 0) {
+        const docsFormData = new FormData()
+        documentFiles.value.forEach((file) => docsFormData.append('files', file))
+        try {
+          await api.post(ENDPOINTS.CUSTOMER_DOCUMENTS(createdCustomer.id), docsFormData)
+        } catch (e) {
+          console.error('❌ Hujjatlarni yuklashda xato:', e)
+          success.value = `Mijoz yaratildi, lekin hujjatlar yuklanmadi: ${e?.response?.data?.message || 'Xatolik yuz berdi'}`
+        }
+      }
+
       const params = new URLSearchParams({
         fish,
         telefon: phone.value || '',
@@ -866,7 +911,6 @@ const save = async () => {
         sana: Date.now().toString()
       })
 
-      await sendTelegramMessages(telegram.value, name.value, `${surname.value} MJZ-${createdCustomer?.customer_id || ''}`)
       emit('saved')
       setTimeout(() => emit('close'), 1800)
 
@@ -950,126 +994,268 @@ const paymentOptions = ref([
   { value: 'NASIYA', label: 'Nasiya' },
 ])
 
+// Eslatma — faqat shu ekranda qolib turadigan izoh (backendda maydon yo'q)
+const note = ref('')
+
+// Telegram shablon xabarlar — mijozga yuboriladigan tayyor matnlar
 const telegramTemplates = ref([
-  {
-    id: 1,
-    text: "Assalomu alaykum! Siz yuridik xizmatlar byurosiga muvaffaqiyatli ro'yxatdan o'tdingiz. Navbatingiz tayinlandi. Tez orada mutaxassis siz bilan bog'lanadi.",
-    selected: true,
-  },
-  {
-    id: 2,
-    text: "Hurmatli mijoz! Sizning arizangiz qabul qilindi. Iltimos, navbatingizni kuting. Qo'shimcha ma'lumot uchun biz bilan bog'laning.",
-    selected: true,
-  },
-  {
-    id: 3,
-    text: "Xush kelibsiz! Sizning murojaatingiz ro'yxatga olindi. Mutaxassisimiz yaqin orada siz bilan aloqaga chiqadi. Rahmat!",
-    selected: true,
-  },
+  { id: 1, text: "Assalomu alaykum! Siz yuridik xizmatlar buyurtmasiga muvaffaqiyatli ro'yxatdan o'tdingiz. Navbatingiz tayinlandi. Tez orada mutaxassis siz bilan bog'lanadi.", selected: false },
+  { id: 2, text: "Hurmatli mijoz! Sizning arizangiz qabul qilindi. Iltimos, navbatingizni kuting. Qo'shimcha ma'lumot uchun biz bilan bog'laning.", selected: false },
+  { id: 3, text: "Xush kelibsiz! Sizning murojaatingiz ro'yxatga olindi. Mutaxassisimiz yaqin orada siz bilan aloqaga chiqadi. Rahmat.", selected: false },
 ])
 
-const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
-  if (!telegramTo) return
-  const selected = telegramTemplates.value.filter(t => t.selected)
-  for (const tmpl of selected) {
-    try {
-      await api.post('/api/telegram/send', { to: telegramTo, message: tmpl.text, firstName, lastName })
-    } catch (e) {
-      console.error('Telegram xabar yuborishda xato:', e)
-    }
-  }
+const copiedTemplateId = ref(null)
+const copyTemplate = (tmpl) => {
+  navigator.clipboard?.writeText(tmpl.text)
+  copiedTemplateId.value = tmpl.id
+  setTimeout(() => {
+    if (copiedTemplateId.value === tmpl.id) copiedTemplateId.value = null
+  }, 1500)
 }
-
 </script>
-
 <template>
-  <Teleport to="body">
-    <Transition name="modal-fade">
-      <div class="fixed inset-0 z-50 flex flex-col" style="background:var(--bg-card);">
+  <div class="space-y-5">
 
-        <!-- Modal Header -->
-        <div class="px-6 py-5 flex items-center justify-between shrink-0 border-b" style="border-color:var(--border);">
-          <div>
-            <h2 class="text-base font-bold tracking-wide" style="color:var(--text-1);">
-              {{ props.editing?.id ? $t('Mijozni tahrirlash') : $t("Yangi mijoz qo'shish") }}
-            </h2>
-            <p class="text-sm mt-0.5" style="color:var(--text-2);">{{ $t("Majburiy maydonlarni to'ldiring") }}
-            </p>
-          </div>
-          <button @click="$emit('close')"
-            class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-            style="background:var(--border-light); color:var(--text-2);">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-              stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+    <!-- Sarlavha va info banner -->
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+          style="background:linear-gradient(135deg, var(--info), #7c5cf5);">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 8v6M22 11h-6" />
+          </svg>
         </div>
+        <div>
+          <h2 class="text-xl font-bold tracking-wide" style="color:var(--text-1);">
+            {{ props.editing?.id ? $t('Mijozni tahrirlash') : $t("Yangi mijoz qo'shish") }}
+          </h2>
+          <p class="text-sm mt-0.5" style="color:var(--text-2);">{{ $t("Majburiy maydonlarni to'ldiring") }}</p>
+        </div>
+      </div>
 
-        <!-- Modal Body -->
-        <div class="flex-1 overflow-y-auto p-6 sm:p-8 space-y-4">
-          <div v-if="success"
-            class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 text-xs">
-            {{ success }}</div>
-          <div v-if="error"
-            class="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-400 text-xs">
-            {{ error }}</div>
+<!-- Info banner clone -->
+<div
+  class="relative ml-auto flex h-16 flex-1 min-w-[600px] max-w-md items-center overflow-hidden rounded-[10px] border border-[#dfe3ff] bg-gradient-to-r from-white via-[#fbfbff] to-[#f2f3ff] px-6 shadow-[0_1px_3px_rgba(70,84,180,0.05),inset_0_0_0_1px_rgba(255,255,255,0.7)]"
+>
+  <div class="relative z-[5] flex items-center gap-4">
+    <div
+      class="flex h-7 w-7 min-w-7 items-center justify-center rounded-full border-2 border-[#4f67ff] bg-white font-serif text-[18px] font-bold leading-none text-[#4f67ff]"
+    >
+      i
+    </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <p class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.1px] text-[#26345d]">
+      {{ $t("Yulduzcha") }}
+      <span class="font-bold text-[#f04438]">( * )</span>
+      {{ $t("bilan belgilangan maydonlar majburiy.") }}
+    </p>
+  </div>
+
+  <div class="pointer-events-none absolute right-0 top-0 z-[1] h-[78px] w-[185px]">
+    <svg viewBox="0 0 185 78" xmlns="http://www.w3.org/2000/svg" class="block h-full w-full">
+      <defs>
+        <linearGradient id="mainCard" x1="73" y1="10" x2="162" y2="70">
+          <stop offset="0" stop-color="#ffffff" stop-opacity="0.95" />
+          <stop offset="1" stop-color="#eef1ff" stop-opacity="0.85" />
+        </linearGradient>
+
+        <linearGradient id="plusGradient" x1="136" y1="52" x2="160" y2="76">
+          <stop offset="0" stop-color="#7c8cff" />
+          <stop offset="1" stop-color="#5067ff" />
+        </linearGradient>
+
+        <filter id="shadow" x="0" y="0" width="200%" height="200%">
+          <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#6676ff" flood-opacity="0.18" />
+        </filter>
+
+        <filter id="plusShadow" x="0" y="0" width="200%" height="200%">
+          <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#4f67ff" flood-opacity="0.35" />
+        </filter>
+      </defs>
+
+      <path
+        d="M18 78C45 47 70 31 105 23C137 16 160 18 185 0V78H18Z"
+        fill="#eef0ff"
+        opacity="0.8"
+      />
+
+      <path
+        d="M88 0C112 15 131 24 160 19C171 17 179 12 185 8V78H80Z"
+        fill="#e8ebff"
+        opacity="0.65"
+      />
+
+      <rect
+        x="104"
+        y="-14"
+        width="72"
+        height="92"
+        rx="13"
+        fill="#e4e7ff"
+        opacity="0.72"
+        transform="rotate(8 104 -14)"
+      />
+
+      <rect
+        x="75"
+        y="10"
+        width="90"
+        height="62"
+        rx="10"
+        fill="url(#mainCard)"
+        stroke="#dfe3ff"
+        stroke-width="1"
+        filter="url(#shadow)"
+        transform="rotate(7 75 10)"
+      />
+
+      <rect x="144" y="17" width="17" height="15" rx="4" fill="#6272f7" opacity="0.95" />
+
+      <path
+        d="M148 17V12.5C148 9 150 6.8 152.5 6.8C155 6.8 157 9 157 12.5V17"
+        fill="none"
+        stroke="#6272f7"
+        stroke-width="3"
+        stroke-linecap="round"
+      />
+
+      <circle cx="98" cy="35" r="6.5" fill="none" stroke="#6676ff" stroke-width="2.4" />
+
+      <path
+        d="M85.5 53C87.2 45.5 91.8 42 98 42C104.2 42 108.8 45.5 110.5 53"
+        fill="none"
+        stroke="#6676ff"
+        stroke-width="2.4"
+        stroke-linecap="round"
+      />
+
+      <rect x="119" y="32" width="27" height="3.2" rx="2" fill="#9da7ff" opacity="0.75" />
+      <rect x="118" y="44" width="38" height="3.2" rx="2" fill="#9da7ff" opacity="0.65" />
+      <rect x="91" y="60" width="49" height="3.2" rx="2" fill="#b4bcff" opacity="0.55" />
+
+      <circle cx="148" cy="63" r="14" fill="url(#plusGradient)" filter="url(#plusShadow)" />
+
+      <path
+        d="M148 56.5V69.5M141.5 63H154.5"
+        stroke="#ffffff"
+        stroke-width="2.6"
+        stroke-linecap="round"
+      />
+    </svg>
+  </div>
+</div>
+    </div>
+
+    <div v-if="success" class="p-3 rounded-xl text-xs"
+      style="background:var(--success-bg); border:1px solid var(--success-border); color:var(--success);">
+      {{ success }}</div>
+    <div v-if="error" class="p-3 rounded-xl text-xs"
+      style="background:var(--danger-bg); border:1px solid var(--danger-border); color:var(--danger);">
+      {{ error }}</div>
+
+    <!-- Asosiy 2 ustunli tarkib -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+
+      <!-- ══ Chap ustun ══ -->
+      <div class="space-y-5 flex flex-col">
+
+        <!-- 1. Shaxsiy ma'lumotlar -->
+        <div class="card p-5 space-y-4">
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+              style="background:var(--primary);">1</span>
+            <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Shaxsiy ma'lumotlar") }}</h3>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
             <!-- Ism -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !name ? 'text-red-500' : 'text-[var(--text-2)]']">{{
-                  $t('Ism') }}
-                <span :class="name ? 'text-green-500' : 'text-red-500'">*</span></label>
-              <input v-model="name" type="text" :placeholder="$t('Ism')"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1', submitted && !name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !name ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">
+                {{ $t('Ism') }}
+                <span :class="name ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+                <input v-model="name" type="text" :placeholder="$t('Ism')"
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !name ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+              </div>
             </div>
 
             <!-- Familiya -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !surname ? 'text-red-500' : 'text-[var(--text-2)]']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !surname ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
                   $t('Familiya') }}
-                <span :class="surname ? 'text-green-500' : 'text-red-500'">*</span></label>
-              <input v-model="surname" type="text" :placeholder="$t('Familiya')"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1', submitted && !surname ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+                <span :class="surname ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+                <input v-model="surname" type="text" :placeholder="$t('Familiya')"
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !surname ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+              </div>
             </div>
+          </div>
 
-            <!-- Otasining ismi -->
-            <div class="space-y-1">
-              <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !father_name ? 'text-red-500' : 'text-[var(--text-2)]']">{{
-                  $t('Otasining ismi') }} <span :class="father_name ? 'text-green-500' : 'text-red-500'">*</span></label>
+          <!-- Otasining ismi -->
+          <div class="space-y-1">
+            <label
+              :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !father_name ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
+                $t('Otasining ismi') }} <span :class="father_name ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
               <input v-model="father_name" type="text" :placeholder="$t('Otasining ismi')"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1', submitted && !father_name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+                :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !father_name ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
             </div>
+          </div>
 
+          <div class="grid grid-cols-2 gap-4">
             <!-- Telefon -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !phone ? 'text-red-500' : 'text-[var(--text-2)]']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !phone ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
                   $t('Telefon') }}
-                <span :class="phone ? 'text-green-500' : 'text-red-500'">*</span></label>
-              <input v-model="phone" @input="handlePhone($event, 1)" type="tel" placeholder="+998 XX XXX XX XX"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1', submitted && !phone ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+                <span :class="phone ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h2.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </span>
+                <input v-model="phone" @input="handlePhone($event, 1)" type="tel" placeholder="+998 XX XXX XX XX"
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !phone ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+              </div>
               <label class="flex items-center mt-1 gap-2 text-sm cursor-pointer">
                 <input type="checkbox" v-model="phone2isTelegram" @change="handlePhone2isTelegram"
-                  class="w-4 h-4 accent-blue-600">
-                <span class="text-[var(--text-3)]">{{ $t('Bu raqamda Telegram bormi?') }}</span>
+                  class="w-4 h-4 accent-[var(--primary)]">
+                <span class="text-[11px]" style="color:var(--text-3);">{{ $t('Bu raqamda Telegram bormi?') }}</span>
               </label>
             </div>
-
 
             <!-- Telegram -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !telegram ? 'text-red-500' : 'text-[var(--text-2)]']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !telegram ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
                   $t('Telegram') }}
-                <span :class="telegram ? 'text-green-500' : 'text-red-500'">*</span></label>
+                <span :class="telegram ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400" viewBox="0 0 24 24"
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[var(--info)]" viewBox="0 0 24 24"
                     fill="currentColor">
                     <path
                       d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
@@ -1077,67 +1263,158 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                 </span>
                 <input v-model="telegram" @input="handleInput()" type="text"
                   :placeholder="$t('@username yoki +998 XX XXX XX XX')"
-                  :class="['w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1', submitted && !telegram ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !telegram ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
               </div>
             </div>
+          </div>
+        </div>
 
+        <!-- 2. Manzil ma'lumotlari -->
+        <div class="card p-5 space-y-4">
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+              style="background:var(--primary);">2</span>
+            <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Manzil ma'lumotlari") }}</h3>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
             <!-- Viloyat -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedRegion ? 'text-red-500' : 'text-[var(--text-2)]']">{{
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedRegion ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
                   $t('Viloyat') }}
-                <span :class="selectedRegion ? 'text-green-500' : 'text-red-500'">*</span></label>
-              <select v-model="selectedRegion"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1 cursor-pointer appearance-none', submitted && !selectedRegion ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
-                <option value="">{{ $t('— Viloyatni tanlang —') }}</option>
-                <option v-for="r in regions" :key="r.id" :value="r.id">{{ $t(r.name_uz) }}</option>
-              </select>
+                <span :class="selectedRegion ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                </span>
+                <select v-model="selectedRegion"
+                  :class="['w-full pl-9 pr-8 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !selectedRegion ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
+                  <option value="">{{ $t('— Viloyatni tanlang —') }}</option>
+                  <option v-for="r in regions" :key="r.id" :value="r.id">{{ $t(r.name_uz) }}</option>
+                </select>
+                <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--text-2);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </span>
+              </div>
             </div>
 
             <!-- Tuman -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedDistrict ? 'text-red-500' : 'text-[var(--text-2)]']">{{
-                  $t('Tuman / Shahar') }} <span :class="selectedDistrict ? 'text-green-500' : 'text-red-500'">*</span></label>
-              <select v-model="selectedDistrict" :disabled="!selectedRegion"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1 cursor-pointer appearance-none', submitted && !selectedDistrict ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
-                <option value="">{{ $t('— Tuman tanlang —') }}</option>
-                <option v-for="d in filteredDistricts" :key="d.id" :value="d.id">{{ $t(d.name_uz) }}</option>
-              </select>
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !selectedDistrict ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
+                  $t('Tuman / Shahar') }} <span :class="selectedDistrict ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </span>
+                <select v-model="selectedDistrict" :disabled="!selectedRegion"
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !selectedDistrict ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
+                  <option value="">{{ $t('— Tuman tanlang —') }}</option>
+                  <option v-for="d in filteredDistricts" :key="d.id" :value="d.id">{{ $t(d.name_uz) }}</option>
+                </select>
+              </div>
             </div>
+          </div>
 
-            <!-- 
-            <div class="sm:col-span-2 space-y-1">
-              <label class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">Qo'shimcha manzil (ko'cha, mahalla, uy va h.k.)</label>
-              <input v-model="address" type="text" :placeholder="$t(\"Ko'cha, mahalla, uy raqami, qo'shimcha ma'lumot\")"
-                class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
-            </div> -->
+          <!-- Manzil (ixtiyoriy) -->
+          <div class="space-y-1">
+            <label class="block text-[11px] font-medium uppercase tracking-wider" style="color:var(--text-2);">
+              {{ $t('Manzil') }} <span class="normal-case font-normal" style="color:var(--text-3);">({{ $t('ixtiyoriy') }})</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </span>
+              <input v-model="address" type="text" :placeholder="$t('Manzilni kiriting')"
+                class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+            </div>
+          </div>
+        </div>
+      </div>
 
-            <!-- Manba -->
-            <div class="space-y-1">
-              <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !source ? 'text-red-500' : 'text-[var(--text-2)]']">{{
-                  $t('Qayerdan eshitib kelgan') }} <span :class="source ? 'text-green-500' : 'text-red-500'">*</span></label>
+      <!-- ══ O'ng ustun ══ -->
+      <div class="space-y-5 flex flex-col">
+
+        <!-- 3. Qo'shimcha ma'lumotlar -->
+        <div class="card p-5 space-y-4">
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+              style="background:var(--primary);">3</span>
+            <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Qo'shimcha ma'lumotlar") }}</h3>
+          </div>
+
+          <!-- Manba -->
+          <div class="space-y-1">
+            <label
+              :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !source ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
+                $t('Qayerdan eshitib keldi yoki kim yubordi') }} <span :class="source ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 12a4 4 0 100-8 4 4 0 000 8zm0 2c-3.33 0-6 1.79-6 4v2h12v-2c0-2.21-2.67-4-6-4z" />
+                  <path d="M16.5 12a3.5 3.5 0 100-7 3.5 3.5 0 000 7zm.35 1.98c-.11-.01-.22-.02-.35-.02-.9 0-1.75.15-2.53.42 1.24.85 2.03 2.02 2.03 3.42v2.2h5v-2c0-2.02-2.36-3.69-4.15-4.02z" />
+                </svg>
+              </span>
               <select v-model="source"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1 cursor-pointer appearance-none', submitted && !source ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
+                :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !source ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
                 <option value="">{{ $t('— Tanlanmagan —') }}</option>
                 <option v-for="s in sourceOptions" :key="s.value" :value="s.value">{{ $t(s.label) }}</option>
               </select>
             </div>
+          </div>
 
-            <div class="space-y-2">
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Mas'ul yurist -->
+            <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !price ? 'text-red-500' : 'text-[var(--text-2)]']">{{
-                  $t("Maslaxat narxi") }} <span :class="price ? 'text-green-500' : 'text-red-500'">*</span></label>
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !assignedToId ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
+                  $t("Qabul qiluvchi mutahasis") }} <span :class="assignedToId ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+                <select v-model="assignedToId"
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !assignedToId ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
+                  <option value="">{{ $t('— Belgilanmagan —') }}</option>
+                  <option v-for="u in users" :key="u.id" :value="u.id">
+                    {{ $t(u.surname) }} {{ $t(u.name) }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Maslahat narxi -->
+            <div class="space-y-1">
+              <label
+                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !price ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
+                  $t("Maslaxat narxi") }} <span :class="price ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span></label>
 
               <div class="relative" ref="priceMenuAnchor">
-                <!-- Narx select -->
                 <div class="relative">
                   <div
                     @click="showPriceMenu = !showPriceMenu; showPaymentMenu = false"
-                    :class="['w-full flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-sm cursor-pointer transition-all', submitted && !price ? 'border-red-500' : 'border-[var(--border)] hover:border-[var(--primary)]', price ? 'text-[var(--text-1)]' : 'text-[var(--text-2)]']">
-                    <span>{{ price ? formatMoney(price) + $t(" so'm") : $t("Narxni tanlang") }}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[var(--text-2)] transition-transform" :class="showPriceMenu ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    :class="['w-full flex items-center justify-between gap-2 pl-9 pr-3 py-2 bg-gray-50 border rounded-lg text-sm cursor-pointer transition-all relative', submitted && !price ? 'border-[var(--danger)]' : 'border-[var(--border)] hover:border-[var(--primary)]', price ? 'text-[var(--text-1)]' : 'text-[var(--text-2)]']">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2M9.401 15c.52.598 1.488 1 2.599 1" />
+                        <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </span>
+                    <span class="truncate">{{ price ? formatMoney(price) + $t(" so'm") : $t("Narxni tanlang") }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[var(--text-2)] transition-transform ml-auto shrink-0" :class="showPriceMenu ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
@@ -1145,7 +1422,7 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                   <!-- Narx dropdown -->
                   <Transition name="submenu-fade">
                     <div v-if="showPriceMenu"
-                      class="absolute z-50 top-0 left-full ml-1 min-w-[180px] rounded-xl shadow-2xl border"
+                      class="absolute z-50 top-full mt-1 left-0 w-56 rounded-xl shadow-2xl border"
                       style="background:var(--bg-card); border-color:var(--border);">
                       <div class="px-3 py-2 border-b rounded-t-xl overflow-hidden"
                         style="border-color:var(--border-light);">
@@ -1178,10 +1455,10 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                           </svg>
                         </button>
 
-                        <!-- To'lov turi submenu — narx menyusining yonidan chiqadi -->
+                        <!-- To'lov turi submenu -->
                         <Transition name="submenu-fade">
                           <div v-if="showPaymentMenu"
-                            class="absolute z-50 top-0 left-full ml-1 min-w-[200px] rounded-xl shadow-2xl border overflow-hidden"
+                            class="absolute z-50 top-full mt-1 left-0 w-56 rounded-xl shadow-2xl border overflow-hidden"
                             style="background:var(--bg-card); border-color:var(--border);">
                             <div class="px-3 py-2 border-b"
                               style="border-color:var(--border-light);">
@@ -1214,7 +1491,7 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                 <!-- Tanlangan narx va to'lov turi ko'rsatkich -->
                 <div v-if="price && paymentType && !showPriceMenu && !showPaymentMenu" class="mt-2 flex items-center gap-2 flex-wrap">
                   <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
-                    style="background:#e8f0fe; color:var(--primary);"
+                    style="background:var(--primary-light); color:var(--primary);"
                     @click="showPriceMenu = true">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -1222,7 +1499,7 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                     {{ formatMoney(price) }} {{ $t("so'm") }}
                   </span>
                   <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
-                    style="background:#f0fdf4; color:#166534;"
+                    style="background:var(--success-bg); color:var(--success);"
                     @click="showPaymentMenu = true">
                     {{ paymentType === 'NAQD' ? '💵' : paymentType === 'KARTA' ? '💳' : paymentType === 'ONLINE' ? '📱' : paymentType === 'NASIYA' ? '🤝' : '🏦' }}
                     {{ paymentType === 'NAQD' ? $t('Naqd pul') : paymentType === 'KARTA' ? $t('Plastik karta') : paymentType === 'ONLINE' ? $t("Online to'lov") : paymentType === 'NASIYA' ? $t('Nasiya') : $t("Bank o'tkazmasi") }}
@@ -1230,88 +1507,116 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
                 </div>
               </div>
             </div>
-
-            <!-- Mas'ul yurist -->
-            <div class="space-y-1">
-              <label
-                :class="['block text-[11px] font-medium uppercase tracking-wider', submitted && !assignedToId ? 'text-red-500' : 'text-[var(--text-2)]']">{{
-                  $t("Qabul qiluvchi mutahasis") }} <span :class="assignedToId ? 'text-green-500' : 'text-red-500'">*</span></label>
-              <select v-model="assignedToId"
-                :class="['w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-white focus:ring-1 cursor-pointer appearance-none', submitted && !assignedToId ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
-                <option value="">{{ $t('— Belgilanmagan —') }}</option>
-                <option v-for="u in users" :key="u.id" :value="u.id">
-                  {{ $t(u.surname) }} {{ $t(u.name) }}
-                </option>
-              </select>
-            </div>
-
-
-
-            <!-- Telegram shablon xabarlar (faqat yangi mijozda) -->
-            <div v-if="!props.editing?.id" class="sm:col-span-2 space-y-2">
-              <label class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider flex items-center gap-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
-                </svg>
-                {{ $t('Telegram shablon xabarlar') }}
-              </label>
-              <div class="space-y-2">
-                <div v-for="tmpl in telegramTemplates" :key="tmpl.id"
-                  @click="tmpl.selected = !tmpl.selected"
-                  :class="['flex items-start gap-3 px-3 py-2.5 rounded-lg border cursor-pointer transition-all select-none', tmpl.selected ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20' : 'border-[var(--border)] bg-[var(--border-light)]']">
-                  <div :class="['mt-0.5 w-4 h-4 rounded-lg flex items-center justify-center shrink-0 border-2 transition-all', tmpl.selected ? 'bg-blue-500 border-blue-500' : 'border-[var(--border)]']">
-                    <svg v-if="tmpl.selected" xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span class="text-xs leading-relaxed" :class="tmpl.selected ? 'text-blue-800 dark:text-blue-200' : 'text-[var(--text-3)]'">
-                    {{ tmpl.text }}
-                  </span>
-                </div>
-              </div>
-              <p class="text-[10px] text-[var(--text-2)]">
-                {{ $t('Tanlangan shablonlar mijoz tasdiqlangandan so\'ng avtomatik yuboriladi') }}
-              </p>
-            </div>
-
-            <!-- Izoh -->
-            <div class="sm:col-span-2 space-y-1">
-              <label
-                class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
-                  $t('Murojaatning qisqacha mazmuni') }}</label>
-              <textarea v-model="description" rows="3" :placeholder="$t('Murojaatning qisqacha mazmuni...')"
-                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 resize-none"></textarea>
-            </div>
-
-            <!-- Yaratilgan sana -->
-            <div v-if="props.editing?.id"
-              class="sm:col-span-2 flex items-center gap-2 px-3 py-2 bg-[var(--border-light)]/50 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-[var(--text-2)]" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span class="text-[11px] text-[var(--text-2)]">{{ $t('Yaratilgan sana:') }}</span>
-              <span class="text-[11px] font-medium text-[var(--text-1)]">{{
-                formatDate(props.editing?.createdAt) }}</span>
-            </div>
           </div>
         </div>
 
-        <!-- Modal Footer -->
-        <div class="px-6 py-4 flex justify-end gap-3 shrink-0 flex-wrap border-t"
-          style="border-color:var(--border); background:var(--border-light);">
-          <button @click="$emit('close')" class="btn btn-ghost">
-            {{ $t('Bekor qilish') }}
-          </button>
+        <!-- 4. Murojaat ma'lumotlari -->
+        <div class="card p-5 space-y-3 flex-1 flex flex-col">
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+              style="background:var(--primary);">4</span>
+            <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Murojaat ma'lumotlari") }}</h3>
+          </div>
 
-          <button @click="save" class="btn btn-primary">
-            {{ props.editing?.id ? $t('Saqlash') : $t('Yaratish') }}
-          </button>
+          <div class="space-y-1 flex-1 flex flex-col">
+            <label class="block text-[11px] font-medium uppercase tracking-wider" style="color:var(--text-2);">
+              {{ $t('Murojaatning qisqacha mazmuni') }} <span :class="description ? 'text-[var(--success)]' : 'text-[var(--danger)]'">*</span>
+            </label>
+            <div class="relative flex-1 flex flex-col">
+              <textarea v-model="description" maxlength="500" :placeholder="$t('Murojaatning qisqacha mazmunini yozing...')"
+                class="w-full flex-1 min-h-[140px] px-3 py-2.5 bg-gray-50 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 resize-none"></textarea>
+              <span class="absolute bottom-2 right-3 text-[10px]" style="color:var(--text-3);">{{ description.length }}/500</span>
+            </div>
+          </div>
         </div>
       </div>
-    </Transition>
-  </Teleport>
+    </div>
+
+    <!-- Eslatma / Fayl ilova qilish -->
+    <div class="grid grid-cols-1 lg:grid-cols-1 gap-5">
+      <!-- Fayl ilova qilish (ixtiyoriy) -->
+      <div v-if="!props.editing?.id" class="card p-5 space-y-2">
+        <label class="block text-[11px] font-medium uppercase tracking-wider flex items-center gap-1.5" style="color:var(--text-2);">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" style="color:var(--info);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 10-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+          </svg>
+          {{ $t('Fayl ilova qilish') }} <span class="normal-case font-normal" style="color:var(--text-3);">({{ $t('ixtiyoriy') }})</span>
+        </label>
+
+        <div class="flex items-center justify-between gap-3 px-4 py-4 bg-gray-50 border border-dashed rounded-lg cursor-pointer"
+          style="border-color:var(--border);" @click="triggerDocumentsInput">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:var(--info-bg); color:var(--info);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 10-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium truncate" style="color:var(--text-1);">{{ $t("Fayllarni yuklang yoki sudrab olib keling") }}</p>
+              <p class="text-[11px]" style="color:var(--text-3);">JPG, PNG, PDF, DOCX ({{ $t('maks.') }} 10MB)</p>
+            </div>
+          </div>
+          <label class="btn btn-ghost btn-sm shrink-0 cursor-pointer flex items-center gap-1.5 whitespace-nowrap" @click.stop>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
+            </svg>
+            {{ $t('Fayl tanlash') }}
+            <input ref="documentsInputRef" :key="documentsInputKey" type="file" multiple class="hidden"  @change="handleDocumentFiles" />
+          </label>
+        </div>
+
+        <div v-if="documentFiles.length > 0" class="flex flex-wrap gap-2 mt-1">
+          <div v-for="(file, idx) in documentFiles" :key="idx"
+            class="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-lg text-xs"
+            style="background:var(--info-bg); color:var(--info);">
+            <span class="truncate max-w-[160px]">{{ file.name }}</span>
+            <span style="color:var(--text-3);">{{ formatFileSize(file.size) }}</span>
+            <button type="button" @click="removeDocumentFile(idx)"
+              class="w-4 h-4 flex items-center justify-center rounded-full shrink-0"
+              style="color:var(--danger);">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3 h-3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Yaratilgan sana (tahrirlashda) -->
+    <div v-if="props.editing?.id"
+      class="flex items-center gap-2 px-4 py-2.5 rounded-lg" style="background:var(--border-light);">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" style="color:var(--text-2);" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <span class="text-[11px]" style="color:var(--text-2);">{{ $t('Yaratilgan sana:') }}</span>
+      <span class="text-[11px] font-medium" style="color:var(--text-1);">{{ formatDate(props.editing?.createdAt) }}</span>
+    </div>
+
+    <!-- Pastki tugmalar -->
+    <div class="flex justify-end gap-3 flex-wrap pt-1">
+      <button @click="$emit('close')" class="btn btn-ghost flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        {{ $t('Bekor qilish') }}
+      </button>
+
+      <button @click="save" class="btn flex items-center gap-2 text-white"
+        style="background:linear-gradient(135deg, var(--info), #7c5cf5);">
+        {{ props.editing?.id ? $t('Saqlash') : $t('Yaratish') }}
+        <svg v-if="!props.editing?.id" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m-3-3h6" />
+        </svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </button>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -1323,26 +1628,5 @@ const sendTelegramMessages = async (telegramTo, firstName, lastName) => {
 .submenu-fade-leave-to {
   opacity: 0;
   transform: translateY(-6px) scale(0.97);
-}
-
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-  transition: opacity 0.22s ease;
-}
-
-.modal-fade-enter-from,
-.modal-fade-leave-to {
-  opacity: 0;
-}
-
-.modal-fade-enter-active>*,
-.modal-fade-leave-active>* {
-  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.22s ease;
-}
-
-.modal-fade-enter-from>*,
-.modal-fade-leave-to>* {
-  transform: scale(0.96) translateY(10px);
-  opacity: 0;
 }
 </style>

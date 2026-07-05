@@ -66,10 +66,13 @@ const debtorsCount = computed(() =>
 const paidCount = computed(() => totalCustomers.value - debtorsCount.value)
 
 const sourceMap = computed(() => ({
+  MUSTAQIL_MUROJAAT: { label: langStore.t('Mustaqil murojaat qildi'), color: '#6366f1' },
   INSTAGRAM: { label: 'Instagram',             color: '#e1306c' },
   TELEGRAM:  { label: 'Telegram',              color: '#2ea6dd' },
   YOUTUBE:   { label: 'YouTube',               color: '#ff0000' },
   TANISHIDAN:{ label: langStore.t('Tanishidan'), color: '#2E8B57' },
+  TASHQI_REKLAMA: { label: langStore.t('Tashqi reklama orqali'), color: '#f59e0b' },
+  AVVALGI_MIJOZ: { label: langStore.t('Avvalgi mijoz'), color: '#0891b2' },
 }))
 
 const sourceStats = computed(() => {
@@ -445,11 +448,11 @@ const divider = 'background:var(--border)'
               <circle cx="50" cy="50" r="40" fill="none"
                 :stroke="'var(--border)'" stroke-width="12" />
               <circle cx="50" cy="50" r="40" fill="none"
-                stroke="#16a34a" stroke-width="12" stroke-linecap="round"
+                stroke="var(--success)" stroke-width="12" stroke-linecap="round"
                 :stroke-dasharray="`${totalCustomers > 0 ? (paidCount / totalCustomers) * 251.3 : 0} 251.3`"
                 stroke-dashoffset="0" style="transition: all 0.7s ease;" />
               <circle cx="50" cy="50" r="40" fill="none"
-                stroke="#dc2626" stroke-width="12" stroke-linecap="round"
+                stroke="var(--danger)" stroke-width="12" stroke-linecap="round"
                 :stroke-dasharray="`${totalCustomers > 0 ? (debtorsCount / totalCustomers) * 251.3 : 0} 251.3`"
                 :stroke-dashoffset="`${-(totalCustomers > 0 ? (paidCount / totalCustomers) * 251.3 : 0)}`"
                 style="transition: all 0.7s ease;" />
@@ -465,7 +468,7 @@ const divider = 'background:var(--border)'
             <div class="flex items-center justify-between p-3 rounded-lg"
               style="background:var(--success-bg); border:1px solid var(--success-border);">
               <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full" style="background:#16a34a;"></span>
+                <span class="w-2.5 h-2.5 rounded-full" style="background:var(--success);"></span>
                 <span class="text-xs font-semibold" style="color:var(--success);">{{ langStore.t("To'lagan") }}</span>
               </div>
               <span class="text-sm font-black" style="color:var(--success);">{{ paidCount }}</span>
@@ -473,7 +476,7 @@ const divider = 'background:var(--border)'
             <div class="flex items-center justify-between p-3 rounded-lg"
               style="background:var(--danger-bg); border:1px solid var(--danger-border);">
               <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full" style="background:#dc2626;"></span>
+                <span class="w-2.5 h-2.5 rounded-full" style="background:var(--danger);"></span>
                 <span class="text-xs font-semibold" style="color:var(--danger);">{{ langStore.t('Qarzdor') }}</span>
               </div>
               <span class="text-sm font-black" style="color:var(--danger);">{{ debtorsCount }}</span>
@@ -573,7 +576,7 @@ const divider = 'background:var(--border)'
             <td>
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-white text-xs font-bold"
-                  style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
+                  style="background:linear-gradient(135deg,var(--primary),var(--primary-hover));">
                   {{ ($t(c.surname) || $t(c.name) || '?')[0].toUpperCase() }}
                 </div>
                 <span class="font-semibold text-sm" :style="textPrimary">

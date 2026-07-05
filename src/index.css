@@ -3,86 +3,184 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* ── ASOSIY RANG (Primary) ──────────────────────────────────────────
+     Qayerda: .btn-primary tugma foni, sidebar aktiv havola (.aside-link-active),
+     tanlangan pill (.pill-selected), input focus border & ring,
+     period-tab-active, MJZ-ID badge foni, .pill-selected pill rangi.
+  */
   --primary:        #16234a;
-  --primary-hover:  #223368;
-  --primary-light:  #eef1f8;
+  --primary-hover:  #223368;  /* .btn-primary:hover, sidebar aktiv link hover */
+  --primary-light:  #eef1f8;  /* .gov-badge-blue fon, stat-card ikonka bg, input focus ring */
+
+  /* ── ACCENT RANG (Yashil) ───────────────────────────────────────────
+     Qayerda: .btn-success tugma foni, qarz yo'q holati ("To'liq to'langan" rangi),
+     dark modeda primary rangining o'rnini bosadi.
+  */
   --accent:         #16a34a;
-  --accent-hover:   #15803d;
-  --accent-light:   #f0fdf4;
+  --accent-hover:   #15803d;  /* .btn-success:hover */
+  --accent-light:   #f0fdf4;  /* Yashil badge fon (success) */
+
+  /* ── GOLD RANG ──────────────────────────────────────────────────────
+     Qayerda: Sidebar ichidagi aktiv havola foni (sidebar o'z --primary sifatida ishlatadi),
+     maxsus badge, premium highlight elementlar.
+  */
   --gold:           #c89a3c;
-  --gold-hover:     #d9ac4d;
-  --gold-light:     #faf1de;
+  --gold-hover:     #d9ac4d;  /* Gold element hover */
+  --gold-light:     #faf1de;  /* Gold badge yoki kartochka foni */
+
+  /* ── FON RANGLARI ───────────────────────────────────────────────────
+     --bg-page   → html, body asosiy sahifa foni (barcha sahifalar orqasi)
+     --bg-card   → .card, .stat-card, modal, jadval (.gov-table thead) foni
+     --bg-sidebar → <aside class="app-sidebar"> chap sidebar paneli foni
+  */
   --bg-page:        #faf6ec;
   --bg-card:        #ffffff;
   --bg-sidebar:     #11213f;
+
+  /* ── CHEGARA RANGLARI ───────────────────────────────────────────────
+     --border       → .card chegara, jadval qator chiziqlari, modal ajratgich,
+                      input/select/textarea border, Kanban jadval tashqi border
+     --border-light → .gov-table tbody tr:hover fon, .btn-ghost:hover fon,
+                      modal footer fon, sidebar nav item hover fon
+  */
   --border:         #e8e0cd;
   --border-light:   #f3eee0;
+
+  /* ── MATN RANGLARI ──────────────────────────────────────────────────
+     --text-1 → Asosiy matn: sarlavhalar, mijoz ismi, jadval qiymati, modal header
+     --text-2 → Ikkilamchi matn: label, telefon raqam, manzil, sidebar nav havolalar
+     --text-3 → Uchinchi daraja: placeholder, kun/soat, manba ikonkasi, izohlar
+  */
   --text-1:         #1a2338;
-  --text-2:         #6b6759;
+  --text-2:         #000000;
   --text-3:         #94907f;
+
+  /* ── SOYALAR ────────────────────────────────────────────────────────
+     --shadow-sm   → .card-hover:hover engil soya
+     --shadow-md   → Katta kartalar, floating panellar, modal ustidagi element
+     --shadow-card → .card standart soyasi (hozir o'chirilgan — none)
+  */
   --shadow-sm:      0 1px 2px rgba(0,0,0,0.02);
   --shadow-md:      0 8px 20px -6px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
   --shadow-card:    none;
+
+  /* ── MUVAFFAQIYAT (Success / Yashil) ───────────────────────────────
+     Qayerda: "To'liq to'langan" matn, .gov-badge-green badge rangi,
+     to'lov tasdiqlangan holati, qarz yo'q yashil ko'rsatgich.
+  */
   --success:        #16a34a;
-  --success-bg:     #f0fdf4;
-  --success-border: #bbf7d0;
+  --success-bg:     #f0fdf4;  /* .gov-badge-green fon */
+  --success-border: #bbf7d0;  /* .gov-badge-green chegara */
+
+  /* ── XAVF (Danger / Qizil) ──────────────────────────────────────────
+     Qayerda: Qarz miqdori matn rangi, .gov-badge-red, arxivga o'tkazish tugmasi iconi,
+     xato xabarlari (debtError va boshqalar), majburiy maydon (*) belgisi.
+  */
   --danger:         #a3410f;
-  --danger-bg:      #fdf1ea;
-  --danger-border:  #f0cba9;
+  --danger-bg:      #fdf1ea;  /* .gov-badge-red fon */
+  --danger-border:  #f0cba9;  /* .gov-badge-red chegara */
+
+  /* ── OGOHLANTIRISH (Warning / Sariq) ───────────────────────────────
+     Qayerda: .gov-badge-yellow, muddati yaqin yoki ehtiyotlik holatlari,
+     sariq rang bilan ajraladigan ma'lumotlar.
+  */
   --warning:        #b45309;
-  --warning-bg:     #fffbeb;
-  --warning-border: #fde68a;
+  --warning-bg:     #fffbeb;  /* .gov-badge-yellow fon */
+  --warning-border: #fde68a;  /* .gov-badge-yellow chegara */
+
+  /* ── MA'LUMOT (Info / Ko'k) ─────────────────────────────────────────
+     Qayerda: Navbat raqami belgisi (A-01), "Ko'rib chiqildi" status rangi,
+     ma'lumot xarakteridagi badge va yozuvlar.
+  */
+  --info:           #2563eb;
+  --info-bg:        #eff6ff;  /* Ko'k belgi foni */
+  --info-border:    #bfdbfe;  /* Ko'k belgi chegarasi */
+
+  /* ── QOPLAMA (Overlay) ────────────────────────────────────────────
+     Qayerda: Modal oynalar ortidagi qorong'ilashtiruvchi fon (backdrop).
+  */
+  --overlay:        rgba(15, 23, 42, 0.5);
+
+  /* ── BURCHAK YUMALOQLASH (Border Radius) ────────────────────────────
+     --radius    → .card, .form-input, oddiy tugmalar (8px)
+     --radius-sm → .btn, kichik tugmalar, badge (6px)
+     --radius-lg → Katta kartalar (.stat-card), modal oyna (12px)
+  */
   --radius:         8px;
   --radius-sm:      6px;
   --radius-lg:      12px;
+
+  /* ── SIDEBAR AKTIV BAND MATNI ────────────────────────────────────────
+     Qayerda: Chap menyudagi tanlangan (aktiv) havolaning matn rangi
+     (.aside-link-active). Fon rangi bilan (odatda oltin) yaxshi
+     kontrast beradigan rang bo'lishi kerak.
+  */
+  --sidebar-active-text: #ffffff;
 }
 
-/* Sidebar (dark navy + gold) — vars scoped so only the <aside> is affected */
+/* ──────────────────────────────────────────────────────────────────────
+   SIDEBAR O'Z RANGLARI — faqat <aside class="app-sidebar"> ichida ishlaydi.
+   Bu yerda --primary = gold rangga o'zgartirilgan (aktiv havolalar uchun oltin fon).
+   Qolgan ranglar sidebar to'q ko'k-qoʻngʻir rangiga moslashtirilgan.
+   MUHIM: Tema panelidan (suzuvchi panel yoki /theme sahifasi) rang o'zgartirilganda,
+          bu yergi gold ustidan yoziladi (theme-presets.js dagi sidebarOverrideCss()
+          orqali inject qilingan dinamik <style> teg yordamida).
+────────────────────────────────────────────────────────────────────── */
 .app-sidebar {
-  --border:         #263759;
-  --border-light:   #1a2947;
-  --text-1:         #f6f2e7;
-  --text-2:         #aab3cc;
-  --text-3:         #7c86a4;
-  --primary:        #c89a3c;
-  --primary-hover:  #d9ac4d;
-  --danger:         #f0a596;
-  --danger-bg:      #351f22;
+  --border:         #263759;  /* Sidebar ichidagi ajratgich chiziqlar */
+  --border-light:   #1a2947;  /* Sidebar nav item :hover foni */
+  --text-1:         #f6f2e7;  /* Sidebar asosiy matn (oq-sarg'ish) */
+  --text-2:         #aab3cc;  /* Sidebar ikkilamchi matn */
+  --text-3:         #7c86a4;  /* Sidebar uchinchi daraja matn */
+  --primary:        #c89a3c;  /* Sidebar aktiv nav link foni (GOLD) */
+  --primary-hover:  #d9ac4d;  /* Sidebar aktiv nav link hover */
+  --danger:         #f0a596;  /* Sidebar xavf rangi (yorqinroq) */
+  --danger-bg:      #351f22;  /* Sidebar xavf fon */
+  --sidebar-active-text: #1a2338;  /* Oltin fon ustidagi aktiv havola matni (to'q rang, kontrast uchun) */
 }
 
-html { background-color: var(--bg-page); }
-
+/* ──────────────────────────────────────────────────────────────────────
+   DARK MODE — html elementiga .dark klassi qo'shilganda ishlaydi.
+   Barcha quyidagi qiymatlar :root qiymatlarini ustidan yozib qo'yadi.
+   Dark rejim ThemeStore (src/stores/theme.js) tomonidan boshqariladi.
+────────────────────────────────────────────────────────────────────── */
 html.dark {
-  --primary:        #fafafa;
-  --primary-hover:  #ffffff;
-  --primary-light:  #1c1c1f;
-  --accent:         #4ade80;
+  --primary:        #d1a54c;   /* Dark: sidebar bilan bir xil oltin — brend rangi light/dark'da izchil qoladi */
+  --primary-hover:  #e6bd6a;
+  --primary-light:  #2a2113;   /* Dark: primary-light issiq to'q jigar-oltin fon (neytral kulrang emas) */
+  --accent:         #4ade80;   /* Dark: accent yashil — yorqinroq */
   --accent-hover:   #86efac;
-  --accent-light:   #0d1f14;
-  --bg-page:        #0a0a0b;
-  --bg-card:        #0a0a0b;
-  --bg-sidebar:     #0a0a0b;
-  --border:         #232326;
-  --border-light:   #19191c;
-  --text-1:         #f4f4f5;
-  --text-2:         #a1a1aa;
-  --text-3:         #6b6b74;
+  --accent-light:   #0d1f14;   /* Dark: yashil badge fon */
+  --bg-page:        #0a0a0b;   /* Dark: sahifa va body mutlaq qora */
+  --bg-card:        #0a0a0b;   /* Dark: karta, modal, sidebar foni — ham qora */
+  --bg-sidebar:     #0a0a0b;   /* Dark: sidebar paneli foni */
+  --border:         #232326;   /* Dark: chegara to'q kulrang */
+  --border-light:   #19191c;   /* Dark: border-light — hover va footer fonlari */
+  --text-1:         #f4f4f5;   /* Dark: asosiy matn deyarli oq */
+  --text-2:         #a1a1aa;   /* Dark: ikkilamchi kulrang matn */
+  --text-3:         #6b6b74;   /* Dark: uchinchi daraja to'q kulrang */
   --shadow-sm:      0 1px 2px rgba(0,0,0,0.4);
   --shadow-md:      0 8px 20px -6px rgba(0,0,0,0.5);
   --shadow-card:    none;
-  --success:        #4ade80;
+  --success:        #4ade80;   /* Dark: yashil yorqinroq */
   --success-bg:     #0d1f14;
   --success-border: #14532d;
-  --danger:         #f87171;
+  --danger:         #f87171;   /* Dark: qizil yorqinroq */
   --danger-bg:      #250d0d;
   --danger-border:  #5c1f1f;
-  --warning:        #fbbf24;
+  --warning:        #fbbf24;   /* Dark: sariq yorqinroq */
   --warning-bg:     #201705;
   --warning-border: #4d3510;
+  --info:           #60a5fa;   /* Dark: ko'k yorqinroq */
+  --info-bg:        #0b1a2e;
+  --info-border:    #1e3a5f;
+  --overlay:        rgba(0, 0, 0, 0.7);
+  --sidebar-active-text: #0a0a0b;  /* Dark: primary deyarli oq bo'lgani uchun matn qora */
   background-color: #0a0a0b;
 }
 
-/* dark-mode primary is near-white, so text drawn in #fff on primary bg must flip to dark */
+/* Dark modeda --primary deyarli oq (#fafafa), shuning uchun
+   .btn-primary matn rangi qora bo'lishi kerak (aks holda oq matn ko'rinmaydi) */
 html.dark .btn-primary {
   color: #0a0a0b !important;
 }
@@ -314,11 +412,9 @@ input:focus, select:focus, textarea:focus {
 }
 .aside-link-active {
   background: var(--primary) !important;
-  color: #ffffff !important;
+  color: var(--sidebar-active-text) !important;
   font-weight: 600;
 }
-html.dark .aside-link-active { color: #0a0a0b !important; }
-.app-sidebar .aside-link-active { color: #1a2338 !important; }
 
 /* ── Selected pill (dropdown/menu items on primary background) ── */
 .pill-selected {

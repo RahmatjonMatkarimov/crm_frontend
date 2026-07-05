@@ -55,10 +55,32 @@ export const ENDPOINTS = {
   CUSTOMER_ARCHIVE:   (id) => `/api/customers/${id}/archive`,
   CUSTOMER_RESTORE:   (id) => `/api/customers/${id}/restore`,
   CUSTOMER_CHECK:     (id) => `/api/customers/${id}/check`,
+  CUSTOMER_DOCUMENTS: (id) => `/api/customers/${id}/documents`,
+  CUSTOMER_CALL:      (id) => `/api/customers/${id}/call`,
   PRICES:             '/api/customers/settings/prices',
+
+  // Queue / Waiting room
+  WAITING_ROOM_QUEUE: '/api/queue/waiting-room',
 
   // Permissions
   PERMISSION:  (id) => `/permissions/${id}`,
+
+  // Settings
+  SETTINGS_WAITING_ROOM_VIDEO: '/api/settings/waiting-room-video',
+
+  // Auto messages (mijoz yaratilganda avtomatik yuboriladigan xabarlar)
+  AUTO_MESSAGES:      '/api/auto-messages',
+  AUTO_MESSAGE:       (id) => `/api/auto-messages/${id}`,
+
+  // Scheduled messages (mijoz qo'shilganidan N kun o'tgach, yillik takrorlanadigan xabarlar)
+  SCHEDULED_MESSAGES: '/api/scheduled-messages',
+  SCHEDULED_MESSAGE:  (id) => `/api/scheduled-messages/${id}`,
+
+  // Telegram
+  TELEGRAM_STATUS:    '/api/telegram/status',
+  TELEGRAM_SEND_CODE: '/api/telegram/send-code',
+  TELEGRAM_SIGN_IN:   '/api/telegram/sign-in',
+  TELEGRAM_LOGOUT:    '/api/telegram/logout',
 }
 
 export default api

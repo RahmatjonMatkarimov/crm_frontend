@@ -39,7 +39,6 @@ const passwordError = ref('')
 
 onMounted(() => {
     fillForm()
-    checkTgStatus()
 })
 
 const fillForm = () => {
@@ -145,66 +144,6 @@ const saveProfile = async () => {
 const removeImage = () => {
     imgFile.value = null
     imgPreview.value = ''
-}
-
-// Telegram login
-const tgStatus = ref('loading') // 'loading' | 'connected' | 'disconnected'
-const tgPhone = ref('')
-const tgCode = ref('')
-const tgStep = ref(1)
-const tgLoading = ref(false)
-const tgError = ref('')
-
-const checkTgStatus = async () => {
-    try {
-        const { data } = await api.get('/api/telegram/status')
-        tgStatus.value = data.connected ? 'connected' : 'disconnected'
-        if (data.phone) tgPhone.value = data.phone
-    } catch {
-        tgStatus.value = 'disconnected'
-    }
-}
-
-const tgSendCode = async () => {
-    tgError.value = ''
-    tgLoading.value = true
-    try {
-        await api.post('/api/telegram/send-code', { phone: tgPhone.value })
-        tgStep.value = 2
-    } catch (e) {
-        tgError.value = e?.response?.data?.message || 'Xatolik yuz berdi'
-    } finally {
-        tgLoading.value = false
-    }
-}
-
-const tgSignIn = async () => {
-    tgError.value = ''
-    tgLoading.value = true
-    try {
-        await api.post('/api/telegram/sign-in', { phone: tgPhone.value, code: tgCode.value })
-        tgStatus.value = 'connected'
-        tgStep.value = 1
-        tgCode.value = ''
-    } catch (e) {
-        tgError.value = e?.response?.data?.message || 'Kod noto\'g\'ri'
-    } finally {
-        tgLoading.value = false
-    }
-}
-
-const tgLogout = async () => {
-    tgLoading.value = true
-    try {
-        await api.post('/api/telegram/logout')
-        tgStatus.value = 'disconnected'
-        tgPhone.value = ''
-        tgStep.value = 1
-    } catch {
-        tgStatus.value = 'disconnected'
-    } finally {
-        tgLoading.value = false
-    }
 }
 
 const fields = computed(() => [
@@ -406,116 +345,6 @@ const formatField = (field, e) => {
             </div>
         </div>
 
-        <!-- Telegram ulanish card -->
-        <div class="card overflow-hidden">
-            <div class="px-6 py-4 border-b flex items-center gap-3"
-                style="border-color:var(--border); background:var(--border-light);">
-                <div class="w-7 h-7 rounded-xl flex items-center justify-center" style="background:#229ED9/15">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#229ED9" class="w-4 h-4">
-                        <path
-                            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.4 13.893l-2.93-.918c-.638-.196-.651-.638.136-.943l11.438-4.41c.531-.197.999.131.85.599z" />
-                    </svg>
-                </div>
-                <h3 class="text-sm font-bold" :style="'color:var(--text-1)'">
-                    Telegram ulanish
-                </h3>
-                <span v-if="tgStatus === 'connected'"
-                    class="ml-auto text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
-                    Ulangan ✓
-                </span>
-                <span v-else-if="tgStatus === 'disconnected'"
-                    class="ml-auto text-xs font-semibold px-2.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
-                    Ulanmagan
-                </span>
-            </div>
-
-            <div class="p-6 space-y-4">
-                <!-- Ulangan holat -->
-                <div v-if="tgStatus === 'connected'" class="space-y-3">
-                    <div class="flex items-center gap-3 p-3 rounded-xl"
-                        :class="themeStore.isDark ? 'bg-emerald-900/20 border border-emerald-800/30' : 'bg-emerald-50 border border-emerald-200'">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="w-5 h-5 text-emerald-500 shrink-0">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <div>
-                            <p class="text-sm font-semibold text-emerald-700 dark:text-emerald-400">Muvaffaqiyatli
-                                ulangan</p>
-                            <p v-if="tgPhone" class="text-xs text-emerald-600/70 dark:text-emerald-500/70">+{{ tgPhone
-                                }}</p>
-                        </div>
-                    </div>
-                    <button @click="tgLogout" :disabled="tgLoading"
-                        class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-red-500 border border-red-200 dark:border-red-800/30 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all disabled:opacity-60">
-                        <div v-if="tgLoading"
-                            class="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin">
-                        </div>
-                        Chiqish (logout)
-                    </button>
-                </div>
-
-                <!-- Login holat -->
-                <div v-else class="space-y-4">
-                    <p class="text-sm text-[var(--text-2)]">
-                        Telegram akkauntingizni ulang — shundan keyin mijozlarga to'g'ridan-to'g'ri xabar yuborish
-                        mumkin
-                        bo'ladi.
-                    </p>
-
-                    <!-- Qadam 1: telefon -->
-                    <div v-if="tgStep === 1" class="space-y-3">
-                        <div class="space-y-1.5">
-                            <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                                :style="'color:var(--text-2)'">
-                                Telefon raqam (xalqaro format)
-                            </label>
-                            <input v-model="tgPhone" type="tel" placeholder="+998901234567"
-                                class="w-full px-3.5 py-2.5 rounded-xl text-sm transition-all focus:outline-none"
-                                :class="'bg-[var(--border-light)] border border-[var(--border)] text-[var(--text-1)] placeholder-[var(--text-3)] focus:border-[#229ED9]'" />
-                        </div>
-                        <p v-if="tgError" class="text-xs text-red-500">{{ tgError }}</p>
-                        <button @click="tgSendCode" :disabled="tgLoading || !tgPhone"
-                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97] disabled:opacity-60"
-                            style="background:#229ED9;">
-                            <div v-if="tgLoading"
-                                class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin">
-                            </div>
-                            SMS kod yuborish
-                        </button>
-                    </div>
-
-                    <!-- Qadam 2: kod -->
-                    <div v-if="tgStep === 2" class="space-y-3">
-                        <div class="space-y-1.5">
-                            <label class="block text-[11px] font-semibold uppercase tracking-widest"
-                                :style="'color:var(--text-2)'">
-                                Telegram dan kelgan kod
-                            </label>
-                            <input v-model="tgCode" type="text" placeholder="12345" maxlength="6"
-                                class="w-full px-3.5 py-2.5 rounded-xl text-sm transition-all focus:outline-none tracking-widest font-mono"
-                                :class="'bg-[var(--border-light)] border border-[var(--border)] text-[var(--text-1)] placeholder-[var(--text-3)] focus:border-[#229ED9]'" />
-                        </div>
-                        <p v-if="tgError" class="text-xs text-red-500">{{ tgError }}</p>
-                        <div class="flex gap-2">
-                            <button @click="tgStep = 1; tgCode = ''; tgError = ''"
-                                class="px-4 py-2.5 rounded-xl text-sm font-medium" :class="'text-[var(--text-2)]'">
-                                Orqaga
-                            </button>
-                            <button @click="tgSignIn" :disabled="tgLoading || !tgCode"
-                                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97] disabled:opacity-60"
-                                style="background:#229ED9;">
-                                <div v-if="tgLoading"
-                                    class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin">
-                                </div>
-                                Tasdiqlash
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Password change card -->
         <div class="card overflow-hidden">
             <button @click="showPasswordSection = !showPasswordSection"
@@ -550,7 +379,8 @@ const formatField = (field, e) => {
                     :style="themeStore.isDark ? 'border-color:var(--border)' : 'border-color:var(--border-light)'">
 
                     <div v-if="passwordError"
-                        class="p-3.5 rounded-xl text-xs flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400">
+                        class="p-3.5 rounded-xl text-xs flex items-center gap-2"
+                        style="background:var(--danger-bg); border:1px solid var(--danger-border); color:var(--danger);">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                             class="w-4 h-4 shrink-0">
                             <path fill-rule="evenodd"

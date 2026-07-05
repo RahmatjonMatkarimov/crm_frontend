@@ -8,8 +8,11 @@ import UsersModalUpdate from '@/components/users/usersUpdateModal.vue'
 import AppCheckbox from '@/components/ui/AppCheckbox.vue'
 import api, { ENDPOINTS, BASE_URL } from '@/api'
 import translateText from '@/utils/translete.js'
+import { useHistoryBack } from '@/composables/useHistoryBack'
+import { useRouter } from 'vue-router'
 
 const { proxy } = getCurrentInstance()
+const router = useRouter()
 const authStore = useAuthStore()
 const userModalStore = useUserModalStore()
 const themeStore = useThemeStore()
@@ -90,18 +93,26 @@ const detailUser = ref(null)
 const openDetail = (user) => { detailUser.value = user }
 const closeDetail = () => { detailUser.value = null }
 
+useHistoryBack(() => !!detailUser.value, () => closeDetail())
+
+// Drawer yopilishi browser history'da orqaga o'tish orqali amalga oshadi (useHistoryBack),
+// bu asinxron. Shu tufayli yangi modal/sahifa ochishni bir tick keyinga qoldiramiz,
+// aks holda kutilmagan "orqaga" o'tishi endigina ochilgan narsani darhol yopib qo'yadi.
+const editFromDetail = (user) => {
+    closeDetail()
+    setTimeout(() => userModalStore.openEditModal(user), 0)
+}
+const openPermissionsFromDetail = (user) => {
+    closeDetail()
+    setTimeout(() => router.push(`/permissions/${user.id}`), 0)
+}
+
 const roleLabel = (role) => ({
     ADMIN: proxy.$t('Administrator'),
     RAHBAR: proxy.$t('Rahbar'),
     YURIST: proxy.$t('Yurist'),
     KASSIR: proxy.$t('Kassir'),
 }[role] || role)
-const roleBadgeClass = (role) => ({
-    ADMIN: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
-    RAHBAR: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-    YURIST: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
-    KASSIR: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-}[role] || '')
 
 const fields = computed(() => {
     return [
@@ -256,7 +267,7 @@ const fields = computed(() => {
     <!-- User Detail Drawer -->
     <Teleport to="body">
         <Transition name="drawer-backdrop">
-            <div v-if="detailUser" class="fixed inset-0 z-50" style="background:rgba(0,0,0,0.5);" @click="closeDetail"></div>
+            <div v-if="detailUser" class="fixed inset-0 z-50" style="background:var(--overlay);" @click="closeDetail"></div>
         </Transition>
         <Transition name="drawer">
             <div v-if="detailUser"
@@ -314,7 +325,7 @@ const fields = computed(() => {
                 <!-- Footer actions -->
                 <div class="px-4 py-4 flex gap-2.5 shrink-0"
                     style="border-top:1px solid var(--border); background:var(--border-light);">
-                    <button @click="userModalStore.openEditModal(detailUser); closeDetail()"
+                    <button @click="editFromDetail(detailUser)"
                         v-if="authStore.permission.edit_users"
                         class="btn btn-primary flex-1 justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
@@ -330,7 +341,7 @@ const fields = computed(() => {
                         </svg>
                         {{ $t("O'chirish") }}
                     </button>
-                    <button @click="$router.push(`/permissions/${detailUser.id}`); closeDetail()"
+                    <button @click="openPermissionsFromDetail(detailUser)"
                         v-if="authStore.permission.permisisons"
                         class="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all"
                         style="background:var(--warning-bg); color:var(--warning); border:1px solid var(--warning-border);">

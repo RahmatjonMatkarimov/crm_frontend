@@ -49,6 +49,16 @@ export const useCustomersStore = defineStore('customers', {
       }
     },
 
+    async callCustomer(id) {
+      try {
+        const { data } = await api.put(ENDPOINTS.CUSTOMER_CALL(id))
+        await this.fetchCustomers()
+        return { success: true, customer: data }
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.response?.data?.error || err.message }
+      }
+    },
+
     async archiveCustomer(id) {
       await api.put(ENDPOINTS.CUSTOMER_ARCHIVE(id))
       await this.fetchCustomers()

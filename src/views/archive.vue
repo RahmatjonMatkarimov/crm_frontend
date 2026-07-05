@@ -226,14 +226,14 @@ const formatMoney = (amount) => {
                 <div class="flex gap-2">
                     <button @click="selectedC = []" class="px-4 py-1.5 rounded-lg text-sm transition-colors" :style="'color:var(--text-2);'">{{ $t('Bekor qilish') }}</button>
                     <button @click="restoreSelectedC"
-                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/30 border border-emerald-500/30 transition-colors">
+                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-[var(--success)]/20 text-[var(--success)] hover:bg-[var(--success)]/30 border border-[var(--success)]/30 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                         </svg>
                         {{ $t('Qaytarish') }}
                     </button>
                     <button @click="deleteSelectedC"
-                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-red-500/20 text-red-500 hover:bg-red-500/30 border border-red-500/30 transition-colors">
+                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-[var(--danger)]/20 text-[var(--danger)] hover:bg-[var(--danger)]/30 border border-[var(--danger)]/30 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.595 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.595-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -252,14 +252,14 @@ const formatMoney = (amount) => {
                 <div class="flex gap-2">
                     <button @click="selectedU = []" class="px-4 py-1.5 rounded-lg text-sm transition-colors" :style="'color:var(--text-2);'">{{ $t('Bekor qilish') }}</button>
                     <button @click="restoreSelectedU"
-                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/30 border border-emerald-500/30 transition-colors">
+                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-[var(--success)]/20 text-[var(--success)] hover:bg-[var(--success)]/30 border border-[var(--success)]/30 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                         </svg>
                         {{ $t('Qaytarish') }}
                     </button>
                     <button @click="deleteSelectedU"
-                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-red-500/20 text-red-500 hover:bg-red-500/30 border border-red-500/30 transition-colors">
+                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm bg-[var(--danger)]/20 text-[var(--danger)] hover:bg-[var(--danger)]/30 border border-[var(--danger)]/30 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.595 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.595-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -307,7 +307,7 @@ const formatMoney = (amount) => {
                     <!-- Avatar + Name -->
                     <div class="flex items-start gap-3 mt-7 mb-4">
                         <div class="w-11 h-11 rounded-lg flex items-center justify-center text-white font-bold text-base shrink-0"
-                            style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
+                            style="background:linear-gradient(135deg,var(--primary),var(--primary-hover));">
                             {{ ($t(c.surname) || $t(c.name) || '?')[0].toUpperCase() }}
                         </div>
                         <div class="flex-1 min-w-0">
@@ -353,20 +353,14 @@ const formatMoney = (amount) => {
                     <!-- Actions -->
                     <div class="flex gap-2">
                         <button @click="restoreCustomer(c)"
-                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all"
-                            :class="themeStore.isDark
-                                ? 'bg-emerald-900/30 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-900/50'
-                                : 'bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100'">
+                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all bg-[var(--success-bg)] text-[var(--success)] border border-[var(--success-border)] hover:bg-[var(--success)]/15">
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                             </svg>
                             {{ $t('Qaytarish') }}
                         </button>
                         <button @click="deleteCustomer(c)"
-                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all"
-                            :class="themeStore.isDark
-                                ? 'bg-red-900/30 text-red-400 border border-red-500/20 hover:bg-red-900/50'
-                                : 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'">
+                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all bg-[var(--danger-bg)] text-[var(--danger)] border border-[var(--danger-border)] hover:bg-[var(--danger)]/15">
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.595 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.595-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
@@ -471,20 +465,14 @@ const formatMoney = (amount) => {
                     <!-- Actions -->
                     <div class="flex gap-2">
                         <button @click="restoreUser(u)"
-                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all"
-                            :class="themeStore.isDark
-                                ? 'bg-emerald-900/30 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-900/50'
-                                : 'bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100'">
+                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all bg-[var(--success-bg)] text-[var(--success)] border border-[var(--success-border)] hover:bg-[var(--success)]/15">
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                             </svg>
                             {{ $t('Qaytarish') }}
                         </button>
                         <button @click="deleteUser(u)"
-                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all"
-                            :class="themeStore.isDark
-                                ? 'bg-red-900/30 text-red-400 border border-red-500/20 hover:bg-red-900/50'
-                                : 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'">
+                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all bg-[var(--danger-bg)] text-[var(--danger)] border border-[var(--danger-border)] hover:bg-[var(--danger)]/15">
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.595 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.595-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>

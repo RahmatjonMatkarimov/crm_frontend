@@ -5,6 +5,7 @@ import { useAuthStore } from '../../stores/auth'
 import { useUserModalStore } from '../../stores/users.modal'
 import { useThemeStore } from '../../stores/theme'
 import { BASE_URL } from '@/api'
+import { useHistoryBack } from '@/composables/useHistoryBack'
 
 const emit = defineEmits(['user-created'])
 
@@ -12,6 +13,8 @@ const { proxy } = getCurrentInstance()
 const authStore = useAuthStore()
 const userModalStore = useUserModalStore()
 const themeStore = useThemeStore()
+
+useHistoryBack(() => userModalStore.isUserEditingModalVisible, () => closeModal())
 
 // Rejim
 const isEditing = computed(() => !!userModalStore.editingUser?.id)
@@ -270,7 +273,7 @@ watch(
         <Transition name="modal">
             <div v-if="userModalStore.isUserEditingModalVisible" @click.self="closeModal"
                 class="fixed inset-0 z-50 flex"
-                style="background:rgba(0,0,0,0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+                style="background:var(--overlay); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
 
                 <div class="relative w-full h-full flex flex-col overflow-hidden shadow-2xl"
                     style="background:var(--bg-card);">
@@ -296,12 +299,12 @@ watch(
                     <div class="flex-1 overflow-y-auto p-6 sm:p-8 space-y-5">
                         <!-- Alerts -->
                         <div v-if="userCreateSuccess"
-                            class="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 text-xs flex items-center gap-2">
+                            class="p-3.5 rounded-xl bg-[var(--success-bg)] border border-[var(--success-border)] text-[var(--success)] text-xs flex items-center gap-2">
                             <!-- success icon -->
                             {{ userCreateSuccess }}
                         </div>
                         <div v-if="userCreateError"
-                            class="p-3.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-400 text-xs flex items-center gap-2">
+                            class="p-3.5 rounded-xl bg-[var(--danger-bg)] border border-[var(--danger-border)] text-[var(--danger)] text-xs flex items-center gap-2">
                             <!-- error icon -->
                             {{ userCreateError }}
                         </div>
@@ -322,7 +325,7 @@ watch(
                                 <input type="file" accept="image/*" @change="handleImgChange" class="hidden" />
                             </label>
                             <button v-if="imgPreview && isEditing" @click="removeImage"
-                                class="ml-4 text-red-500 text-sm hover:underline">
+                                class="ml-4 text-[var(--danger)] text-sm hover:underline">
                                 {{ $t("Rasmni o'chirish") }}
                             </button>
                         </div>
@@ -334,20 +337,20 @@ watch(
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Ism') }}
                                     </label>
                                 <input v-model="newUserName" type="text" :placeholder="$t('Ismni kiriting')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
+                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--text-1)]" />
                             </div>
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Familiya') }}
                                     </label>
                                 <input v-model="newUserSurname" type="text" :placeholder="$t('Familiyani kiriting')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
+                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--text-1)]" />
                             </div>
                             <div class="space-y-1 sm:col-span-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Otasining ismi') }}</label>
                                 <input v-model="newUserFatherName" type="text" :placeholder="$t('Otasining ismini kiriting')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
+                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--text-1)]" />
                             </div>
 
                             <div class="space-y-1">
@@ -355,7 +358,7 @@ watch(
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Login') }}
                                    </label>
                                 <input v-model="newUserUsername" type="text" :placeholder="$t('Loginni kiriting')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
+                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--text-1)]" />
                             </div>
 
                             <!-- Parol -->
@@ -375,7 +378,7 @@ watch(
                                     </span>
                                     <input v-model="newUserPassword" :type="showPassword ? 'text' : 'password'" required
                                         :placeholder="$t('Parolni kiriting')"
-                                        class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                        class="w-full pl-9 pr-10 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                                     <button type="button" @click="showPassword = !showPassword"
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-[var(--text-2)] hover:text-[var(--text-3)] transition-colors">
                                         <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -401,23 +404,23 @@ watch(
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Telefon') }}</label>
                                 <input v-model="newUserPhone" @input="handlePhoneInput" type="tel"
                                     placeholder="+998 XX XXX XX XX"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
+                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--text-1)]" />
                             </div>
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t("Qo'shimcha telefon") }}</label>
                                 <input v-model="newUserPhone2" @input="handlePhoneInput2" type="tel"
                                     placeholder="+998 XX XXX XX XX"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
+                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--text-1)]" />
                             </div>
 
                             <div class="space-y-1">
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
-                                    $t('Telegram') }} <span class="text-red-500">*</span></label>
+                                    $t('Telegram') }} <span class="text-[var(--danger)]">*</span></label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400"
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[var(--info)]"
                                             viewBox="0 0 24 24" fill="currentColor">
                                             <path
                                                 d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
@@ -425,7 +428,7 @@ watch(
                                     </span>
                                     <input v-model="newUserTelegram" @input="handleInput" type="text"
                                         :placeholder="$t('@username yoki +998 XX XXX XX XX')"
-                                        class="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-white focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                        class="w-full pl-8 pr-4 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                                 </div>
                             </div>
 
@@ -433,7 +436,7 @@ watch(
                                 <label
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t("Tug'ilgan sana") }}</label>
                                 <input v-model="newUserBirthDate" type="date"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
+                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--text-1)]" />
                             </div>
 
                             <div class="space-y-1">
@@ -441,7 +444,7 @@ watch(
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Pasport seriya') }}</label>
                                 <input v-model="newUserUserCode" @input="handlePassportInput" type="text"
                                     :placeholder="$t('AA1234567')"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
+                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--text-1)]" />
                             </div>
 
                             <div class="space-y-1">
@@ -450,7 +453,7 @@ watch(
                                 </label>
                                 <input v-model="newUserUniqueCode" type="text" maxlength="14" :placeholder="$t('14 raqam')"
                                     @input="newUserUniqueCode = $event.target.value.replace(/\D/g, '').slice(0, 14)"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]" />
+                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--text-1)]" />
                             </div>
 
                             <div class="space-y-1 sm:col-span-2">
@@ -458,7 +461,7 @@ watch(
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Lavozim') }}
                                     </label>
                                 <select v-model="newUserRole"
-                                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-white focus:border-[var(--text-1)]">
+                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-sm text-[var(--text-1)] placeholder-[var(--text-3)] focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--text-1)]">
                                     <option v-for="role in availableRoles" :key="role.value" :value="role.value">
                                         {{ role.label }}
                                     </option>
