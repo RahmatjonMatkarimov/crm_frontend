@@ -23,11 +23,18 @@ const routerList = computed(() => [
         permission: true
     },
     {
+        path: '/customers/create',
+        name: langStore.t('Mijoz yaratish'),
+        icon: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z',
+        permission: authStore.permission?.add_customers || false
+    },
+    {
         path: '/customers',
         name: langStore.t('Mijozlar'),
         icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z',
         permission: authStore.permission?.view_customers || false
     },
+
     {
         path: '/archive',
         name: langStore.t('Arxiv'),
@@ -51,6 +58,7 @@ const routerList = computed(() => [
 const currentPageTitle = computed(() => {
     const routeName = {
         Dashboard: langStore.t('Bosh sahifa'),
+        'customer-create': langStore.t('Mijoz yaratish'),
         customers: langStore.t('Mijozlar'),
         archive: langStore.t('Arxiv'),
         users: langStore.t('Ishchilar'),
@@ -111,7 +119,8 @@ function selectLang(val) {
 
             <!-- Nav -->
             <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto overflow-x-hidden">
-                <p v-if="!sidebarCollapsed" class="px-2.5 pb-2 pt-1 text-[10px] font-bold uppercase tracking-wider" style="color:var(--text-2);">
+                <p v-if="!sidebarCollapsed" class="px-2.5 pb-2 pt-1 text-[10px] font-bold uppercase tracking-wider"
+                    style="color:var(--text-2);">
                     {{ langStore.t('Menyu') }}
                 </p>
 
@@ -129,12 +138,58 @@ function selectLang(val) {
                 </router-link>
             </nav>
 
+            <!-- Yordam kerakmi? -->
+            <div v-if="!sidebarCollapsed" class="mx-3 mb-3 rounded-xl p-3.5 shrink-0"
+                style="background:var(--border-light); border:1px solid var(--border);">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                        style="background:var(--primary); box-shadow:0 2px 8px -1px color-mix(in srgb, var(--primary) 60%, transparent);">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                            class="mt-1" :stroke="'var(--sidebar-active-text)'" style="width:20px;height:20px;">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 12.75v-1.5a9 9 0 1118 0v1.5m-18 0a2.25 2.25 0 002.25 2.25H6a1.5 1.5 0 001.5-1.5v-3A1.5 1.5 0 006 8.998H5.25A2.25 2.25 0 003 11.25v1.5zm18 0a2.25 2.25 0 01-2.25 2.25H18a1.5 1.5 0 01-1.5-1.5v-3a1.5 1.5 0 011.5-1.5h.75a2.25 2.25 0 012.25 2.25v1.5z" />
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold leading-tight truncate" style="color:var(--text-1);">
+                            {{ langStore.t('Yordam kerakmi?') }}
+                        </p>
+                        <p class="text-[11px] leading-tight truncate" style="color:var(--text-2);">
+                            {{ langStore.t("Biz bilan bog'laning") }}
+                        </p>
+                    </div>
+                </div>
+                <a href="tel:+998919999883"
+                    class="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                    style="background:var(--primary); color:var(--sidebar-active-text);"
+                    @mouseover="e => e.currentTarget.style.background = 'var(--primary-hover)'"
+                    @mouseleave="e => e.currentTarget.style.background = 'var(--primary)'">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" style="width:13px;height:13px;flex-shrink:0;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                    </svg>
+                    +998 91 999 98 83
+                </a>
+            </div>
+            <div v-else class="flex justify-center mb-3 shrink-0">
+                <a href="tel:+998712000044" :title="`${langStore.t('Yordam kerakmi?')}: +998 71 200 00 44`"
+                    class="w-9 h-9 rounded-lg flex items-center justify-center transition-all cursor-pointer"
+                    style="background:var(--primary); color:var(--sidebar-active-text);">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                        stroke="currentColor" style="width:17px;height:17px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 12.75v-1.5a9 9 0 1118 0v1.5m-18 0a2.25 2.25 0 002.25 2.25H6a1.5 1.5 0 001.5-1.5v-3A1.5 1.5 0 006 8.998H5.25A2.25 2.25 0 003 11.25v1.5zm18 0a2.25 2.25 0 01-2.25 2.25H18a1.5 1.5 0 01-1.5-1.5v-3a1.5 1.5 0 011.5-1.5h.75a2.25 2.25 0 012.25 2.25v1.5z" />
+                    </svg>
+                </a>
+            </div>
+
             <!-- Bottom: user + logout -->
-            <div class="flex items-center justify-center gap-2 border-t px-3 py-3 shrink-0" style="border-color:var(--border);">
+            <div class="flex items-center justify-center gap-2 border-t px-3 py-3 shrink-0"
+                style="border-color:var(--border);">
                 <button @click="handleLogout" :title="sidebarCollapsed ? langStore.t('Chiqish') : ''"
                     class="w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg transition-all cursor-pointer"
-                    style="color:var(--danger);"
-                    @mouseover="e => e.currentTarget.style.background = 'var(--danger-bg)'"
+                    style="color:var(--danger);" @mouseover="e => e.currentTarget.style.background = 'var(--danger-bg)'"
                     @mouseleave="e => e.currentTarget.style.background = ''">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
                         stroke="currentColor" style="width:18px;height:18px;flex-shrink:0;">
@@ -166,7 +221,8 @@ function selectLang(val) {
 
                     <!-- Breadcrumb -->
                     <nav class="flex items-center gap-1.5 text-xs" style="color:var(--text-2);">
-                        <span class="cursor-pointer transition-colors hover:text-[var(--primary)]" @click="$router.push('/')">
+                        <span class="cursor-pointer transition-colors hover:text-[var(--primary)]"
+                            @click="$router.push('/')">
                             {{ langStore.t('Bosh sahifa') }}
                         </span>
                         <template v-if="currentPageTitle !== langStore.t('Bosh sahifa')">
@@ -200,7 +256,8 @@ function selectLang(val) {
                             enter-from-class="opacity-0 -translate-y-1" enter-to-class="opacity-100 translate-y-0"
                             leave-active-class="transition-all duration-100" leave-from-class="opacity-100"
                             leave-to-class="opacity-0">
-                            <div v-if="langDropdownOpen" class="absolute right-0 mt-1.5 w-32 overflow-hidden z-50 rounded-xl"
+                            <div v-if="langDropdownOpen"
+                                class="absolute right-0 mt-1.5 w-32 overflow-hidden z-50 rounded-xl"
                                 style="background:var(--bg-card); border:1px solid var(--border); box-shadow:var(--shadow-md);">
                                 <button v-for="opt in langOptions" :key="opt.value" @click="selectLang(opt.value)"
                                     class="w-full flex items-center gap-2 px-3 py-2.5 text-left text-xs transition-all cursor-pointer"

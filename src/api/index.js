@@ -57,6 +57,9 @@ export const ENDPOINTS = {
   CUSTOMER_CHECK:     (id) => `/api/customers/${id}/check`,
   CUSTOMER_DOCUMENTS: (id) => `/api/customers/${id}/documents`,
   CUSTOMER_CALL:      (id) => `/api/customers/${id}/call`,
+  CUSTOMER_CHECK_DUPLICATE: '/api/customers/check-duplicate',
+  CUSTOMER_BLACKLIST:       (id) => `/api/customers/${id}/blacklist`,
+  CUSTOMER_UNBLACKLIST:     (id) => `/api/customers/${id}/unblacklist`,
   PRICES:             '/api/customers/settings/prices',
 
   // Queue / Waiting room
@@ -81,6 +84,8 @@ export const ENDPOINTS = {
   TELEGRAM_SEND_CODE: '/api/telegram/send-code',
   TELEGRAM_SIGN_IN:   '/api/telegram/sign-in',
   TELEGRAM_LOGOUT:    '/api/telegram/logout',
+  TELEGRAM_SEND:      '/api/telegram/send',
+  TELEGRAM_SEND_FILE: '/api/telegram/send-file',
 }
 
 export default api

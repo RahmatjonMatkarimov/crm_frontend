@@ -7,6 +7,7 @@ import Home from '../views/home.vue'
 import Profile from '@/views/profile.vue'
 import Users from '@/views/users.vue'
 import Customers from '@/views/customers.vue'
+import CustomersByStatus from '@/views/CustomersByStatus.vue'
 import Archive from '@/views/archive.vue'
 import PreviewPage from '@/views/PreviewPage.vue'
 import ThemeCustomizer from '@/views/ThemeCustomizer.vue'
@@ -40,6 +41,18 @@ const routes = [
         path: '/customers',
         name: 'customers',
         component: Customers,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/customers/status/:code',
+        name: 'customers-status',
+        component: CustomersByStatus,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/customers/create',
+        name: 'customer-create',
+        component: () => import('@/views/CustomerCreate.vue'),
         meta: { requiresAuth: true },
       },
       {

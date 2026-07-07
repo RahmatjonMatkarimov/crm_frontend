@@ -93,16 +93,18 @@ const detailUser = ref(null)
 const openDetail = (user) => { detailUser.value = user }
 const closeDetail = () => { detailUser.value = null }
 
-useHistoryBack(() => !!detailUser.value, () => closeDetail())
+const { suppressNextClose } = useHistoryBack(() => !!detailUser.value, () => closeDetail())
 
 // Drawer yopilishi browser history'da orqaga o'tish orqali amalga oshadi (useHistoryBack),
 // bu asinxron. Shu tufayli yangi modal/sahifa ochishni bir tick keyinga qoldiramiz,
 // aks holda kutilmagan "orqaga" o'tishi endigina ochilgan narsani darhol yopib qo'yadi.
 const editFromDetail = (user) => {
+    suppressNextClose()
     closeDetail()
     setTimeout(() => userModalStore.openEditModal(user), 0)
 }
 const openPermissionsFromDetail = (user) => {
+    suppressNextClose()
     closeDetail()
     setTimeout(() => router.push(`/permissions/${user.id}`), 0)
 }

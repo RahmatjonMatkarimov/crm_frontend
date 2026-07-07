@@ -73,5 +73,32 @@ export const useCustomersStore = defineStore('customers', {
       await api.delete(ENDPOINTS.CUSTOMER(id))
       await this.fetchArchived()
     },
+
+    async checkDuplicate({ name, surname, phone }) {
+      try {
+        const { data } = await api.get(ENDPOINTS.CUSTOMER_CHECK_DUPLICATE, { params: { name, surname, phone } })
+        return { success: true, data }
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.response?.data?.error || err.message }
+      }
+    },
+
+    async blacklistCustomer(id, reason) {
+      try {
+        const { data } = await api.put(ENDPOINTS.CUSTOMER_BLACKLIST(id), { reason })
+        return { success: true, customer: data }
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.response?.data?.error || err.message }
+      }
+    },
+
+    async unblacklistCustomer(id) {
+      try {
+        const { data } = await api.put(ENDPOINTS.CUSTOMER_UNBLACKLIST(id))
+        return { success: true, customer: data }
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.response?.data?.error || err.message }
+      }
+    },
   },
 })

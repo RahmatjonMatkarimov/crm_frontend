@@ -4,13 +4,13 @@
 
             <!-- Loading -->
             <div v-if="loading" class="flex flex-col items-center justify-center py-32 gap-3">
-                <div class="w-8 h-8 border-2 rounded-full animate-spin" style="border-color:var(--border); border-top-color:var(--primary);"></div>
+                <div class="w-8 h-8 border-2 rounded-full animate-spin"
+                    style="border-color:var(--border); border-top-color:var(--primary);"></div>
                 <p class="text-[var(--text-2)] text-sm">{{ $t("Ma'lumotlar yuklanmoqda...") }}</p>
             </div>
 
             <!-- Not found -->
-            <div v-else-if="!customer"
-                class="p-8 rounded-xl text-center"
+            <div v-else-if="!customer" class="p-8 rounded-xl text-center"
                 style="background:var(--danger-bg); border:1px solid var(--danger-border);">
                 <p class="text-lg font-medium" style="color:var(--danger);">{{ $t('Mijoz topilmadi') }}</p>
             </div>
@@ -27,7 +27,8 @@
                             </div>
                             <div>
                                 <h1 class="text-xl font-bold leading-tight" style="color:var(--text-1);">
-                                    {{ $t(customer.surname) }} {{ $t(customer.name) }} {{ $t(customer.father_name || '') }}
+                                    {{ $t(customer.surname) }} {{ $t(customer.name) }} {{ $t(customer.father_name || '')
+                                    }}
                                 </h1>
                                 <div class="flex items-center gap-2 mt-1 flex-wrap">
                                     <span class="inline-flex items-center gap-1 text-xs" style="color:var(--text-2);">
@@ -38,7 +39,8 @@
                                         </svg>
                                         {{ customer.phone || '-' }}
                                     </span>
-                                    <span v-if="customer.customer_id" class="text-xs" style="color:var(--text-3);">•</span>
+                                    <span v-if="customer.customer_id" class="text-xs"
+                                        style="color:var(--text-3);">•</span>
                                     <span v-if="customer.customer_id" class="gov-badge gov-badge-blue">
                                         ID: MJZ-{{ customer.customer_id }}
                                     </span>
@@ -51,7 +53,8 @@
                         <button @click="goBack" class="btn btn-ghost">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-4 h-4">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                             </svg>
                             {{ $t('Orqaga') }}
                         </button>
@@ -61,359 +64,477 @@
                 <!-- Info Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-                    <!-- Main Info Card -->
-                    <div class="lg:col-span-2 rounded-xl border shadow-sm overflow-hidden"
-                        :class="'bg-[var(--bg-card)] border-[var(--border)]'">
-                        <div class="px-6 py-4 border-b"
-                            :class="'border-[var(--border)] bg-[var(--border-light)]'">
-                            <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
-                                {{ $t('Mijoz haqida') }}
-                            </p>
-                        </div>
-                        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <InfoRow :label="$t('F.I.Sh')"
-                                :value="`${$t(customer.surname || '')} ${$t(customer.name || '')} ${$t(customer.father_name || '')}`" icon="user" />
-                            <InfoRow :label="$t('Telefon raqam')" :value="customer.phone || '-'" icon="phone" />
-                            <div class="flex flex-col gap-1">
-                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{ $t('Telegram') }}</p>
-                                <div class="flex items-center gap-2">
-                                    <p class="text-sm font-semibold" :class="'text-[var(--text-1)]'">
-                                        {{ customer.telegram || '-' }}
+                    <!-- Left column: Mijoz haqida + To'lov Tarixi -->
+                    <div class="lg:col-span-2 flex flex-col gap-5">
+
+                        <!-- Main Info Card -->
+                        <div class="rounded-xl border shadow-sm overflow-hidden"
+                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
+                            <div class="px-6 py-4 border-b" :class="'border-[var(--border)] bg-[var(--border-light)]'">
+                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
+                                    {{ $t('Mijoz haqida') }}
+                                </p>
+                            </div>
+                            <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <InfoRow :label="$t('F.I.Sh')"
+                                    :value="`${$t(customer.surname || '')} ${$t(customer.name || '')} ${$t(customer.father_name || '')}`"
+                                    icon="user" />
+                                <InfoRow :label="$t('Telefon raqam')" :value="customer.phone || '-'" icon="phone" />
+                                <div class="flex flex-col gap-1">
+                                    <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
+                                        $t('Telegram') }}</p>
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-sm font-semibold" :class="'text-[var(--text-1)]'">
+                                            {{ customer.telegram || '-' }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <InfoRow :label="$t('Manzil')"
+                                    :value="`${$t(customer.address || '')} ${customer.region || customer.district ? `(${$t(customer.region)} ${$t(customer.district)})` : ''}`"
+                                    icon="location" />
+                                <InfoRow :label="$t('Maslahat narxi')"
+                                    :value="`${Number(customer.price || 0).toLocaleString()} ${$t('so\'m')}`"
+                                    icon="money" highlight />
+                            </div>
+
+                            <!-- Description -->
+                            <div v-if="authStore.userRole === 'YURIST'" class="px-6 pb-6">
+                                <div class="rounded-lg p-4"
+                                    :class="'bg-[var(--border-light)] border border-[var(--border)]'">
+                                    <p
+                                        class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)] mb-2">
+                                        {{ $t('Izoh / Tavsif') }}
+                                    </p>
+                                    <p class="text-sm whitespace-pre-wrap"
+                                        :class="themeStore.isDark ? 'text-[var(--text-2)]' : 'text-[var(--text-1)]'">
+                                        {{ $t(customer.description) || $t("Izoh yo'q") }}
                                     </p>
                                 </div>
                             </div>
-                            <InfoRow :label="$t('Manzil')"
-                                :value="`${$t(customer.address || '')} ${customer.region || customer.district ? `(${$t(customer.region)} ${$t(customer.district)})` : ''}`"
-                                icon="location" />
-                            <InfoRow :label="$t('Maslahat narxi')"
-                                :value="`${Number(customer.price || 0).toLocaleString()} ${$t('so\'m')}`"
-                                icon="money" highlight />
                         </div>
 
-                        <!-- Description -->
-                        <div v-if="authStore.userRole === 'YURIST'"
-                            class="px-6 pb-6">
-                            <div class="rounded-lg p-4"
-                                :class="'bg-[var(--border-light)] border border-[var(--border)]'">
-                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)] mb-2">
-                                    {{ $t('Izoh / Tavsif') }}
+                        <!-- Payment History -->
+                        <div class="rounded-xl border shadow-sm overflow-hidden"
+                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
+                            <div class="px-6 py-4 border-b flex items-center justify-between"
+                                :class="'border-[var(--border)] bg-[var(--border-light)]'">
+                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
+                                    {{ $t("To'lov Tarixi") }}
                                 </p>
-                                <p class="text-sm whitespace-pre-wrap"
-                                    :class="themeStore.isDark ? 'text-[var(--text-2)]' : 'text-[var(--text-1)]'">
-                                    {{ $t(customer.description) || $t("Izoh yo'q") }}
+                                <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
+                                    :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
+                                    {{ payments.length }} {{ $t('ta') }}
+                                </span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr :class="'border-b border-[var(--border)]'">
+                                            <th
+                                                class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--text-2)]">
+                                                {{ $t('Sana') }}
+                                            </th>
+                                            <th
+                                                class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--text-2)]">
+                                                {{ $t('Summa') }}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y" :class="'divide-[var(--border)]'">
+                                        <tr v-for="payment in payments" :key="payment.id" class="transition-colors"
+                                            :class="'hover:bg-[var(--border-light)]'">
+                                            <td class="px-6 py-4 text-sm"
+                                                :class="themeStore.isDark ? 'text-[var(--text-2)]' : 'text-[var(--text-3)]'">
+                                                {{ formatDate(payment.createdAt) }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span
+                                                    class="inline-flex items-center gap-1 text-sm font-semibold text-[var(--success)]">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"
+                                                        class="w-3.5 h-3.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M12 4.5v15m7.5-7.5h-15" />
+                                                    </svg>
+                                                    {{ Number(payment.amount).toLocaleString() }} {{ $t("so'm") }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="payments.length === 0">
+                                            <td colspan="2" class="px-6 py-16 text-center">
+                                                <div class="flex flex-col items-center gap-3">
+                                                    <div class="w-12 h-12 rounded-lg flex items-center justify-center"
+                                                        :class="'bg-[var(--border-light)]'">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                            class="w-6 h-6 text-[var(--text-2)]">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text-sm text-[var(--text-2)]">
+                                                        {{ $t("Hali hech qanday to'lov yo'q") }}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Checks -->
+                        <div class="rounded-xl border shadow-sm overflow-hidden"
+                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
+                            <div class="px-6 py-4 border-b flex items-center justify-between"
+                                :class="'border-[var(--border)] bg-[var(--border-light)]'">
+                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
+                                    {{ $t('Cheklar') }}
                                 </p>
+                                <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
+                                    :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
+                                    {{ checks.length }} {{ $t('ta') }}
+                                </span>
+                            </div>
+
+                            <div v-if="checks.length > 0"
+                                class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                <div v-for="check in checks" :key="check.id" @click="openCheck(check)"
+                                    class="group cursor-pointer rounded-lg overflow-hidden border transition-all hover:shadow-lg hover:-translate-y-0.5"
+                                    style="background:var(--border-light); border-color:var(--border);">
+                                    <div class="aspect-video flex items-center justify-center overflow-hidden"
+                                        :class="'bg-[var(--border-light)]'">
+                                        <img v-if="isImage(check.checkUrl)" :src="check.checkUrl"
+                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            alt="Check" />
+                                        <div v-else-if="isPDF(check.checkUrl)"
+                                            class="flex flex-col items-center justify-center gap-2">
+                                            <span class="text-4xl">📕</span>
+                                            <span class="text-xs font-medium text-[var(--text-2)]">PDF</span>
+                                        </div>
+                                        <span v-else class="text-5xl opacity-50">📄</span>
+                                    </div>
+                                    <div class="p-3">
+                                        <p class="text-xs text-[var(--text-2)]">
+                                            {{ formatDate(check.createdAt) }}
+                                        </p>
+                                        <p class="text-xs font-medium mt-1.5 flex items-center gap-1"
+                                            style="color:var(--primary);">
+                                            {{ $t('Ochish') }}
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="2" stroke="currentColor" class="w-3 h-3">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                            </svg>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-else class="p-16 text-center">
+                                <div class="flex flex-col items-center gap-3">
+                                    <div class="w-14 h-14 rounded-lg flex items-center justify-center"
+                                        :class="'bg-[var(--border-light)]'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor"
+                                            class="w-7 h-7 text-[var(--text-2)]">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-sm text-[var(--text-2)]">
+                                        {{ $t('Bu mijoz uchun hali check yuklanmagan') }}
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Hujjatlar -->
+                        <div class="rounded-xl border shadow-sm overflow-hidden"
+                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
+                            <div class="px-6 py-4 border-b flex items-center justify-between"
+                                :class="'border-[var(--border)] bg-[var(--border-light)]'">
+                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
+                                    {{ $t('Hujjatlar') }}
+                                </p>
+                                <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
+                                    :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
+                                    {{ documents.length }} {{ $t('ta') }}
+                                </span>
+                            </div>
+
+                            <div v-if="documents.length > 0"
+                                class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                <div v-for="doc in documents" :key="doc.id" @click="openDocument(doc)"
+                                    class="group cursor-pointer rounded-lg overflow-hidden border transition-all hover:shadow-lg hover:-translate-y-0.5"
+                                    style="background:var(--border-light); border-color:var(--border);">
+                                    <div class="aspect-video flex items-center justify-center overflow-hidden"
+                                        :class="'bg-[var(--border-light)]'">
+                                        <img v-if="isImage(doc.url)" :src="`${BASE_URL}${doc.url}`"
+                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            alt="Hujjat" />
+                                        <div v-else-if="isPDF(doc.url)"
+                                            class="flex flex-col items-center justify-center gap-2">
+                                            <span class="text-4xl">📕</span>
+                                            <span class="text-xs font-medium text-[var(--text-2)]">PDF</span>
+                                        </div>
+                                        <span v-else class="text-5xl opacity-50">📄</span>
+                                    </div>
+                                    <div class="p-3">
+                                        <p class="text-xs truncate" style="color:var(--text-1);"
+                                            :title="doc.originalName">
+                                            {{ doc.originalName }}
+                                        </p>
+                                        <p class="text-xs text-[var(--text-2)] mt-1">
+                                            {{ formatDate(doc.createdAt) }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-else class="p-16 text-center">
+                                <div class="flex flex-col items-center gap-3">
+                                    <div class="w-14 h-14 rounded-lg flex items-center justify-center"
+                                        :class="'bg-[var(--border-light)]'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor"
+                                            class="w-7 h-7 text-[var(--text-2)]">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-sm text-[var(--text-2)]">
+                                        {{ $t('Bu mijoz uchun hali hujjat yuklanmagan') }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Meta Card -->
-                    <div class="rounded-xl border shadow-sm overflow-hidden"
-                        :class="'bg-[var(--bg-card)] border-[var(--border)]'">
-                        <div class="px-6 py-4 border-b"
-                            :class="'border-[var(--border)] bg-[var(--border-light)]'">
-                            <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
-                                {{ $t("Qo'shimcha") }}
-                            </p>
-                        </div>
-                        <div class="p-6 space-y-5">
-                            <!-- Status -->
-                            <div>
-                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-2">
-                                    {{ $t('Ish jarayoni') }}
-                                </p>
-                                <div class="relative">
-                                    <select
-                                        :value="customer.status || 'NAVBATDA'"
-                                        @change="changeStatus($event.target.value)"
-                                        :disabled="statusSaving"
-                                        class="w-full pl-3 pr-8 py-2 rounded-xl text-sm font-semibold transition-all focus:outline-none appearance-none cursor-pointer disabled:opacity-60"
-                                        :style="`background:${statusInlineColors[customer.status || 'NAVBATDA']?.bg}; color:${statusInlineColors[customer.status || 'NAVBATDA']?.color}; border:1.5px solid ${statusInlineColors[customer.status || 'NAVBATDA']?.color}40;`"
-                                    >
-                                        <option v-for="(label, key) in statusLabels" :key="key" :value="key">{{ label }}</option>
-                                    </select>
-                                    <svg v-if="!statusSaving" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                        :style="`color:${statusInlineColors[customer.status || 'NAVBATDA']?.color}`">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                    <div v-else class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin"
-                                        :style="`color:${statusInlineColors[customer.status || 'NAVBATDA']?.color}`"></div>
-                                </div>
-                            </div>
+                    <!-- Right column: Qo'shimcha + Qo'shimcha amallar -->
+                    <div class="flex flex-col gap-5">
 
-                            <!-- Konsultatsiya vaqti (faqat YURIST va RAHBAR) -->
-                            <div v-if="canSeeTimer && (customer.calledAt || customer.consultationSeconds != null)">
-                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-1">
-                                    {{ $t('Konsultatsiya vaqti') }}
-                                </p>
-                                <ConsultationTimer :called-at="customer.calledAt" :seconds="customer.consultationSeconds" />
-                            </div>
-
-                            <div>
-                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-1">
-                                    {{ $t('Yaratilgan sana') }}
-                                </p>
-                                <p class="text-sm font-semibold"
-                                    :class="'text-[var(--text-1)]'">
-                                    {{ formatDate(customer.createdAt) }}
+                        <!-- Meta Card -->
+                        <div class="rounded-xl border shadow-sm overflow-hidden"
+                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
+                            <div class="px-6 py-4 border-b" :class="'border-[var(--border)] bg-[var(--border-light)]'">
+                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
+                                    {{ $t("Qo'shimcha") }}
                                 </p>
                             </div>
-                            <div v-if="customer.assignedTo">
-                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-1">
-                                    {{ $t("Mas'ul") }}
-                                </p>
-                                <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white"
-                                        style="background:linear-gradient(135deg,var(--primary),var(--primary-hover));">
-                                        {{ (customer.assignedTo.name || '?').charAt(0).toUpperCase() }}
-                                    </div>
-                                    <p class="text-sm font-semibold"
-                                        :class="'text-[var(--text-1)]'">
-                                        {{ $t(customer.assignedTo.name) }} {{ $t(customer.assignedTo.surname) }}
+                            <div class="p-6 space-y-5">
+                                <!-- Status -->
+                                <div>
+                                    <p
+                                        class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-2">
+                                        {{ $t('Ish jarayoni') }}
                                     </p>
+                                    <div class="relative">
+                                        <select :value="customer.status || 'NAVBATDA'"
+                                            @change="changeStatus($event.target.value)" :disabled="statusSaving"
+                                            class="w-full pl-3 pr-8 py-2 rounded-xl text-sm font-semibold transition-all focus:outline-none appearance-none cursor-pointer disabled:opacity-60"
+                                            :style="`background:${statusInlineColors[customer.status || 'NAVBATDA']?.bg}; color:${statusInlineColors[customer.status || 'NAVBATDA']?.color}; border:1.5px solid ${statusInlineColors[customer.status || 'NAVBATDA']?.color}40;`">
+                                            <option v-for="(label, key) in statusLabels" :key="key" :value="key">{{
+                                                label }}
+                                            </option>
+                                        </select>
+                                        <svg v-if="!statusSaving"
+                                            class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                            :style="`color:${statusInlineColors[customer.status || 'NAVBATDA']?.color}`">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                        <div v-else
+                                            class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin"
+                                            :style="`color:${statusInlineColors[customer.status || 'NAVBATDA']?.color}`">
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Payment summary -->
-                            <div class="pt-4 border-t"
-                                :class="'border-[var(--border)]'">
-                                <p class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-3">
-                                    {{ $t("To'lovlar") }}
-                                </p>
-                                <div class="space-y-2">
-                                    <div class="rounded-xl px-4 py-3 flex items-center justify-between"
-                                        style="background:var(--success-bg); border:1px solid var(--success-border);">
-                                        <span class="text-xs text-[var(--success)] font-medium">
-                                            {{ $t('Jami to\'langan') }}
-                                        </span>
-                                        <span class="text-sm font-bold text-[var(--success)]">
-                                            {{ totalPaid.toLocaleString() }} {{ $t("so'm") }}
-                                        </span>
-                                    </div>
-                                    <div v-if="remainingDebt > 0" class="rounded-xl px-4 py-3 flex items-center justify-between"
+                                <!-- Qora ro'yxat -->
+                                <div
+                                    v-if="authStore.user.role === 'YURIST' || authStore.user.role === 'ADMIN' || authStore.user.role === 'RAHBAR'">
+                                    <div v-if="customer.isBlacklisted" class="rounded-lg p-3 space-y-2"
                                         style="background:var(--danger-bg); border:1px solid var(--danger-border);">
-                                        <span class="text-xs text-[var(--danger)] font-medium">
-                                            {{ $t('Qarz') }}
-                                        </span>
-                                        <span class="text-sm font-bold text-[var(--danger)]">
-                                            {{ remainingDebt.toLocaleString() }} {{ $t("so'm") }}
-                                        </span>
+                                        <p class="text-xs font-bold" style="color:var(--danger);">
+                                            {{ $t("Qora ro'yxatda") }}
+                                        </p>
+                                        <p class="text-xs" style="color:var(--danger);">{{ $t('Sababi') }}: {{
+                                            customer.blacklistReason || '-' }}</p>
+                                        <p class="text-[11px]" style="color:var(--danger);">{{
+                                            formatDate(customer.blacklistedAt) }}</p>
+                                        <button v-if="canManageBlacklist" @click="removeFromBlacklist"
+                                            :disabled="blacklistSaving"
+                                            class="text-xs font-semibold underline disabled:opacity-60"
+                                            style="color:var(--danger);">
+                                            {{ $t("Qora ro'yxatdan chiqarish") }}
+                                        </button>
                                     </div>
-                                    <button v-if="remainingDebt > 0"
-                                        @click="showDebtModal = true"
-                                        class="btn btn-primary w-full mt-1 justify-center">
-                                        {{ $t("Qarz to'lash") }}
+                                    <button v-else-if="canManageBlacklist" @click="openBlacklistModal"
+                                        class="w-full text-xs font-semibold py-2 rounded-lg transition-all"
+                                        style="background:var(--danger-bg); color:var(--danger); border:1px solid var(--danger-border);">
+                                        {{ $t("Qora ro'yxatga qo'shish") }}
                                     </button>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Payment History -->
-                <div class="rounded-xl border shadow-sm overflow-hidden"
-                    :class="'bg-[var(--bg-card)] border-[var(--border)]'">
-                    <div class="px-6 py-4 border-b flex items-center justify-between"
-                        :class="'border-[var(--border)] bg-[var(--border-light)]'">
-                        <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
-                            {{ $t("To'lov Tarixi") }}
-                        </p>
-                        <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
-                            :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
-                            {{ payments.length }} {{ $t('ta') }}
-                        </span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr :class="'border-b border-[var(--border)]'">
-                                    <th class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--text-2)]">
-                                        {{ $t('Sana') }}
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--text-2)]">
-                                        {{ $t('Summa') }}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y"
-                                :class="'divide-[var(--border)]'">
-                                <tr v-for="payment in payments" :key="payment.id"
-                                    class="transition-colors"
-                                    :class="'hover:bg-[var(--border-light)]'">
-                                    <td class="px-6 py-4 text-sm"
-                                        :class="themeStore.isDark ? 'text-[var(--text-2)]' : 'text-[var(--text-3)]'">
-                                        {{ formatDate(payment.createdAt) }}
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span
-                                            class="inline-flex items-center gap-1 text-sm font-semibold text-[var(--success)]">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M12 4.5v15m7.5-7.5h-15" />
-                                            </svg>
-                                            {{ Number(payment.amount).toLocaleString() }} {{ $t("so'm") }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr v-if="payments.length === 0">
-                                    <td colspan="2" class="px-6 py-16 text-center">
-                                        <div class="flex flex-col items-center gap-3">
-                                            <div class="w-12 h-12 rounded-lg flex items-center justify-center"
-                                                :class="'bg-[var(--border-light)]'">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                    stroke-width="1.5" stroke="currentColor"
-                                                    class="w-6 h-6 text-[var(--text-2)]">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
-                                                </svg>
-                                            </div>
-                                            <p class="text-sm text-[var(--text-2)]">
-                                                {{ $t("Hali hech qanday to'lov yo'q") }}
-                                            </p>
+                                <!-- Konsultatsiya vaqti (faqat YURIST va RAHBAR) -->
+                                <div v-if="canSeeTimer && (customer.calledAt || customer.consultationSeconds != null)">
+                                    <p
+                                        class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-1">
+                                        {{ $t('Konsultatsiya vaqti') }}
+                                    </p>
+                                    <ConsultationTimer :called-at="customer.calledAt"
+                                        :seconds="customer.consultationSeconds" />
+                                </div>
+
+                                <div>
+                                    <p
+                                        class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-1">
+                                        {{ $t('Yaratilgan sana') }}
+                                    </p>
+                                    <p class="text-sm font-semibold" :class="'text-[var(--text-1)]'">
+                                        {{ formatDate(customer.createdAt) }}
+                                    </p>
+                                </div>
+                                <div v-if="customer.assignedTo">
+                                    <p
+                                        class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-1">
+                                        {{ $t("Mas'ul") }}
+                                    </p>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white"
+                                            style="background:linear-gradient(135deg,var(--primary),var(--primary-hover));">
+                                            {{ (customer.assignedTo.name || '?').charAt(0).toUpperCase() }}
                                         </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Checks -->
-                <div class="rounded-xl border shadow-sm overflow-hidden"
-                    :class="'bg-[var(--bg-card)] border-[var(--border)]'">
-                    <div class="px-6 py-4 border-b flex items-center justify-between"
-                        :class="'border-[var(--border)] bg-[var(--border-light)]'">
-                        <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
-                            {{ $t('Cheklar') }}
-                        </p>
-                        <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
-                            :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
-                            {{ checks.length }} {{ $t('ta') }}
-                        </span>
-                    </div>
-
-                    <div v-if="checks.length > 0" class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <div v-for="check in checks" :key="check.id"
-                            @click="openCheck(check)"
-                            class="group cursor-pointer rounded-lg overflow-hidden border transition-all hover:shadow-lg hover:-translate-y-0.5"
-                            style="background:var(--border-light); border-color:var(--border);">
-                            <div class="aspect-video flex items-center justify-center overflow-hidden"
-                                :class="'bg-[var(--border-light)]'">
-                                <img v-if="isImage(check.checkUrl)" :src="check.checkUrl"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    alt="Check" />
-                                <div v-else-if="isPDF(check.checkUrl)"
-                                    class="flex flex-col items-center justify-center gap-2">
-                                    <span class="text-4xl">📕</span>
-                                    <span class="text-xs font-medium text-[var(--text-2)]">PDF</span>
+                                        <p class="text-sm font-semibold" :class="'text-[var(--text-1)]'">
+                                            {{ $t(customer.assignedTo.name) }} {{ $t(customer.assignedTo.surname) }}
+                                        </p>
+                                    </div>
                                 </div>
-                                <span v-else class="text-5xl opacity-50">📄</span>
+                                <div v-if="customer.createdByUser">
+                                    <p
+                                        class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-1">
+                                        {{ $t("Yaratgan") }}
+                                    </p>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white"
+                                            style="background:linear-gradient(135deg,var(--primary),var(--primary-hover));">
+                                            {{ (customer.createdByUser.name || '?').charAt(0).toUpperCase() }}
+                                        </div>
+                                        <p class="text-sm font-semibold" :class="'text-[var(--text-1)]'">
+                                            {{ $t(customer.createdByUser.name) }} {{ $t(customer.createdByUser.surname)
+                                            }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Payment summary -->
+                                <div class="pt-4 border-t" :class="'border-[var(--border)]'">
+                                    <p
+                                        class="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider mb-3">
+                                        {{ $t("To'lovlar") }}
+                                    </p>
+                                    <div class="space-y-2">
+                                        <div class="rounded-xl px-4 py-3 flex items-center justify-between"
+                                            style="background:var(--success-bg); border:1px solid var(--success-border);">
+                                            <span class="text-xs text-[var(--success)] font-medium">
+                                                {{ $t('Jami to\'langan') }}
+                                            </span>
+                                            <span class="text-sm font-bold text-[var(--success)]">
+                                                {{ totalPaid.toLocaleString() }} {{ $t("so'm") }}
+                                            </span>
+                                        </div>
+                                        <div v-if="remainingDebt > 0"
+                                            class="rounded-xl px-4 py-3 flex items-center justify-between"
+                                            style="background:var(--danger-bg); border:1px solid var(--danger-border);">
+                                            <span class="text-xs text-[var(--danger)] font-medium">
+                                                {{ $t('Qarz') }}
+                                            </span>
+                                            <span class="text-sm font-bold text-[var(--danger)]">
+                                                {{ remainingDebt.toLocaleString() }} {{ $t("so'm") }}
+                                            </span>
+                                        </div>
+                                        <button v-if="remainingDebt > 0" @click="showDebtModal = true"
+                                            class="btn btn-primary w-full mt-1 justify-center">
+                                            {{ $t("Qarz to'lash") }}
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="p-3">
-                                <p class="text-xs text-[var(--text-2)]">
-                                    {{ formatDate(check.createdAt) }}
+                        </div>
+                        <div class="rounded-xl border shadow-sm overflow-hidden"
+                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
+                            <div class="px-6 py-4 border-b" :class="'border-[var(--border)] bg-[var(--border-light)]'">
+                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
+                                    {{ $t("Qo'shimcha amallar") }}
                                 </p>
-                                <p class="text-xs font-medium mt-1.5 flex items-center gap-1" style="color:var(--primary);">
-                                    {{ $t('Ochish') }}
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="2" stroke="currentColor" class="w-3 h-3">
+                            </div>
+                            <div class="p-[22px] grid gap-3">
+                                <button @click="printQabulxat" class="btn"
+                                    style="background:var(--primary-light); color:var(--primary);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                            d="M6.72 13.83A2.25 2.25 0 004.5 16.08v3.42a.75.75 0 00.75.75h13.5a.75.75 0 00.75-.75v-3.42a2.25 2.25 0 00-2.22-2.25M6.72 13.83V8.25a.75.75 0 01.75-.75h9.06a.75.75 0 01.75.75v5.58M6.72 13.83h10.56" />
                                     </svg>
-                                </p>
+                                    {{ $t('Qabul xatini chop etish') }}
+                                </button>
+                                <button @click="printChek" class="btn"
+                                    style="background:var(--success-bg); color:var(--success); border:1px solid var(--success-border);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                    </svg>
+                                    {{ $t('Chekni chop etish') }}
+                                </button>
+                                <button @click="openAppointmentModal" class="btn"
+                                    style="background:var(--info-bg); color:var(--info); border:1px solid var(--info);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008z" />
+                                    </svg>
+                                    {{ $t('Qabul vaqtini belgilash') }}
+                                </button>
+                                <button @click="openPaymentLinkModal" class="btn"
+                                    style="background:var(--warning-bg); color:var(--warning); border:1px solid var(--warning-border);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                    </svg>
+                                    {{ $t("To'lov havolasini yuborish") }}
+                                </button>
+                                <button @click="openTelegramModal" class="btn"
+                                    style="background:var(--primary-light); color:var(--primary); border:1px solid var(--border);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                    </svg>
+                                    {{ $t('Telegram orqali xabar/fayl yuborish') }}
+                                </button>
+                                <label class="btn cursor-pointer"
+                                    style="background:var(--border-light); color:var(--text-1); border:1px solid var(--border);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
+                                    </svg>
+                                    {{ $t('Fayl yuklash') }}
+                                    <input type="file" multiple class="hidden" @change="handleUploadDocuments" />
+                                </label>
                             </div>
-                        </div>
-                    </div>
-
-                    <div v-else class="p-16 text-center">
-                        <div class="flex flex-col items-center gap-3">
-                            <div class="w-14 h-14 rounded-lg flex items-center justify-center"
-                                :class="'bg-[var(--border-light)]'">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-[var(--text-2)]">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                                </svg>
-                            </div>
-                            <p class="text-sm text-[var(--text-2)]">
-                                {{ $t('Bu mijoz uchun hali check yuklanmagan') }}
+                            <p v-if="documentUploadError" class="px-6 pb-4 text-xs" style="color:var(--danger);">
+                                {{ documentUploadError }}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Hujjatlar -->
-                <div class="rounded-xl border shadow-sm overflow-hidden"
-                    :class="'bg-[var(--bg-card)] border-[var(--border)]'">
-                    <div class="px-6 py-4 border-b flex items-center justify-between"
-                        :class="'border-[var(--border)] bg-[var(--border-light)]'">
-                        <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
-                            {{ $t('Hujjatlar') }}
-                        </p>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
-                                :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
-                                {{ documents.length }} {{ $t('ta') }}
-                            </span>
-                            <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all"
-                                style="background:var(--primary-light); color:var(--primary);">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
-                                </svg>
-                                {{ $t('Fayl yuklash') }}
-                                <input type="file" multiple class="hidden" @change="handleUploadDocuments" />
-                            </label>
-                        </div>
-                    </div>
-                    <p v-if="documentUploadError" class="px-6 pt-3 text-xs" style="color:var(--danger);">
-                        {{ documentUploadError }}
-                    </p>
 
-                    <div v-if="documents.length > 0" class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <div v-for="doc in documents" :key="doc.id"
-                            @click="openDocument(doc)"
-                            class="group cursor-pointer rounded-lg overflow-hidden border transition-all hover:shadow-lg hover:-translate-y-0.5"
-                            style="background:var(--border-light); border-color:var(--border);">
-                            <div class="aspect-video flex items-center justify-center overflow-hidden"
-                                :class="'bg-[var(--border-light)]'">
-                                <img v-if="isImage(doc.url)" :src="`${BASE_URL}${doc.url}`"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    alt="Hujjat" />
-                                <div v-else-if="isPDF(doc.url)"
-                                    class="flex flex-col items-center justify-center gap-2">
-                                    <span class="text-4xl">📕</span>
-                                    <span class="text-xs font-medium text-[var(--text-2)]">PDF</span>
-                                </div>
-                                <span v-else class="text-5xl opacity-50">📄</span>
-                            </div>
-                            <div class="p-3">
-                                <p class="text-xs truncate" style="color:var(--text-1);" :title="doc.originalName">
-                                    {{ doc.originalName }}
-                                </p>
-                                <p class="text-xs text-[var(--text-2)] mt-1">
-                                    {{ formatDate(doc.createdAt) }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div v-else class="p-16 text-center">
-                        <div class="flex flex-col items-center gap-3">
-                            <div class="w-14 h-14 rounded-lg flex items-center justify-center"
-                                :class="'bg-[var(--border-light)]'">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-[var(--text-2)]">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                                </svg>
-                            </div>
-                            <p class="text-sm text-[var(--text-2)]">
-                                {{ $t('Bu mijoz uchun hali hujjat yuklanmagan') }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         </div>
@@ -422,19 +543,17 @@
     <!-- Qarz to'lash modal -->
     <Teleport to="body">
         <Transition name="modal-fade">
-            <div v-if="showDebtModal"
-                class="fixed inset-0 z-50 flex items-center justify-center p-4"
-                style="background:var(--overlay);"
-                @click.self="closeDebtModal">
-                <div class="w-full max-w-sm rounded-lg shadow-2xl overflow-hidden"
-                    :class="'bg-[var(--bg-card)]'">
+            <div v-if="showDebtModal" class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                style="background:var(--overlay);" @click.self="closeDebtModal">
+                <div class="w-full max-w-sm rounded-lg shadow-2xl overflow-hidden" :class="'bg-[var(--bg-card)]'">
                     <!-- Header -->
-                    <div class="px-6 py-4 flex items-center justify-between border-b" style="border-color:var(--border);">
+                    <div class="px-6 py-4 flex items-center justify-between border-b"
+                        style="border-color:var(--border);">
                         <h3 class="font-bold text-base" style="color:var(--text-1);">{{ $t("Qarz to'lash") }}</h3>
-                        <button @click="closeDebtModal"
-                            class="w-7 h-7 rounded-lg flex items-center justify-center"
+                        <button @click="closeDebtModal" class="w-7 h-7 rounded-lg flex items-center justify-center"
                             style="background:var(--border-light); color:var(--text-2);">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                                stroke="currentColor" class="w-4 h-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
@@ -459,15 +578,10 @@
                             <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
                                 {{ $t("To'lov miqdori") }} <span class="text-[var(--danger)] text-[16px]">*</span>
                             </label>
-                            <input
-                                :value="debtAmount"
-                                @input="handleDebtAmountInput"
-                                type="text"
-                                inputmode="numeric"
+                            <input :value="debtAmount" @input="handleDebtAmountInput" type="text" inputmode="numeric"
                                 :placeholder="$t('Miqdorni kiriting')"
                                 class="w-full px-3 py-2.5 bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20"
-                                style="border-color:var(--border); color:var(--text-1);"
-                            />
+                                style="border-color:var(--border); color:var(--text-1);" />
                         </div>
 
                         <!-- To'lov turi -->
@@ -488,14 +602,285 @@
                     <!-- Footer -->
                     <div class="px-6 py-4 flex justify-end gap-3 border-t"
                         style="border-color:var(--border); background:var(--border-light);">
-                        <button @click="closeDebtModal"
-                            class="px-5 py-2 rounded-lg text-sm font-medium"
+                        <button @click="closeDebtModal" class="px-5 py-2 rounded-lg text-sm font-medium"
                             :class="'text-[var(--text-2)]'">
                             {{ $t('Bekor qilish') }}
                         </button>
                         <button @click="payDebt" :disabled="debtSaving" class="btn btn-primary">
-                            <div v-if="debtSaving" class="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70"></div>
+                            <div v-if="debtSaving"
+                                class="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70">
+                            </div>
                             {{ $t("To'lash") }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+    </Teleport>
+
+    <!-- Qora ro'yxatga qo'shish modal -->
+    <Teleport to="body">
+        <Transition name="modal-fade">
+            <div v-if="showBlacklistModal" class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                style="background:var(--overlay);" @click.self="closeBlacklistModal">
+                <div class="w-full max-w-sm rounded-lg shadow-2xl overflow-hidden" :class="'bg-[var(--bg-card)]'">
+                    <div class="px-6 py-4 flex items-center justify-between border-b"
+                        style="border-color:var(--border);">
+                        <h3 class="font-bold text-base" style="color:var(--text-1);">{{ $t("Qora ro'yxatga qo'shish") }}
+                        </h3>
+                        <button @click="closeBlacklistModal" class="w-7 h-7 rounded-lg flex items-center justify-center"
+                            style="background:var(--border-light); color:var(--text-2);">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                                stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                        <div v-if="blacklistError" class="text-xs text-[var(--danger)] px-1">{{ blacklistError }}</div>
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
+                                {{ $t('Sababi') }} <span class="text-[var(--danger)] text-[16px]">*</span>
+                            </label>
+                            <textarea v-model="blacklistReason" rows="4"
+                                :placeholder="$t('Qora ro\'yxatga qo\'shish sababini kiriting')"
+                                class="w-full px-3 py-2.5 bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20"
+                                style="border-color:var(--border); color:var(--text-1);"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-4 flex justify-end gap-3 border-t"
+                        style="border-color:var(--border); background:var(--border-light);">
+                        <button @click="closeBlacklistModal" class="px-5 py-2 rounded-lg text-sm font-medium"
+                            :class="'text-[var(--text-2)]'">
+                            {{ $t('Bekor qilish') }}
+                        </button>
+                        <button @click="submitBlacklist" :disabled="blacklistSaving" class="btn"
+                            style="background:var(--danger); color:white;">
+                            <div v-if="blacklistSaving"
+                                class="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70">
+                            </div>
+                            {{ $t("Qo'shish") }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+    </Teleport>
+
+    <!-- Qabul vaqtini belgilash modal -->
+    <Teleport to="body">
+        <Transition name="modal-fade">
+            <div v-if="showAppointmentModal" class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                style="background:var(--overlay);" @click.self="closeAppointmentModal">
+                <div class="w-full max-w-md rounded-lg shadow-2xl overflow-hidden" :class="'bg-[var(--bg-card)]'">
+                    <div class="px-6 py-4 flex items-center justify-between border-b"
+                        style="border-color:var(--border);">
+                        <h3 class="font-bold text-base" style="color:var(--text-1);">{{ $t('Qabul vaqtini belgilash') }}
+                        </h3>
+                        <button @click="closeAppointmentModal"
+                            class="w-7 h-7 rounded-lg flex items-center justify-center"
+                            style="background:var(--border-light); color:var(--text-2);">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                                stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                        <div v-if="appointmentError" class="text-xs text-[var(--danger)] px-1">{{ appointmentError }}
+                        </div>
+                        <div v-if="appointmentSent" class="text-xs text-[var(--success)] px-1">{{ $t('Xabar yuborildi')
+                        }}</div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
+                                {{ $t('Qabul sanasi va vaqti') }}
+                            </label>
+                            <input type="datetime-local" v-model="appointmentDateTime" @change="onAppointmentDateChange"
+                                class="w-full px-3 py-2.5 bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20"
+                                style="border-color:var(--border); color:var(--text-1);" />
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
+                                {{ $t('Xabar matni') }}
+                            </label>
+                            <textarea v-model="appointmentMessage" rows="5"
+                                class="w-full px-3 py-2.5 bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20"
+                                style="border-color:var(--border); color:var(--text-1);"></textarea>
+                        </div>
+
+                        <p class="text-xs" style="color:var(--text-3);">
+                            {{ $t('Yuboriladi') }}: {{ customer?.telegram || customer?.phone || '-' }}
+                        </p>
+                    </div>
+
+                    <div class="px-6 py-4 flex justify-end gap-3 border-t"
+                        style="border-color:var(--border); background:var(--border-light);">
+                        <button @click="closeAppointmentModal" class="px-5 py-2 rounded-lg text-sm font-medium"
+                            :class="'text-[var(--text-2)]'">
+                            {{ $t('Bekor qilish') }}
+                        </button>
+                        <button @click="sendAppointmentMessage" :disabled="appointmentSending" class="btn btn-primary">
+                            <div v-if="appointmentSending"
+                                class="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70">
+                            </div>
+                            {{ $t('Yuborish') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+    </Teleport>
+
+    <!-- To'lov havolasini yuborish modal -->
+    <Teleport to="body">
+        <Transition name="modal-fade">
+            <div v-if="showPaymentLinkModal" class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                style="background:var(--overlay);" @click.self="closePaymentLinkModal">
+                <div class="w-full max-w-md rounded-lg shadow-2xl overflow-hidden" :class="'bg-[var(--bg-card)]'">
+                    <div class="px-6 py-4 flex items-center justify-between border-b"
+                        style="border-color:var(--border);">
+                        <h3 class="font-bold text-base" style="color:var(--text-1);">{{ $t("To'lov havolasini yuborish")
+                        }}</h3>
+                        <button @click="closePaymentLinkModal"
+                            class="w-7 h-7 rounded-lg flex items-center justify-center"
+                            style="background:var(--border-light); color:var(--text-2);">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                                stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                        <div v-if="paymentLinkError" class="text-xs text-[var(--danger)] px-1">{{ paymentLinkError }}
+                        </div>
+                        <div v-if="paymentLinkSent" class="text-xs text-[var(--success)] px-1">{{ $t('Xabar yuborildi')
+                        }}</div>
+
+                        <div class="rounded-xl px-4 py-3 flex items-center justify-between"
+                            style="background:var(--danger-bg); border:1px solid var(--danger-border);">
+                            <span class="text-xs font-medium text-[var(--danger)]">{{ $t('Qolgan qarz') }}</span>
+                            <span class="text-sm font-bold text-[var(--danger)]">
+                                {{ remainingDebt.toLocaleString() }} {{ $t("so'm") }}
+                            </span>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
+                                {{ $t("To'lov havolasi (URL)") }}
+                            </label>
+                            <input type="text" v-model="paymentLinkUrl" @input="onPaymentLinkChange"
+                                :placeholder="$t('https://...')"
+                                class="w-full px-3 py-2.5 bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20"
+                                style="border-color:var(--border); color:var(--text-1);" />
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
+                                {{ $t('Xabar matni') }}
+                            </label>
+                            <textarea v-model="paymentLinkMessage" rows="5"
+                                class="w-full px-3 py-2.5 bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20"
+                                style="border-color:var(--border); color:var(--text-1);"></textarea>
+                        </div>
+
+                        <p class="text-xs" style="color:var(--text-3);">
+                            {{ $t('Yuboriladi') }}: {{ customer?.telegram || customer?.phone || '-' }}
+                        </p>
+                    </div>
+
+                    <div class="px-6 py-4 flex justify-end gap-3 border-t"
+                        style="border-color:var(--border); background:var(--border-light);">
+                        <button @click="closePaymentLinkModal" class="px-5 py-2 rounded-lg text-sm font-medium"
+                            :class="'text-[var(--text-2)]'">
+                            {{ $t('Bekor qilish') }}
+                        </button>
+                        <button @click="sendPaymentLinkMessage" :disabled="paymentLinkSending" class="btn btn-primary">
+                            <div v-if="paymentLinkSending"
+                                class="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70">
+                            </div>
+                            {{ $t('Yuborish') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+    </Teleport>
+
+    <!-- Telegram orqali xabar/fayl yuborish modal -->
+    <Teleport to="body">
+        <Transition name="modal-fade">
+            <div v-if="showTelegramModal" class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                style="background:var(--overlay);" @click.self="closeTelegramModal">
+                <div class="w-full max-w-md rounded-lg shadow-2xl overflow-hidden" :class="'bg-[var(--bg-card)]'">
+                    <div class="px-6 py-4 flex items-center justify-between border-b"
+                        style="border-color:var(--border);">
+                        <h3 class="font-bold text-base" style="color:var(--text-1);">
+                            {{ $t('Telegram orqali xabar/fayl yuborish') }}</h3>
+                        <button @click="closeTelegramModal" class="w-7 h-7 rounded-lg flex items-center justify-center"
+                            style="background:var(--border-light); color:var(--text-2);">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                                stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                        <div v-if="telegramError" class="text-xs text-[var(--danger)] px-1">{{ telegramError }}</div>
+                        <div v-if="telegramSent" class="text-xs text-[var(--success)] px-1">{{ $t('Yuborildi') }}</div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
+                                {{ $t('Xabar matni') }}
+                            </label>
+                            <textarea v-model="telegramMessage" rows="5" :placeholder="$t('Xabar matnini kiriting')"
+                                class="w-full px-3 py-2.5 bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20"
+                                style="border-color:var(--border); color:var(--text-1);"></textarea>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
+                                {{ $t('Hujjat/fayl (ixtiyoriy)') }}
+                            </label>
+                            <label class="flex items-center gap-2 px-3 py-2.5 rounded-lg border text-sm cursor-pointer"
+                                style="border-color:var(--border); background:var(--border-light); color:var(--text-2);">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
+                                </svg>
+                                <span class="truncate">{{ telegramFile ? telegramFile.name : $t('Fayl tanlang')
+                                }}</span>
+                                <input type="file" class="hidden" @change="handleTelegramFileSelect" />
+                            </label>
+                            <button v-if="telegramFile" @click="telegramFile = null"
+                                class="text-xs font-medium underline" style="color:var(--danger);">
+                                {{ $t('Faylni olib tashlash') }}
+                            </button>
+                        </div>
+
+                        <p class="text-xs" style="color:var(--text-3);">
+                            {{ $t('Yuboriladi') }}: {{ customer?.telegram || customer?.phone || '-' }}
+                        </p>
+                    </div>
+
+                    <div class="px-6 py-4 flex justify-end gap-3 border-t"
+                        style="border-color:var(--border); background:var(--border-light);">
+                        <button @click="closeTelegramModal" class="px-5 py-2 rounded-lg text-sm font-medium"
+                            :class="'text-[var(--text-2)]'">
+                            {{ $t('Bekor qilish') }}
+                        </button>
+                        <button @click="sendTelegramMessage" :disabled="telegramSending" class="btn btn-primary">
+                            <div v-if="telegramSending"
+                                class="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70">
+                            </div>
+                            {{ $t('Yuborish') }}
                         </button>
                     </div>
                 </div>
@@ -534,17 +919,17 @@ const debtPaymentType = ref('NAQD')
 const debtSaving = ref(false)
 const debtError = ref('')
 
-// Telegram modal
+// Telegram orqali xabar/fayl yuborish modal
 const showTelegramModal = ref(false)
 const telegramMessage = ref('')
-const telegramTarget = ref('username')
+const telegramFile = ref(null)
 const telegramSending = ref(false)
 const telegramError = ref('')
 const telegramSent = ref(false)
 
 const openTelegramModal = () => {
-    telegramTarget.value = customer.value?.telegram ? 'username' : 'phone'
     telegramMessage.value = ''
+    telegramFile.value = null
     telegramError.value = ''
     telegramSent.value = false
     showTelegramModal.value = true
@@ -553,19 +938,26 @@ const openTelegramModal = () => {
 const closeTelegramModal = () => {
     showTelegramModal.value = false
     telegramMessage.value = ''
+    telegramFile.value = null
     telegramError.value = ''
     telegramSent.value = false
+}
+
+const handleTelegramFileSelect = (e) => {
+    telegramFile.value = e.target.files?.[0] || null
+    e.target.value = ''
 }
 
 const sendTelegramMessage = async () => {
     telegramError.value = ''
     telegramSent.value = false
-    if (!telegramMessage.value.trim()) return
 
-    const to = telegramTarget.value === 'username'
-        ? customer.value?.telegram
-        : customer.value?.phone
+    if (!telegramMessage.value.trim() && !telegramFile.value) {
+        telegramError.value = 'Xabar matni yoki fayl tanlang'
+        return
+    }
 
+    const to = customer.value?.telegram || customer.value?.phone
     if (!to) {
         telegramError.value = 'Manzil topilmadi'
         return
@@ -573,9 +965,18 @@ const sendTelegramMessage = async () => {
 
     telegramSending.value = true
     try {
-        await api.post('/api/telegram/send', { to, message: telegramMessage.value })
+        if (telegramFile.value) {
+            const formData = new FormData()
+            formData.append('to', to)
+            formData.append('caption', telegramMessage.value)
+            formData.append('file', telegramFile.value)
+            await api.post(ENDPOINTS.TELEGRAM_SEND_FILE, formData)
+        } else {
+            await api.post(ENDPOINTS.TELEGRAM_SEND, { to, message: telegramMessage.value })
+        }
         telegramSent.value = true
         telegramMessage.value = ''
+        telegramFile.value = null
     } catch (e) {
         const msg = e?.response?.data?.message
         if (msg?.includes('ulanmagan') || msg?.includes('login')) {
@@ -588,81 +989,251 @@ const sendTelegramMessage = async () => {
     }
 }
 
+// Qabul vaqtini belgilash modal
+const showAppointmentModal = ref(false)
+const appointmentDateTime = ref('')
+const appointmentMessage = ref('')
+const appointmentSending = ref(false)
+const appointmentError = ref('')
+const appointmentSent = ref(false)
+
+const buildAppointmentMessage = (dateTimeStr) => {
+    const name = `${customer.value?.surname || ''} ${customer.value?.name || ''}`.trim()
+    if (!dateTimeStr) {
+        return ``
+    }
+    const d = new Date(dateTimeStr)
+    const pad = n => String(n).padStart(2, '0')
+    const formatted = `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+    return `Hurmatli ${name}, sizning qabulingiz ${formatted} sanasiga belgilandi. Iltimos, belgilangan vaqtda tashrif buyurishingizni so'raymiz.\n\nYuridik Xizmatlar va Hujjatlar Tayyorlash Byurosi`
+}
+
+const openAppointmentModal = () => {
+    appointmentDateTime.value = ''
+    appointmentMessage.value = buildAppointmentMessage('')
+    appointmentError.value = ''
+    appointmentSent.value = false
+    showAppointmentModal.value = true
+}
+
+const closeAppointmentModal = () => {
+    showAppointmentModal.value = false
+}
+
+const onAppointmentDateChange = () => {
+    appointmentMessage.value = buildAppointmentMessage(appointmentDateTime.value)
+}
+
+const sendAppointmentMessage = async () => {
+    appointmentError.value = ''
+    appointmentSent.value = false
+    if (!appointmentMessage.value.trim()) {
+        appointmentError.value = 'Xabar matnini kiriting'
+        return
+    }
+    const to = customer.value?.telegram || customer.value?.phone
+    if (!to) {
+        appointmentError.value = 'Telegram yoki telefon raqami topilmadi'
+        return
+    }
+    appointmentSending.value = true
+    try {
+        await api.post(ENDPOINTS.TELEGRAM_SEND, { to, message: appointmentMessage.value })
+        appointmentSent.value = true
+    } catch (e) {
+        const msg = e?.response?.data?.message
+        if (msg?.includes('ulanmagan') || msg?.includes('login')) {
+            appointmentError.value = 'Telegram ulanmagan. Sozlamalar sahifasida login qiling.'
+        } else {
+            appointmentError.value = msg || 'Xabar yuborishda xatolik yuz berdi'
+        }
+    } finally {
+        appointmentSending.value = false
+    }
+}
+
+// To'lov havolasini yuborish modal
+const showPaymentLinkModal = ref(false)
+const paymentLinkUrl = ref('')
+const paymentLinkMessage = ref('')
+const paymentLinkSending = ref(false)
+const paymentLinkError = ref('')
+const paymentLinkSent = ref(false)
+
+const buildPaymentLinkMessage = (url) => {
+    const name = `${customer.value?.surname || ''} ${customer.value?.name || ''}`.trim()
+    const debt = remainingDebt.value.toLocaleString()
+    const linkLine = url ? `\n\nTo'lov havolasi: ${url}` : ''
+    return `Hurmatli ${name}, sizning qolgan qarzingiz ${debt} so'm. Iltimos, to'lovni amalga oshiring.${linkLine}\n\nYuridik Xizmatlar va Hujjatlar Tayyorlash Byurosi`
+}
+
+const openPaymentLinkModal = () => {
+    paymentLinkUrl.value = ''
+    paymentLinkMessage.value = buildPaymentLinkMessage('')
+    paymentLinkError.value = ''
+    paymentLinkSent.value = false
+    showPaymentLinkModal.value = true
+}
+
+const closePaymentLinkModal = () => {
+    showPaymentLinkModal.value = false
+}
+
+const onPaymentLinkChange = () => {
+    paymentLinkMessage.value = buildPaymentLinkMessage(paymentLinkUrl.value.trim())
+}
+
+const sendPaymentLinkMessage = async () => {
+    paymentLinkError.value = ''
+    paymentLinkSent.value = false
+    if (!paymentLinkMessage.value.trim()) {
+        paymentLinkError.value = 'Xabar matnini kiriting'
+        return
+    }
+    const to = customer.value?.telegram || customer.value?.phone
+    if (!to) {
+        paymentLinkError.value = 'Telegram yoki telefon raqami topilmadi'
+        return
+    }
+    paymentLinkSending.value = true
+    try {
+        await api.post(ENDPOINTS.TELEGRAM_SEND, { to, message: paymentLinkMessage.value })
+        paymentLinkSent.value = true
+    } catch (e) {
+        const msg = e?.response?.data?.message
+        if (msg?.includes('ulanmagan') || msg?.includes('login')) {
+            paymentLinkError.value = 'Telegram ulanmagan. Sozlamalar sahifasida login qiling.'
+        } else {
+            paymentLinkError.value = msg || 'Xabar yuborishda xatolik yuz berdi'
+        }
+    } finally {
+        paymentLinkSending.value = false
+    }
+}
+
 const paymentOptions = [
-  { value: 'NAQD', label: 'Naqd pul' },
-  { value: 'KARTA', label: 'Plastik karta' },
-  { value: 'ONLINE', label: "Online to'lov" },
-  { value: 'BANK_TRANSFER', label: "Bank o'tkazmasi" },
+    { value: 'NAQD', label: 'Naqd pul' },
+    { value: 'KARTA', label: 'Plastik karta' },
+    { value: 'ONLINE', label: "Online to'lov" },
+    { value: 'BANK_TRANSFER', label: "Bank o'tkazmasi" },
 ]
 
 const handleDebtAmountInput = (e) => {
-  const raw = e.target.value.replace(/\D/g, '')
-  debtAmount.value = raw.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+    const raw = e.target.value.replace(/\D/g, '')
+    debtAmount.value = raw.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 
 const closeDebtModal = () => {
-  showDebtModal.value = false
-  debtAmount.value = ''
-  debtPaymentType.value = 'NAQD'
-  debtError.value = ''
+    showDebtModal.value = false
+    debtAmount.value = ''
+    debtPaymentType.value = 'NAQD'
+    debtError.value = ''
 }
 
 const payDebt = async () => {
-  debtError.value = ''
-  const amountRaw = Number(String(debtAmount.value).replace(/\./g, ''))
-  if (!amountRaw || amountRaw <= 0) {
-    debtError.value = "To'lov miqdorini kiriting"
-    return
-  }
-  if (amountRaw > remainingDebt.value) {
-    debtError.value = `Qarzdan ko'p kiritildi. Maksimal: ${remainingDebt.value.toLocaleString()} so'm`
-    return
-  }
-  debtSaving.value = true
-  try {
-    await api.put(ENDPOINTS.CUSTOMER(customer.value.id), {
-      paymentAmount: amountRaw,
-      paymentType: debtPaymentType.value,
-    })
-    await fetchCustomerData()
-    closeDebtModal()
-  } catch (e) {
-    debtError.value = "Xatolik yuz berdi"
-  } finally {
-    debtSaving.value = false
-  }
+    debtError.value = ''
+    const amountRaw = Number(String(debtAmount.value).replace(/\./g, ''))
+    if (!amountRaw || amountRaw <= 0) {
+        debtError.value = "To'lov miqdorini kiriting"
+        return
+    }
+    if (amountRaw > remainingDebt.value) {
+        debtError.value = `Qarzdan ko'p kiritildi. Maksimal: ${remainingDebt.value.toLocaleString()} so'm`
+        return
+    }
+    debtSaving.value = true
+    try {
+        await api.put(ENDPOINTS.CUSTOMER(customer.value.id), {
+            paymentAmount: amountRaw,
+            paymentType: debtPaymentType.value,
+        })
+        await fetchCustomerData()
+        closeDebtModal()
+    } catch (e) {
+        debtError.value = "Xatolik yuz berdi"
+    } finally {
+        debtSaving.value = false
+    }
 }
 
 const statusLabels = computed(() => ({
-  NAVBATDA: langStore.t('Navbatda'),
-  KORIB_CHIQILDI: langStore.t("Qabulga kiritildi"),
-  YAKUNLANDI: langStore.t('Maslahat berildi'),
-  YURISTDA: langStore.t('Maslahat berildi va shartnoma tuzildi'),
-  BEKOR_QILINDI: langStore.t('Rad etildi'),
+    NAVBATDA: langStore.t('Navbatda'),
+    KORIB_CHIQILDI: langStore.t("Qabulga kiritildi"),
+    YAKUNLANDI: langStore.t('Maslahat berildi'),
+    YURISTDA: langStore.t('Maslahat berildi va shartnoma tuzildi'),
+    BEKOR_QILINDI: langStore.t('Rad etildi'),
 }))
 
 const statusInlineColors = {
-  NAVBATDA: { bg: 'var(--border-light)', color: 'var(--text-2)' },
-  YURISTDA: { bg: 'var(--success-bg)', color: 'var(--success)' },
-  KORIB_CHIQILDI: { bg: 'var(--warning-bg)', color: 'var(--warning)' },
-  JARAYONDA: { bg: 'var(--primary-light)', color: 'var(--text-1)' },
-  YAKUNLANDI: { bg: 'var(--success-bg)', color: 'var(--success)' },
-  BEKOR_QILINDI: { bg: 'var(--danger-bg)', color: 'var(--danger)' },
+    NAVBATDA: { bg: 'var(--border-light)', color: 'var(--text-2)' },
+    YURISTDA: { bg: 'var(--success-bg)', color: 'var(--success)' },
+    KORIB_CHIQILDI: { bg: 'var(--warning-bg)', color: 'var(--warning)' },
+    JARAYONDA: { bg: 'var(--primary-light)', color: 'var(--text-1)' },
+    YAKUNLANDI: { bg: 'var(--success-bg)', color: 'var(--success)' },
+    BEKOR_QILINDI: { bg: 'var(--danger-bg)', color: 'var(--danger)' },
 }
 
 // Konsultatsiya taymeri faqat YURIST va RAHBAR uchun ko'rinadi
 const canSeeTimer = computed(() => ['YURIST', 'RAHBAR'].includes(authStore.user?.role))
 
+// Qora ro'yxatga qo'shish/olib tashlash — faqat YURIST, RAHBAR, ADMIN
+const canManageBlacklist = computed(() => ['YURIST', 'RAHBAR', 'ADMIN'].includes(authStore.user?.role))
+
+const showBlacklistModal = ref(false)
+const blacklistReason = ref('')
+const blacklistSaving = ref(false)
+const blacklistError = ref('')
+
+const openBlacklistModal = () => {
+    blacklistReason.value = ''
+    blacklistError.value = ''
+    showBlacklistModal.value = true
+}
+
+const closeBlacklistModal = () => {
+    showBlacklistModal.value = false
+    blacklistReason.value = ''
+    blacklistError.value = ''
+}
+
+const submitBlacklist = async () => {
+    blacklistError.value = ''
+    if (!blacklistReason.value.trim()) {
+        blacklistError.value = 'Sababni kiriting'
+        return
+    }
+    blacklistSaving.value = true
+    try {
+        const { data } = await api.put(ENDPOINTS.CUSTOMER_BLACKLIST(customer.value.id), { reason: blacklistReason.value.trim() })
+        customer.value = { ...customer.value, ...data }
+        closeBlacklistModal()
+    } catch (e) {
+        blacklistError.value = e?.response?.data?.message || 'Xatolik yuz berdi'
+    } finally {
+        blacklistSaving.value = false
+    }
+}
+
+const removeFromBlacklist = async () => {
+    blacklistSaving.value = true
+    try {
+        const { data } = await api.put(ENDPOINTS.CUSTOMER_UNBLACKLIST(customer.value.id))
+        customer.value = { ...customer.value, ...data }
+    } finally {
+        blacklistSaving.value = false
+    }
+}
+
 const changeStatus = async (newStatus) => {
-  if (!customer.value || statusSaving.value) return
-  statusSaving.value = true
-  try {
-    const { data } = await api.put(ENDPOINTS.CUSTOMER(customer.value.id), { status: newStatus })
-    // To'liq javobni merge qilamiz — consultationSeconds ham darhol yangilanadi
-    customer.value = { ...customer.value, ...data }
-  } finally {
-    statusSaving.value = false
-  }
+    if (!customer.value || statusSaving.value) return
+    statusSaving.value = true
+    try {
+        const { data } = await api.put(ENDPOINTS.CUSTOMER(customer.value.id), { status: newStatus })
+        // To'liq javobni merge qilamiz — consultationSeconds ham darhol yangilanadi
+        customer.value = { ...customer.value, ...data }
+    } finally {
+        statusSaving.value = false
+    }
 }
 
 const totalPaid = computed(() =>
@@ -670,8 +1241,8 @@ const totalPaid = computed(() =>
 )
 
 const remainingDebt = computed(() => {
-  const price = Number(customer.value?.price || 0)
-  return Math.max(0, price - totalPaid.value)
+    const price = Number(customer.value?.price || 0)
+    return Math.max(0, price - totalPaid.value)
 })
 
 const fetchCustomerData = async () => {
@@ -707,6 +1278,59 @@ const formatDate = (dateString) => {
 
 const isImage = (url) => /\.(jpg|jpeg|png|webp|gif)$/i.test(url)
 const isPDF = (url) => /\.pdf$/i.test(url)
+
+const printQabulxat = () => {
+    const c = customer.value
+    if (!c) return
+    const params = new URLSearchParams({
+        fish: `${c.surname || ''} ${c.name || ''}`.trim(),
+        telefon: c.phone || '',
+        manzil: c.address || '',
+        id: `MJZ-${c.customer_id || ''}`,
+        raqam: c.queueNumber ? `A-${String(c.queueNumber).padStart(2, '0')}` : '—',
+        yurist: c.assignedTo ? `${c.assignedTo.surname} ${c.assignedTo.name}` : '—',
+        sana: (c.createdAt ? new Date(c.createdAt) : new Date()).getTime().toString(),
+    })
+    window.open(`/qabulxati.html?${params.toString()}`, '_blank')
+}
+
+const printChek = () => {
+    const c = customer.value
+    if (!c) return
+    const w = window.open('about:blank', '_blank')
+    const today = new Date()
+    const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`
+    const fullName = `${c.surname || ''} ${c.name || ''}`.trim()
+    const queueNumber = c.queueNumber ? String(c.queueNumber).padStart(2, '0') : '--'
+    w.document.write(`<!DOCTYPE html><html><head><title>Chek</title><style>
+    @page{size:80mm auto;margin:0}*{box-sizing:border-box}
+    body{width:80mm;margin:0;padding:10mm 5mm;font-family:"Courier New",monospace;color:#000;font-size:12px}
+    .center{text-align:center}.company{font-size:13px;font-weight:bold;text-transform:uppercase;margin-bottom:2px}
+    .subtitle{font-size:11px;margin-bottom:10px}.divider{border-top:1px dashed #000;margin:8px 0}
+    .info-row{display:flex;justify-content:space-between;margin:4px 0}.label{font-weight:bold}
+    .client-name{text-align:center;font-size:15px;font-weight:bold;margin:10px 0;word-break:break-word}
+    .queue-box{border:2px solid #000;text-align:center;padding:10px 0;margin:10px 0}
+    .queue-number{font-size:42px;font-weight:bold;line-height:1}
+    .queue-text{font-size:12px;margin-top:5px;font-weight:bold}
+    .notice{text-align:center;font-size:11px;margin-top:10px;line-height:1.5}
+    .footer{text-align:center;margin-top:12px;font-size:10px}
+  </style></head><body>
+    <div class="center"><div class="company">Yuridik Xizmatlar va Hujjatlar Tayyorlash Byurosi</div><div class="subtitle">QABUL CHEKI</div></div>
+    <div class="divider"></div>
+    <div class="info-row"><span class="label">Sana:</span><span>${formattedDate}</span></div>
+    <div class="info-row"><span class="label">ID:</span><span>MJZ-${c.customer_id || ''}</span></div>
+    <div class="divider"></div>
+    <div class="center"><div class="label">MIJOZ</div><div class="client-name">${fullName}</div></div>
+    <div class="divider"></div>
+    <div class="queue-box"><div class="queue-number">A-${queueNumber}</div><div class="queue-text">NAVBAT RAQAMI</div></div>
+    <div class="divider"></div>
+    <div class="notice"><b>Eslatma</b><br>Ushbu chekni saqlab qo'ying.<br>Navbatni tekshirish uchun ID raqamdan foydalaning.</div>
+    <div class="divider"></div>
+    <div class="footer"><br><br>Tashrifingiz uchun rahmat!</div>
+  </body></html>`)
+    w.document.close()
+    setTimeout(() => { w.focus(); w.print() }, 400)
+}
 
 const openCheck = (check) => {
     const filterUrl = (url) => {
@@ -783,10 +1407,11 @@ export default defineComponent({
 <style scoped>
 .modal-fade-enter-active,
 .modal-fade-leave-active {
-  transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease;
 }
+
 .modal-fade-enter-from,
 .modal-fade-leave-to {
-  opacity: 0;
+    opacity: 0;
 }
 </style>
