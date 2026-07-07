@@ -15,6 +15,7 @@ const router = useRouter()
 const showPricesModal = ref(false)
 const editingPriceOne = ref(0)
 const editingPriceTwo = ref(0)
+const editingPriceThree = ref(0)
 
 let unsubscribeCalled = null
 
@@ -31,6 +32,7 @@ onUnmounted(() => {
 const openPricesModal = () => {
   editingPriceOne.value = pricesStore.prices.price_one
   editingPriceTwo.value = pricesStore.prices.price_two
+  editingPriceThree.value = pricesStore.prices.price_three
   showPricesModal.value = true
 }
 
@@ -38,6 +40,7 @@ const savePrices = async () => {
   const result = await pricesStore.updatePrices({
     price_one: editingPriceOne.value,
     price_two: editingPriceTwo.value,
+    price_three: editingPriceThree.value,
   })
   if (result.success) {
     showPricesModal.value = false
@@ -149,6 +152,11 @@ const openStatus = (key) => {
               <label class="block text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-2);">{{
                 $t('2-narx (so\'mda)') }}</label>
               <input v-model="editingPriceTwo" type="number" class="form-input" />
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-2);">{{
+                $t('3-narx (so\'mda)') }}</label>
+              <input v-model="editingPriceThree" type="number" class="form-input" />
             </div>
           </div>
 

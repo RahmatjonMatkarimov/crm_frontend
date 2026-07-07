@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount, computed, getCurrentInstance } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, computed, nextTick, getCurrentInstance } from 'vue'
 import { useCustomersStore } from '@/stores/customers'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
@@ -89,6 +89,65 @@ const triggerDocumentsInput = () => {
 const removeDocumentFile = (index) => {
   documentFiles.value = documentFiles.value.filter((_, i) => i !== index)
 }
+
+// Kamera bilan hujjat rasmga olish
+const showCameraModal = ref(false)
+const cameraVideoRef = ref(null)
+const cameraStream = ref(null)
+const cameraError = ref('')
+
+const openCamera = async () => {
+  cameraError.value = ''
+  showCameraModal.value = true
+  await nextTick()
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment' },
+      audio: false,
+    })
+    cameraStream.value = stream
+    if (cameraVideoRef.value) {
+      cameraVideoRef.value.srcObject = stream
+      await cameraVideoRef.value.play()
+    } else {
+      stream.getTracks().forEach((track) => track.stop())
+    }
+  } catch (err) {
+    cameraError.value = "Kameraga ulanib bo'lmadi. Ruxsat berilganini tekshiring."
+  }
+}
+
+const stopCamera = () => {
+  cameraStream.value?.getTracks().forEach((track) => track.stop())
+  cameraStream.value = null
+  if (cameraVideoRef.value) cameraVideoRef.value.srcObject = null
+}
+
+const closeCamera = () => {
+  stopCamera()
+  showCameraModal.value = false
+  cameraError.value = ''
+}
+
+const capturePhoto = () => {
+  const video = cameraVideoRef.value
+  if (!video || !video.videoWidth) return
+  const canvas = document.createElement('canvas')
+  canvas.width = video.videoWidth
+  canvas.height = video.videoHeight
+  const ctx = canvas.getContext('2d')
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+  canvas.toBlob((blob) => {
+    if (!blob) return
+    const file = new File([blob], `hujjat-${Date.now()}.jpg`, { type: 'image/jpeg' })
+    documentFiles.value = [...documentFiles.value, file]
+    closeCamera()
+  }, 'image/jpeg', 0.92)
+}
+
+onBeforeUnmount(() => {
+  stopCamera()
+})
 
 const formatFileSize = (bytes) => {
   if (!bytes) return '0 KB'
@@ -211,10 +270,8 @@ const trackedFieldsFilled = computed(() => [
   !!selectedDistrict.value,
   !!source.value,
   !!assignedToId.value,
-  !!price.value,
+  !!price.value !== '',
   !!description.value,
-  !!address.value,
-  documentFiles.value.length > 0,
 ])
 const filledFieldsCount = computed(() => trackedFieldsFilled.value.filter(Boolean).length)
 const totalFieldsCount = computed(() => trackedFieldsFilled.value.length)
@@ -223,15 +280,24 @@ const fillPercent = computed(() => Math.round((filledFieldsCount.value / totalFi
 // Har bir bo'lim to'liq to'ldirilganmi — bosqich indikatori uchun
 const section1Complete = computed(() => !!(name.value && surname.value && father_name.value && phone.value && telegram.value))
 const section2Complete = computed(() => !!(selectedRegion.value && selectedDistrict.value))
-const section3Complete = computed(() => !!(source.value && assignedToId.value && paymentType.value && price.value))
+const section3Complete = computed(() => {
+  if (price.value === '') return false
+  if (Number(price.value) === 0) return !!(source.value && assignedToId.value)
+  return !!(source.value && assignedToId.value && paymentType.value)
+})
 const section4Complete = computed(() => !!description.value)
 
 const formSteps = computed(() => [
   { key: 'personal', label: "Shaxsiy ma'lumotlar", complete: section1Complete.value },
   { key: 'address', label: "Manzil ma'lumotlari", complete: section2Complete.value },
   { key: 'extra', label: "Qo'shimcha ma'lumotlar", complete: section3Complete.value },
-  { key: 'appeal', label: "Murojaat ma'lumotlari", complete: section4Complete.value },
+  { key: 'appeal', label: "Ichki izoh (faqat xodimlar uchun)", complete: section4Complete.value },
 ])
+
+// Forma bo'limlari joylashadigan grid maydonlari — tahrirlashda AI paneli ko'rinmaydi, shuning uchun "extra" 2 ustunga cho'ziladi
+const formGridAreas = computed(() => props.editing?.id
+  ? `"personal extra extra" "address appeal appeal"`
+  : `"personal extra ai" "address appeal appeal"`)
 
 import html2pdf from 'html2pdf.js'
 
@@ -706,7 +772,7 @@ watch(() => props.editing, (val) => {
   telegram.value = val.telegram || ''
   phoneIsTelegram.value = (val.telegram && val.telegram === val.phone) ? 'ha' : 'yoq'
   appealType.value = val.appealType || ''
-  price.value = val.price || ''
+  price.value = (val.price !== undefined && val.price !== null) ? val.price : ''
 
   // 🔴 ASOSIY O'ZGARTIRISH
   if (val.payments && val.payments.length > 0) {
@@ -836,8 +902,8 @@ const validate = () => {
   if (!selectedDistrict.value) emptyFields.push('Tuman')
   if (!source.value) emptyFields.push("Qayerdan eshitib kelgan")
   if (!assignedToId.value) emptyFields.push("Mas'ul xodim")
-  if (!paymentType.value) emptyFields.push("To'lov turi")
-  if (!price.value) emptyFields.push('Narx')
+  if (price.value !== '' && Number(price.value) !== 0 && !paymentType.value) emptyFields.push("To'lov turi")
+  if (price.value === '') emptyFields.push('Narx')
   if (!telegram.value) emptyFields.push('Telegram')
   return emptyFields
 }
@@ -850,14 +916,16 @@ const openPreviewWindow = (fullAddress) => {
   const yuristUser = users.value.find(u => u.id === assignedToId.value)
   const yuristName = yuristUser ? `${yuristUser.surname} ${yuristUser.name}` : '—'
 
-  const paymentLabel = paymentType.value === 'NAQD' ? 'Naqd pul'
-    : paymentType.value === 'KARTA' ? 'Plastik karta'
-      : paymentType.value === 'ONLINE' ? "Online to'lov"
-        : paymentType.value === 'NASIYA' ? 'Nasiya'
-          : "Bank o'tkazmasi"
+  const paymentLabel = Number(price.value) === 0 ? "Bepul maslahat"
+    : paymentType.value === 'NAQD' ? 'Naqd pul'
+      : paymentType.value === 'KARTA' ? 'Plastik karta'
+        : paymentType.value === 'ONLINE' ? "Online to'lov"
+          : paymentType.value === 'NASIYA' ? 'Nasiya'
+            : "Bank o'tkazmasi"
 
-  const amountNum = paymentType.value === 'NASIYA' ? 0
-    : (paymentAmount.value ? Number(String(paymentAmount.value).replace(/\./g, '')) : 0)
+  const amountNum = Number(price.value) === 0 ? 0
+    : paymentType.value === 'NASIYA' ? 0
+      : (paymentAmount.value ? Number(String(paymentAmount.value).replace(/\./g, '')) : 0)
 
   sessionStorage.setItem('previewData', JSON.stringify({
     fish,
@@ -1049,7 +1117,7 @@ watch([name, surname, phone], runDuplicateCheck)
 watch(paymentType, (val) => {
   if (val === 'NASIYA') {
     paymentAmount.value = ''
-  } else if (price.value) {
+  } else if (price.value !== '') {
     paymentAmount.value = String(price.value).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
   }
 })
@@ -1271,17 +1339,16 @@ const copyTemplate = (tmpl) => {
       style="background:var(--danger-bg); border:1px solid var(--danger-border); color:var(--danger);">
       {{ error }}</div>
 
-    <div class="gap-5 flex">
-      <div class="flex flex-col gap-5">
+    <div class="grid grid-cols-3 gap-5" :style="{ gridTemplateAreas: formGridAreas }">
 
-        <!-- 1. Shaxsiy ma'lumotlar -->
-        <div class="card p-5 space-y-4">
-          <div class="flex items-center gap-2.5">
-            <span
-              class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
-              style="background:var(--primary);">1</span>
-            <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Shaxsiy ma'lumotlar") }}</h3>
-          </div>
+      <!-- 1. Shaxsiy ma'lumotlar -->
+      <div class="card p-5 space-y-4" style="grid-area: personal;">
+        <div class="flex items-center gap-2.5">
+          <span
+            class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+            style="background:var(--primary);">1</span>
+          <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Shaxsiy ma'lumotlar") }}</h3>
+        </div>
 
           <div class="grid grid-cols-2 gap-4">
             <!-- Ism -->
@@ -1402,16 +1469,16 @@ const copyTemplate = (tmpl) => {
               </div>
             </div>
           </div>
-        </div>
+      </div>
 
-        <!-- 2. Manzil ma'lumotlari -->
-        <div class="card p-5 space-y-4">
-          <div class="flex items-center gap-2.5">
-            <span
-              class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
-              style="background:var(--primary);">2</span>
-            <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Manzil ma'lumotlari") }}</h3>
-          </div>
+      <!-- 2. Manzil ma'lumotlari -->
+      <div class="card p-5 space-y-4" style="grid-area: address;">
+        <div class="flex items-center gap-2.5">
+          <span
+            class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+            style="background:var(--primary);">2</span>
+          <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Manzil ma'lumotlari") }}</h3>
+        </div>
 
           <div class="grid grid-cols-2 gap-4">
             <!-- Viloyat -->
@@ -1485,18 +1552,16 @@ const copyTemplate = (tmpl) => {
                 class="w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
             </div>
           </div>
-        </div>
       </div>
-      <div class="flex flex-col gap-5">
-        <div class="flex gap-5">
-          <!-- 3. Qo'shimcha ma'lumotlar -->
-          <div class="card p-5 space-y-4">
-            <div class="flex items-center gap-2.5">
-              <span
-                class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
-                style="background:var(--primary);">3</span>
-              <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Qo'shimcha ma'lumotlar") }}</h3>
-            </div>
+
+      <!-- 3. Qo'shimcha ma'lumotlar -->
+      <div class="card p-5 space-y-4" style="grid-area: extra;">
+        <div class="flex items-center gap-2.5">
+          <span
+            class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+            style="background:var(--primary);">3</span>
+          <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Qo'shimcha ma'lumotlar") }}</h3>
+        </div>
 
             <!-- Manba -->
             <div class="space-y-1">
@@ -1545,14 +1610,14 @@ const copyTemplate = (tmpl) => {
               <!-- Maslahat narxi -->
               <div class="space-y-1">
                 <label
-                  :class="['block text-[11px] font-medium  tracking-wider', submitted && !price ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
+                  :class="['block text-[11px] font-medium  tracking-wider', submitted && price === '' ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
                     $t("Maslaxat narxi") }} <span
-                    :class="price ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
+                    :class="price !== '' ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
 
                 <div class="relative" ref="priceMenuAnchor">
                   <div class="relative">
                     <div @click="showPriceMenu = !showPriceMenu; showPaymentMenu = false"
-                      :class="['w-full flex items-center justify-between gap-2 pl-9 pr-3 py-2 bg-gray-50 dark:bg-white/5 border rounded-lg text-sm cursor-pointer transition-all relative', submitted && !price ? 'border-[var(--danger)]' : 'border-[var(--border)] hover:border-[var(--primary)]', price ? 'text-[var(--text-1)]' : 'text-[var(--text-2)]']">
+                      :class="['w-full flex items-center justify-between gap-2 pl-9 pr-3 py-2 bg-gray-50 dark:bg-white/5 border rounded-lg text-sm cursor-pointer transition-all relative', submitted && price === '' ? 'border-[var(--danger)]' : 'border-[var(--border)] hover:border-[var(--primary)]', price !== '' ? 'text-[var(--text-1)]' : 'text-[var(--text-2)]']">
                       <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none"
                           viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1561,7 +1626,7 @@ const copyTemplate = (tmpl) => {
                           <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                       </span>
-                      <span class="truncate">{{ price ? formatMoney(price) + $t(" so'm") : $t("Narxni tanlang")
+                      <span class="truncate">{{ price === '' ? $t("Narxni tanlang") : Number(price) === 0 ? $t("Bepul maslahat") : formatMoney(price) + $t(" so'm")
                         }}</span>
                       <svg xmlns="http://www.w3.org/2000/svg"
                         class="w-4 h-4 text-[var(--text-2)] transition-transform ml-auto shrink-0"
@@ -1583,6 +1648,19 @@ const copyTemplate = (tmpl) => {
                           </p>
                         </div>
                         <div class="py-1" style="position: relative;">
+                                                    <button type="button"
+                            @click.stop="price = 0; paymentAmount = ''; paymentType = ''; showPaymentMenu = false; showPriceMenu = false"
+                            class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
+                            :class="price !== '' && Number(price) === 0
+                              ? 'pill-selected'
+                              : 'text-[var(--text-1)] hover:bg-[var(--border-light)]'">
+                            {{ $t("Bepul maslahat") }}
+                            <svg v-if="price !== '' && Number(price) === 0"
+                              xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                              stroke="currentColor" stroke-width="3">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
                           <button type="button"
                             @click.stop="price = pricesStore.prices.price_one; paymentAmount = String(pricesStore.prices.price_one).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); showPaymentMenu = true"
                             class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
@@ -1609,6 +1687,7 @@ const copyTemplate = (tmpl) => {
                               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                           </button>
+
 
                           <!-- To'lov turi submenu -->
                           <Transition name="submenu-fade">
@@ -1643,7 +1722,7 @@ const copyTemplate = (tmpl) => {
                   </div>
 
                   <!-- Tanlangan narx va to'lov turi ko'rsatkich -->
-                  <div v-if="price && paymentType && !showPriceMenu && !showPaymentMenu"
+                  <div v-if="price !== '' && (paymentType || Number(price) === 0) && !showPriceMenu && !showPaymentMenu"
                     class="mt-2 flex items-center gap-2 flex-wrap">
                     <span
                       class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
@@ -1652,9 +1731,9 @@ const copyTemplate = (tmpl) => {
                         stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
-                      {{ formatMoney(price) }} {{ $t("so'm") }}
+                      {{ Number(price) === 0 ? $t("Bepul maslahat") : formatMoney(price) + ' ' + $t("so'm") }}
                     </span>
-                    <span
+                    <span v-if="paymentType"
                       class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
                       style="background:var(--success-bg); color:var(--success);" @click="showPaymentMenu = true">
                       {{ paymentType === 'NAQD' ? '💵' : paymentType === 'KARTA' ? '💳' : paymentType === 'ONLINE' ?
@@ -1666,11 +1745,11 @@ const copyTemplate = (tmpl) => {
                   </div>
                 </div>
               </div>
-            </div>
           </div>
+      </div>
 
-          <div v-if="!props.editing?.id" class="card p-5 space-y-4 h-[235px]">
-            <div class="flex flex-col gap-3">
+      <div v-if="!props.editing?.id" class="card p-5 space-y-4 h-full" style="grid-area: ai;">
+        <div class="flex flex-col gap-3">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
@@ -1737,21 +1816,21 @@ const copyTemplate = (tmpl) => {
                   {{ riskLevel === 'yuqori' ? $t('Yuqori') : $t('Past') }}
                 </span>
               </div>
-            </div>
           </div>
-        </div>
-        <!-- 4. Murojaat ma'lumotlari -->
-        <div class="card p-5 space-y-3 flex-1 flex flex-col">
+      </div>
+
+      <!-- 4. Murojaat ma'lumotlari -->
+      <div class="card p-5 space-y-3 flex flex-col h-full" style="grid-area: appeal;">
           <div class="flex items-center gap-2.5">
             <span
               class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
               style="background:var(--primary);">4</span>
-            <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Murojaat ma'lumotlari") }}</h3>
+            <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Ichki izoh (faqat xodimlar uchun)") }}</h3>
           </div>
 
           <div class="space-y-1 flex-1 flex flex-col">
             <label class="block text-[11px] font-medium  tracking-wider" style="color:var(--text-2);">
-              {{ $t('Murojaatning qisqacha mazmuni') }} <span
+              {{ $t('Murojaatning qisqacha mazmuni yoki boshqa ma\'lumot') }} <span
                 :class="description ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span>
             </label>
             <div class="relative flex-1 flex flex-col">
@@ -1762,7 +1841,6 @@ const copyTemplate = (tmpl) => {
               }}/500</span>
             </div>
           </div>
-        </div>
       </div>
     </div>
 
@@ -1799,17 +1877,29 @@ const copyTemplate = (tmpl) => {
               <p class="text-[11px]" style="color:var(--text-3);">JPG, PNG, PDF, DOCX ({{ $t('maks.') }} 10MB)</p>
             </div>
           </div>
-          <label class="btn btn-ghost btn-sm shrink-0 cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
-            @click.stop>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
-            </svg>
-            {{ $t('Fayl tanlash') }}
-            <input ref="documentsInputRef" :key="documentsInputKey" type="file" multiple class="hidden"
-              @change="handleDocumentFiles" />
-          </label>
+          <div class="flex items-center gap-2 shrink-0">
+            <label class="btn btn-ghost btn-sm cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
+              @click.stop>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
+              </svg>
+              {{ $t('Fayl tanlash') }}
+              <input ref="documentsInputRef" :key="documentsInputKey" type="file" multiple class="hidden"
+                @change="handleDocumentFiles" />
+            </label>
+            <button type="button" class="btn btn-ghost btn-sm flex items-center gap-1.5 whitespace-nowrap"
+              @click.stop="openCamera">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 7h3l2-2h8l2 2h3v12a1 1 0 01-1 1H4a1 1 0 01-1-1V7z" />
+                <circle cx="12" cy="13" r="3.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              {{ $t('Kamera') }}
+            </button>
+          </div>
         </div>
 
         <div v-if="documentFiles.length > 0" class="flex flex-wrap gap-2 mt-1">
@@ -1868,6 +1958,45 @@ const copyTemplate = (tmpl) => {
       </button>
     </div>
   </div>
+
+  <!-- Kamera bilan hujjat rasmga olish modali -->
+  <Teleport to="body">
+    <div v-if="showCameraModal" class="fixed inset-0 z-[999] flex items-center justify-center p-4"
+      style="background:rgba(0,0,0,0.75);" @click.self="closeCamera">
+      <div class="w-full max-w-lg rounded-2xl overflow-hidden" style="background:var(--bg-card);">
+        <div class="flex items-center justify-between px-4 py-3 border-b" style="border-color:var(--border);">
+          <p class="text-sm font-medium" style="color:var(--text-1);">{{ $t('Hujjatni rasmga olish') }}</p>
+          <button type="button" @click="closeCamera"
+            class="w-7 h-7 flex items-center justify-center rounded-full" style="color:var(--text-2);">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="relative bg-black aspect-video flex items-center justify-center">
+          <p v-if="cameraError" class="text-sm text-white px-4 text-center">{{ cameraError }}</p>
+          <video v-else ref="cameraVideoRef" class="w-full h-full object-contain" autoplay playsinline muted></video>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 px-4 py-3 border-t" style="border-color:var(--border);">
+          <button type="button" @click="closeCamera" class="btn btn-ghost btn-sm">{{ $t('Bekor qilish') }}</button>
+          <button type="button" :disabled="!!cameraError" @click="capturePhoto"
+            class="btn btn-sm flex items-center gap-1.5 text-white disabled:opacity-50"
+            style="background:linear-gradient(135deg, var(--info), #7c5cf5);">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 7h3l2-2h8l2 2h3v12a1 1 0 01-1 1H4a1 1 0 01-1-1V7z" />
+              <circle cx="12" cy="13" r="3.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            {{ $t('Suratga olish') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
