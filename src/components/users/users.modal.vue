@@ -289,7 +289,7 @@ const closeModal = () => {
                                 $t('Profil rasmi') }}</label>
                             <label class="cursor-pointer inline-block">
                                 <div
-                                    class="w-20 h-20 border-2 border-dashed border-[var(--border)] rounded-xl overflow-hidden flex items-center justify-center hover:border-[var(--text-1)] transition-colors bg-[var(--border-light)]">
+                                    class="w-20 h-20 border-2 border-dashed border-[var(--border)] rounded-xl overflow-hidden flex items-center justify-center hover:border-[var(--text-1)] transition-colors bg-gray-50 dark:bg-white/5">
                                     <img v-if="imgPreview" :src="imgPreview" class="w-full h-full object-cover" />
                                     <div v-else class="flex flex-col items-center gap-1 text-[var(--text-2)]">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -313,7 +313,7 @@ const closeModal = () => {
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
                                     $t('Ism') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserName" type="text" :placeholder="$t('Ismni kiriting')"
-                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                    class="w-full px-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                             </div>
 
                             <!-- Surname -->
@@ -322,7 +322,7 @@ const closeModal = () => {
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
                                     $t('Familiya') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserSurname" type="text" :placeholder="$t('Familiyani kiriting')"
-                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                    class="w-full px-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                             </div>
 
                             <!-- Father name -->
@@ -332,7 +332,7 @@ const closeModal = () => {
                                     $t('Otasining ismi') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserFatherName" type="text"
                                     :placeholder="$t('Otasining ismini kiriting')"
-                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                    class="w-full px-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                             </div>
 
                             <!-- Username -->
@@ -351,7 +351,7 @@ const closeModal = () => {
                                     </span>
                                     <input v-model="newUserUsername" type="text" required
                                         :placeholder="$t('Loginni kiriting')"
-                                        class="w-full pl-9 pr-4 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                        class="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                                 </div>
                             </div>
 
@@ -371,7 +371,7 @@ const closeModal = () => {
                                     </span>
                                     <input v-model="newUserPassword" :type="showPassword ? 'text' : 'password'" required
                                         :placeholder="$t('Parolni kiriting')"
-                                        class="w-full pl-9 pr-10 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                        class="w-full pl-9 pr-10 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                                     <button type="button" @click="showPassword = !showPassword"
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-[var(--text-2)] hover:text-[var(--text-3)] transition-colors">
                                         <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -398,7 +398,7 @@ const closeModal = () => {
                                     $t('Telefon') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserPhone" @input="handlePhoneInput" type="tel"
                                     placeholder="+998 XX XXX XX XX"
-                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                    class="w-full px-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                             </div>
 
                             <!-- Phone 2 -->
@@ -408,7 +408,7 @@ const closeModal = () => {
                                     $t("Qo'shimcha telefon") }}</label>
                                 <input v-model="newUserPhone2" @input="handlePhoneInput2" type="tel"
                                     placeholder="+998 XX XXX XX XX"
-                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                    class="w-full px-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                             </div>
 
                             <!-- Telegram -->
@@ -426,7 +426,7 @@ const closeModal = () => {
                                     </span>
                                     <input v-model="newUserTelegram" @input="handleInput" type="text"
                                         :placeholder="$t('@username yoki +998 XX XXX XX XX')"
-                                        class="w-full pl-8 pr-4 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                        class="w-full pl-8 pr-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                                 </div>
                             </div>
 
@@ -436,7 +436,7 @@ const closeModal = () => {
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
                                     $t("Tug'ilgan sana") }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserBirthDate" type="date"
-                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                    class="w-full px-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                             </div>
 
                             <!-- User code -->
@@ -446,7 +446,7 @@ const closeModal = () => {
                                     $t('Pasport seriya raqami') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <input v-model="newUserUserCode" @input="handlePassportInput" type="text"
                                     :placeholder="$t('AA1234567')"
-                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                    class="w-full px-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                             </div>
 
                             <!-- Unique code -->
@@ -458,7 +458,7 @@ const closeModal = () => {
                                 <input v-model="newUserUniqueCode" type="text" inputmode="numeric"
                                     :placeholder="$t('14 raqam')" maxlength="14"
                                     @input="newUserUniqueCode = $event.target.value.replace(/\D/g, '').slice(0, 14)"
-                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                                    class="w-full px-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
                             </div>
                             <!-- Role -->
                             <div class="space-y-1 sm:col-span-2">
@@ -466,7 +466,7 @@ const closeModal = () => {
                                     class="block text-[11px] font-medium text-[var(--text-2)] uppercase tracking-wider">{{
                                     $t('Lavozim') }} <span class="text-[var(--danger)] text-[16px]">*</span></label>
                                 <select v-model="newUserRole"
-                                    class="w-full px-3 py-2.5 bg-[var(--border-light)] border border-[var(--border)] rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 cursor-pointer">
+                                    class="w-full px-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 cursor-pointer">
                                     <option v-for="role in availableRoles" :key="role.value" :value="role.value">
                                         {{ role.label }}
                                     </option>

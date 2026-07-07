@@ -26,6 +26,21 @@ const themeStore = useThemeStore()
 const name = ref('')
 const surname = ref('')
 const father_name = ref('')
+
+// Ism, familiya, otasining ismi — birinchi harf avtomatik katta bo'lsin
+const capitalizeFirst = (val) => val ? val.charAt(0).toUpperCase() + val.slice(1) : val
+watch(name, (val) => {
+  const capitalized = capitalizeFirst(val)
+  if (capitalized !== val) name.value = capitalized
+})
+watch(surname, (val) => {
+  const capitalized = capitalizeFirst(val)
+  if (capitalized !== val) surname.value = capitalized
+})
+watch(father_name, (val) => {
+  const capitalized = capitalizeFirst(val)
+  if (capitalized !== val) father_name.value = capitalized
+})
 const phone = ref('')
 const phone2 = ref('')
 const address = ref('')
@@ -729,8 +744,8 @@ watch(() => props.editing, (val) => {
   savedCustomerData.value = null
 }, { immediate: true })
 const autoCapFirst = (fieldRef) => {
-  if (fieldRef.value && fieldRef.value[0] !== fieldRef.value[0].to()) {
-    fieldRef.value = fieldRef.value.charAt(0).to() + fieldRef.value.slice(1)
+  if (fieldRef.value && fieldRef.value[0] !== fieldRef.value[0].toUpperCase()) {
+    fieldRef.value = fieldRef.value.charAt(0).toUpperCase() + fieldRef.value.slice(1)
   }
 }
 
@@ -1009,6 +1024,11 @@ const duplicateInfo = ref(null)
 const blacklistedMatch = computed(() => duplicateInfo.value?.matches?.find(m => m.isBlacklisted) || null)
 let duplicateCheckTimer = null
 
+// AI Yordamchisi paneli — telefon, shaxs, oldingi murojaatlar va risk darajasi
+const phoneVerified = computed(() => phone.value.replace(/\D/g, '').length >= 12)
+const riskLevel = computed(() => (blacklistedMatch.value ? 'yuqori' : 'past'))
+const aiPanelCollapsed = ref(false)
+
 const runDuplicateCheck = () => {
   if (props.editing?.id) return
   const hasNameSurname = name.value.trim().length > 1 && surname.value.trim().length > 1
@@ -1095,21 +1115,21 @@ const copyTemplate = (tmpl) => {
 
       <!-- Info banner clone -->
       <div
-        class="relative ml-auto flex h-16 flex-1 min-w-[600px] max-w-md items-center overflow-hidden rounded-[10px] border border-[#dfe3ff] bg-gradient-to-r from-white via-[#fbfbff] to-[#f2f3ff] px-6 shadow-[0_1px_3px_rgba(70,84,180,0.05),inset_0_0_0_1px_rgba(255,255,255,0.7)]">
+        class="relative ml-auto flex h-16 flex-1 min-w-[600px] max-w-md items-center overflow-hidden rounded-[10px] border border-[#dfe3ff] dark:border-[#2a2f52] bg-gradient-to-r from-white via-[#fbfbff] to-[#f2f3ff] dark:from-[#12142a] dark:via-[#15172f] dark:to-[#191c3d] px-6 shadow-[0_1px_3px_rgba(70,84,180,0.05),inset_0_0_0_1px_rgba(255,255,255,0.7)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),inset_0_0_0_1px_rgba(255,255,255,0.04)]">
         <div class="relative z-[5] flex items-center gap-4">
           <div
-            class="flex h-7 w-7 min-w-7 items-center justify-center rounded-full border-2 border-[#4f67ff] bg-white font-serif text-[18px] font-bold leading-none text-[#4f67ff]">
+            class="flex h-7 w-7 min-w-7 items-center justify-center rounded-full border-2 border-[#4f67ff] dark:border-[#7c8cff] bg-white dark:bg-[#191c3d] font-serif text-[18px] font-bold leading-none text-[#4f67ff] dark:text-[#8b9aff]">
             i
           </div>
 
-          <p class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.1px] text-[#26345d]">
+          <p class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.1px] text-[#26345d] dark:text-[#dbe1ff]">
             {{ $t("Yulduzcha") }}
-            <span class="font-bold text-[#f04438]">( * )</span>
+            <span class="font-bold text-[#f04438] dark:text-[#ff7a6e]">( * )</span>
             {{ $t("bilan belgilangan maydonlar majburiy.") }}
           </p>
         </div>
 
-        <div class="pointer-events-none absolute right-0 top-0 z-[1] h-[78px] w-[185px]">
+        <div class="pointer-events-none absolute right-0 top-0 z-[1] h-[78px] w-[185px] dark:opacity-40">
           <svg viewBox="0 0 185 78" xmlns="http://www.w3.org/2000/svg" class="block h-full w-full">
             <defs>
               <linearGradient id="mainCard" x1="73" y1="10" x2="162" y2="70">
@@ -1250,8 +1270,8 @@ const copyTemplate = (tmpl) => {
       style="background:var(--danger-bg); border:1px solid var(--danger-border); color:var(--danger);">
       {{ error }}</div>
 
-    <!-- Asosiy 2 ustunli tarkib -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+    <!-- Asosiy tarkib -->
+    <div :class="['grid grid-cols-1 gap-5 items-stretch', !props.editing?.id ? 'lg:grid-cols-[1fr_1fr_0.75fr]' : 'lg:grid-cols-2']">
 
       <!-- ══ Chap ustun ══ -->
       <div class="space-y-5 flex flex-col">
@@ -1283,7 +1303,7 @@ const copyTemplate = (tmpl) => {
                   </svg>
                 </span>
                 <input v-model="name" type="text" :placeholder="$t('Ism')"
-                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !name ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !name ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
               </div>
             </div>
 
@@ -1304,7 +1324,7 @@ const copyTemplate = (tmpl) => {
                   </svg>
                 </span>
                 <input v-model="surname" type="text" :placeholder="$t('Familiya')"
-                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !surname ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !surname ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
               </div>
             </div>
           </div>
@@ -1324,7 +1344,7 @@ const copyTemplate = (tmpl) => {
                 </svg>
               </span>
               <input v-model="father_name" type="text" :placeholder="$t('Otasining ismi')"
-                :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !father_name ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+                :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !father_name ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
             </div>
           </div>
 
@@ -1345,10 +1365,10 @@ const copyTemplate = (tmpl) => {
                   </svg>
                 </span>
                 <input v-model="phone" @input="handlePhone($event, 1)" type="tel" placeholder="+998 XX XXX XX XX"
-                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !phone ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !phone ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
               </div>
               <div class="flex items-center mt-3 gap-3 text-sm">
-                <span class="text-[11px]" style="color:var(--text-2);">{{ $t('Bu raqamda Telegram bormi?') }}</span>
+                <span class="text-[11px] min-w-[170px]" style="color:var(--text-2);">{{ $t('Bu raqamda Telegram bormi?') }}</span>
                 <label class="flex items-center gap-1 cursor-pointer">
                   <input type="radio" name="phoneIsTelegram" :checked="phoneIsTelegram === 'ha'"
                     @change="setPhoneIsTelegram('ha')" class="w-4 h-4 accent-[var(--primary)]">
@@ -1379,7 +1399,7 @@ const copyTemplate = (tmpl) => {
                 </span>
                 <input v-model="telegram" @input="handleInput()" type="text"
                   :placeholder="$t('@username yoki +998 XX XXX XX XX')"
-                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !telegram ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !telegram ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
               </div>
             </div>
           </div>
@@ -1411,7 +1431,7 @@ const copyTemplate = (tmpl) => {
                   </svg>
                 </span>
                 <select v-model="selectedRegion"
-                  :class="['w-full pl-9 pr-8 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !selectedRegion ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
+                  :class="['w-full pl-9 pr-8 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !selectedRegion ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
                   <option value="">{{ $t('— Viloyatni tanlang —') }}</option>
                   <option v-for="r in regions" :key="r.id" :value="r.id">{{ $t(r.name_uz) }}</option>
                 </select>
@@ -1440,7 +1460,7 @@ const copyTemplate = (tmpl) => {
                   </svg>
                 </span>
                 <select v-model="selectedDistrict" :disabled="!selectedRegion"
-                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !selectedDistrict ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !selectedDistrict ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
                   <option value="">{{ $t('— Tuman tanlang —') }}</option>
                   <option v-for="d in filteredDistricts" :key="d.id" :value="d.id">{{ $t(d.name_uz) }}</option>
                 </select>
@@ -1463,7 +1483,7 @@ const copyTemplate = (tmpl) => {
                 </svg>
               </span>
               <input v-model="address" type="text" :placeholder="$t('Manzilni kiriting')"
-                class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
+                class="w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20" />
             </div>
           </div>
         </div>
@@ -1497,7 +1517,7 @@ const copyTemplate = (tmpl) => {
                 </svg>
               </span>
               <select v-model="source"
-                :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !source ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
+                :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !source ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
                 <option value="">{{ $t('— Tanlanmagan —') }}</option>
                 <option v-for="s in sourceOptions" :key="s.value" :value="s.value">{{ $t(s.label) }}</option>
               </select>
@@ -1516,7 +1536,7 @@ const copyTemplate = (tmpl) => {
     <img src="/avatar.png" width="30" class="rounded-full" alt="">
                 </span>
                 <select v-model="assignedToId"
-                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !assignedToId ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !assignedToId ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
                   <option value="">{{ $t('— Belgilanmagan —') }}</option>
                   <option v-for="u in users" :key="u.id" :value="u.id">
                     {{ $t(u.surname) }} {{ $t(u.name) }}
@@ -1535,7 +1555,7 @@ const copyTemplate = (tmpl) => {
               <div class="relative" ref="priceMenuAnchor">
                 <div class="relative">
                   <div @click="showPriceMenu = !showPriceMenu; showPaymentMenu = false"
-                    :class="['w-full flex items-center justify-between gap-2 pl-9 pr-3 py-2 bg-gray-50 border rounded-lg text-sm cursor-pointer transition-all relative', submitted && !price ? 'border-[var(--danger)]' : 'border-[var(--border)] hover:border-[var(--primary)]', price ? 'text-[var(--text-1)]' : 'text-[var(--text-2)]']">
+                    :class="['w-full flex items-center justify-between gap-2 pl-9 pr-3 py-2 bg-gray-50 dark:bg-white/5 border rounded-lg text-sm cursor-pointer transition-all relative', submitted && !price ? 'border-[var(--danger)]' : 'border-[var(--border)] hover:border-[var(--primary)]', price ? 'text-[var(--text-1)]' : 'text-[var(--text-2)]']">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1667,9 +1687,75 @@ const copyTemplate = (tmpl) => {
             <div class="relative flex-1 flex flex-col">
               <textarea v-model="description" maxlength="500"
                 :placeholder="$t('Murojaatning qisqacha mazmunini yozing...')"
-                class="w-full flex-1 min-h-[140px] px-3 py-2.5 bg-gray-50 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 resize-none"></textarea>
+                class="w-full flex-1 min-h-[140px] px-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 resize-none"></textarea>
               <span class="absolute bottom-2 right-3 text-[10px]" style="color:var(--text-3);">{{ description.length
                 }}/500</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ AI Yordamchisi ustuni ══ -->
+      <div v-if="!props.editing?.id" class="space-y-5 flex flex-col">
+        <div class="card p-5 space-y-4">
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                  :style="{ background: phoneVerified ? 'var(--success)' : 'var(--border)' }">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Telefon raqami tekshirildi') }}</span>
+              </div>
+              <span class="text-[11px] font-semibold" :style="{ color: phoneVerified ? 'var(--success)' : 'var(--text-3)' }">
+                {{ phoneVerified ? $t("To'g'ri") : $t("To'liq kiritilmagan") }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background:var(--success);">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Shaxs topildi') }}</span>
+              </div>
+              <span class="text-[11px] font-semibold" style="color:var(--text-2);">
+                {{ duplicateInfo?.count > 0 ? $t('Mavjud mijoz') : $t('Yangi mijoz') }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background:var(--success);">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Oldingi murojaatlar') }}</span>
+              </div>
+              <span class="text-[11px] font-semibold" style="color:var(--text-2);">
+                {{ duplicateInfo?.count > 0 ? `${duplicateInfo.count} ${$t('ta topildi')}` : $t('Topilmadi') }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                  :style="{ background: riskLevel === 'yuqori' ? 'var(--danger)' : 'var(--success)' }">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Risk darajasi') }}</span>
+              </div>
+              <span class="text-[11px] font-bold" :style="{ color: riskLevel === 'yuqori' ? 'var(--danger)' : 'var(--success)' }">
+                {{ riskLevel === 'yuqori' ? $t('Yuqori') : $t('Past') }}
+              </span>
             </div>
           </div>
         </div>
@@ -1692,7 +1778,7 @@ const copyTemplate = (tmpl) => {
         </label>
 
         <div
-          class="flex items-center justify-between gap-3 px-4 py-4 bg-gray-50 border border-dashed rounded-lg cursor-pointer"
+          class="flex items-center justify-between gap-3 px-4 py-4 bg-gray-50 dark:bg-white/5 border border-dashed rounded-lg cursor-pointer"
           style="border-color:var(--border);" @click="triggerDocumentsInput">
           <div class="flex items-center gap-3 min-w-0">
             <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"

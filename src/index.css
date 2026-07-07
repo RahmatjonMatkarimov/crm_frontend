@@ -374,12 +374,13 @@ body {
   padding: 0 13px;
   font-size: 13.5px;
   color: var(--text-1);
-  background: var(--bg-card);
+  background: #f9fafb;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   outline: none;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
+html.dark .form-input { background: rgba(255, 255, 255, 0.05); }
 .form-input::placeholder { color: var(--text-3); }
 .form-input:focus {
   border-color: var(--text-1) !important;

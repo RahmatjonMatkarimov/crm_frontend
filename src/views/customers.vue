@@ -143,12 +143,12 @@ const openStatus = (key) => {
             <div class="space-y-1.5">
               <label class="block text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-2);">{{
                 $t('1-narx (so\'mda)') }}</label>
-              <input v-model="editingPriceOne" type="number" class="form-input bg-[var(--border-light)]" />
+              <input v-model="editingPriceOne" type="number" class="form-input" />
             </div>
             <div class="space-y-1.5">
               <label class="block text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-2);">{{
                 $t('2-narx (so\'mda)') }}</label>
-              <input v-model="editingPriceTwo" type="number" class="form-input bg-[var(--border-light)]" />
+              <input v-model="editingPriceTwo" type="number" class="form-input" />
             </div>
           </div>
 
