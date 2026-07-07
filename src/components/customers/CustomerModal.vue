@@ -1233,8 +1233,8 @@ const copyTemplate = (tmpl) => {
         style="background:var(--danger-bg); border:1px solid var(--danger-border); color:var(--danger);">
         <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
           style="background:var(--danger); color:#fff;">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
           </svg>
@@ -1248,15 +1248,16 @@ const copyTemplate = (tmpl) => {
         style="background:var(--warning-bg); border:1px solid var(--warning-border); color:var(--warning);">
         <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
           style="background:var(--warning); color:#fff;">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M12 9v3.75m0 3.75h.008v.008H12v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <div class="pt-0.5">
           <p class="font-semibold text-[13px]">{{ $t('Diqqat') }}</p>
-          <p class="mt-1 opacity-90">{{ $t("bu F.I.Sh yoki telefon raqami bilan mijoz avval") }} {{ duplicateInfo.count }}
+          <p class="mt-1 opacity-90">{{ $t("bu F.I.Sh yoki telefon raqami bilan mijoz avval") }} {{ duplicateInfo.count
+            }}
             {{ $t("marta ro'yxatdan o'tgan. Bu") }} {{ duplicateInfo.count + 1 }}-{{ $t("chi marta bo'ladi.") }}</p>
         </div>
       </div>
@@ -1270,11 +1271,8 @@ const copyTemplate = (tmpl) => {
       style="background:var(--danger-bg); border:1px solid var(--danger-border); color:var(--danger);">
       {{ error }}</div>
 
-    <!-- Asosiy tarkib -->
-    <div :class="['grid grid-cols-1 gap-5 items-stretch', !props.editing?.id ? 'lg:grid-cols-[1fr_1fr_0.75fr]' : 'lg:grid-cols-2']">
-
-      <!-- ══ Chap ustun ══ -->
-      <div class="space-y-5 flex flex-col">
+    <div class="gap-5 flex">
+      <div class="flex flex-col gap-5">
 
         <!-- 1. Shaxsiy ma'lumotlar -->
         <div class="card p-5 space-y-4">
@@ -1368,7 +1366,8 @@ const copyTemplate = (tmpl) => {
                   :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !phone ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
               </div>
               <div class="flex items-center mt-3 gap-3 text-sm">
-                <span class="text-[11px] min-w-[170px]" style="color:var(--text-2);">{{ $t('Bu raqamda Telegram bormi?') }}</span>
+                <span class="text-[11px] min-w-[170px]" style="color:var(--text-2);">{{ $t('Bu raqamda Telegram bormi?')
+                  }}</span>
                 <label class="flex items-center gap-1 cursor-pointer">
                   <input type="radio" name="phoneIsTelegram" :checked="phoneIsTelegram === 'ha'"
                     @change="setPhoneIsTelegram('ha')" class="w-4 h-4 accent-[var(--primary)]">
@@ -1488,188 +1487,259 @@ const copyTemplate = (tmpl) => {
           </div>
         </div>
       </div>
-
-      <!-- ══ O'ng ustun ══ -->
-      <div class="space-y-5 flex flex-col">
-
-        <!-- 3. Qo'shimcha ma'lumotlar -->
-        <div class="card p-5 space-y-4">
-          <div class="flex items-center gap-2.5">
-            <span
-              class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
-              style="background:var(--primary);">3</span>
-            <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Qo'shimcha ma'lumotlar") }}</h3>
-          </div>
-
-          <!-- Manba -->
-          <div class="space-y-1">
-            <label
-              :class="['block text-[11px] font-medium  tracking-wider', submitted && !source ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
-                $t('Qayerdan eshitib keldi yoki kim yubordi') }} <span
-                :class="source ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" viewBox="0 0 24 24"
-                  fill="currentColor">
-                  <path d="M9 12a4 4 0 100-8 4 4 0 000 8zm0 2c-3.33 0-6 1.79-6 4v2h12v-2c0-2.21-2.67-4-6-4z" />
-                  <path
-                    d="M16.5 12a3.5 3.5 0 100-7 3.5 3.5 0 000 7zm.35 1.98c-.11-.01-.22-.02-.35-.02-.9 0-1.75.15-2.53.42 1.24.85 2.03 2.02 2.03 3.42v2.2h5v-2c0-2.02-2.36-3.69-4.15-4.02z" />
-                </svg>
-              </span>
-              <select v-model="source"
-                :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !source ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
-                <option value="">{{ $t('— Tanlanmagan —') }}</option>
-                <option v-for="s in sourceOptions" :key="s.value" :value="s.value">{{ $t(s.label) }}</option>
-              </select>
+      <div class="flex flex-col gap-5">
+        <div class="flex gap-5">
+          <!-- 3. Qo'shimcha ma'lumotlar -->
+          <div class="card p-5 space-y-4">
+            <div class="flex items-center gap-2.5">
+              <span
+                class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+                style="background:var(--primary);">3</span>
+              <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t("Qo'shimcha ma'lumotlar") }}</h3>
             </div>
-          </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <!-- Mas'ul yurist -->
+            <!-- Manba -->
             <div class="space-y-1">
               <label
-                :class="['block text-[11px] font-medium  tracking-wider', submitted && !assignedToId ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
-                  $t("Qabul qiluvchi mutahasis") }} <span
-                  :class="assignedToId ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
+                :class="['block text-[11px] font-medium  tracking-wider', submitted && !source ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
+                  $t('Qayerdan eshitib keldi yoki kim yubordi') }} <span
+                  :class="source ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-    <img src="/avatar.png" width="30" class="rounded-full" alt="">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" viewBox="0 0 24 24"
+                    fill="currentColor">
+                    <path d="M9 12a4 4 0 100-8 4 4 0 000 8zm0 2c-3.33 0-6 1.79-6 4v2h12v-2c0-2.21-2.67-4-6-4z" />
+                    <path
+                      d="M16.5 12a3.5 3.5 0 100-7 3.5 3.5 0 000 7zm.35 1.98c-.11-.01-.22-.02-.35-.02-.9 0-1.75.15-2.53.42 1.24.85 2.03 2.02 2.03 3.42v2.2h5v-2c0-2.02-2.36-3.69-4.15-4.02z" />
+                  </svg>
                 </span>
-                <select v-model="assignedToId"
-                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !assignedToId ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
-                  <option value="">{{ $t('— Belgilanmagan —') }}</option>
-                  <option v-for="u in users" :key="u.id" :value="u.id">
-                    {{ $t(u.surname) }} {{ $t(u.name) }}
-                  </option>
+                <select v-model="source"
+                  :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !source ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
+                  <option value="">{{ $t('— Tanlanmagan —') }}</option>
+                  <option v-for="s in sourceOptions" :key="s.value" :value="s.value">{{ $t(s.label) }}</option>
                 </select>
               </div>
             </div>
 
-            <!-- Maslahat narxi -->
-            <div class="space-y-1">
-              <label
-                :class="['block text-[11px] font-medium  tracking-wider', submitted && !price ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
-                  $t("Maslaxat narxi") }} <span
-                  :class="price ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
-
-              <div class="relative" ref="priceMenuAnchor">
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Mas'ul yurist -->
+              <div class="space-y-1">
+                <label
+                  :class="['block text-[11px] font-medium  tracking-wider', submitted && !assignedToId ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
+                    $t("Qabul qiluvchi mutahasis") }} <span
+                    :class="assignedToId ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
                 <div class="relative">
-                  <div @click="showPriceMenu = !showPriceMenu; showPaymentMenu = false"
-                    :class="['w-full flex items-center justify-between gap-2 pl-9 pr-3 py-2 bg-gray-50 dark:bg-white/5 border rounded-lg text-sm cursor-pointer transition-all relative', submitted && !price ? 'border-[var(--danger)]' : 'border-[var(--border)] hover:border-[var(--primary)]', price ? 'text-[var(--text-1)]' : 'text-[var(--text-2)]']">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2M9.401 15c.52.598 1.488 1 2.599 1" />
-                        <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round" />
+                  <span class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                    <img src="/avatar.png" width="30" class="rounded-full" alt="">
+                  </span>
+                  <select v-model="assignedToId"
+                    :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1 cursor-pointer appearance-none', submitted && !assignedToId ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']">
+                    <option value="">{{ $t('— Belgilanmagan —') }}</option>
+                    <option v-for="u in users" :key="u.id" :value="u.id">
+                      {{ $t(u.surname) }} {{ $t(u.name) }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Maslahat narxi -->
+              <div class="space-y-1">
+                <label
+                  :class="['block text-[11px] font-medium  tracking-wider', submitted && !price ? 'text-[var(--danger)]' : 'text-[var(--text-2)]']">{{
+                    $t("Maslaxat narxi") }} <span
+                    :class="price ? 'text-[var(--success)] text-[16px]' : 'text-[var(--danger)] text-[16px]'">*</span></label>
+
+                <div class="relative" ref="priceMenuAnchor">
+                  <div class="relative">
+                    <div @click="showPriceMenu = !showPriceMenu; showPaymentMenu = false"
+                      :class="['w-full flex items-center justify-between gap-2 pl-9 pr-3 py-2 bg-gray-50 dark:bg-white/5 border rounded-lg text-sm cursor-pointer transition-all relative', submitted && !price ? 'border-[var(--danger)]' : 'border-[var(--border)] hover:border-[var(--primary)]', price ? 'text-[var(--text-1)]' : 'text-[var(--text-2)]']">
+                      <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" style="color:var(--info);" fill="none"
+                          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2M9.401 15c.52.598 1.488 1 2.599 1" />
+                          <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </span>
+                      <span class="truncate">{{ price ? formatMoney(price) + $t(" so'm") : $t("Narxni tanlang")
+                        }}</span>
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4 text-[var(--text-2)] transition-transform ml-auto shrink-0"
+                        :class="showPriceMenu ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                       </svg>
-                    </span>
-                    <span class="truncate">{{ price ? formatMoney(price) + $t(" so'm") : $t("Narxni tanlang")
-                      }}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                      class="w-4 h-4 text-[var(--text-2)] transition-transform ml-auto shrink-0"
-                      :class="showPriceMenu ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                      stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    </div>
+
+                    <!-- Narx dropdown -->
+                    <Transition name="submenu-fade">
+                      <div v-if="showPriceMenu"
+                        class="absolute z-50 top-full mt-1 left-0 w-56 rounded-xl shadow-2xl border"
+                        style="background:var(--bg-card); border-color:var(--border);">
+                        <div class="px-3 py-2 border-b rounded-t-xl overflow-hidden"
+                          style="border-color:var(--border-light);">
+                          <p class="text-[10px] font-semibold  tracking-wider" style="color:var(--text-3);">
+                            {{ $t("Narxni tanlang") }}
+                          </p>
+                        </div>
+                        <div class="py-1" style="position: relative;">
+                          <button type="button"
+                            @click.stop="price = pricesStore.prices.price_one; paymentAmount = String(pricesStore.prices.price_one).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); showPaymentMenu = true"
+                            class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
+                            :class="Number(price) === pricesStore.prices.price_one
+                              ? 'pill-selected'
+                              : 'text-[var(--text-1)] hover:bg-[var(--border-light)]'">
+                            {{ formatMoney(pricesStore.prices.price_one) + $t(" so'm") }}
+                            <svg v-if="Number(price) === pricesStore.prices.price_one"
+                              xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                              stroke="currentColor" stroke-width="3">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
+                          <button type="button"
+                            @click.stop="price = pricesStore.prices.price_two; paymentAmount = String(pricesStore.prices.price_two).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); showPaymentMenu = true"
+                            class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
+                            :class="Number(price) === pricesStore.prices.price_two
+                              ? 'pill-selected'
+                              : 'text-[var(--text-1)] hover:bg-[var(--border-light)]'">
+                            {{ formatMoney(pricesStore.prices.price_two) + $t(" so'm") }}
+                            <svg v-if="Number(price) === pricesStore.prices.price_two"
+                              xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                              stroke="currentColor" stroke-width="3">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
+
+                          <!-- To'lov turi submenu -->
+                          <Transition name="submenu-fade">
+                            <div v-if="showPaymentMenu"
+                              class="absolute z-50 top-full mt-1 left-0 w-56 rounded-xl shadow-2xl border overflow-hidden"
+                              style="background:var(--bg-card); border-color:var(--border);">
+                              <div class="px-3 py-2 border-b" style="border-color:var(--border-light);">
+                                <p class="text-[10px] font-semibold  tracking-wider" style="color:var(--text-3);">
+                                  {{ $t("To'lov turini tanlang") }}
+                                </p>
+                              </div>
+                              <div class="py-1">
+                                <button v-for="opt in paymentOptions" :key="opt.value" type="button"
+                                  @click.stop="paymentType = opt.value; showPaymentMenu = false; showPriceMenu = false"
+                                  class="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all text-left"
+                                  :class="paymentType === opt.value
+                                    ? 'pill-selected'
+                                    : 'text-[var(--text-1)] hover:bg-[var(--border-light)]'">
+                                  <span class="font-medium text-[13px]">{{ $t(opt.label) }}</span>
+                                  <svg v-if="paymentType === opt.value" xmlns="http://www.w3.org/2000/svg"
+                                    class="w-3.5 h-3.5 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                    stroke-width="3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          </Transition>
+                        </div>
+                      </div>
+                    </Transition>
                   </div>
 
-                  <!-- Narx dropdown -->
-                  <Transition name="submenu-fade">
-                    <div v-if="showPriceMenu"
-                      class="absolute z-50 top-full mt-1 left-0 w-56 rounded-xl shadow-2xl border"
-                      style="background:var(--bg-card); border-color:var(--border);">
-                      <div class="px-3 py-2 border-b rounded-t-xl overflow-hidden"
-                        style="border-color:var(--border-light);">
-                        <p class="text-[10px] font-semibold  tracking-wider" style="color:var(--text-3);">
-                          {{ $t("Narxni tanlang") }}
-                        </p>
-                      </div>
-                      <div class="py-1" style="position: relative;">
-                        <button type="button"
-                          @click.stop="price = pricesStore.prices.price_one; paymentAmount = String(pricesStore.prices.price_one).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); showPaymentMenu = true"
-                          class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
-                          :class="Number(price) === pricesStore.prices.price_one
-                            ? 'pill-selected'
-                            : 'text-[var(--text-1)] hover:bg-[var(--border-light)]'">
-                          {{ formatMoney(pricesStore.prices.price_one) + $t(" so'm") }}
-                          <svg v-if="Number(price) === pricesStore.prices.price_one" xmlns="http://www.w3.org/2000/svg"
-                            class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        </button>
-                        <button type="button"
-                          @click.stop="price = pricesStore.prices.price_two; paymentAmount = String(pricesStore.prices.price_two).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); showPaymentMenu = true"
-                          class="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-all text-left"
-                          :class="Number(price) === pricesStore.prices.price_two
-                            ? 'pill-selected'
-                            : 'text-[var(--text-1)] hover:bg-[var(--border-light)]'">
-                          {{ formatMoney(pricesStore.prices.price_two) + $t(" so'm") }}
-                          <svg v-if="Number(price) === pricesStore.prices.price_two" xmlns="http://www.w3.org/2000/svg"
-                            class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        </button>
-
-                        <!-- To'lov turi submenu -->
-                        <Transition name="submenu-fade">
-                          <div v-if="showPaymentMenu"
-                            class="absolute z-50 top-full mt-1 left-0 w-56 rounded-xl shadow-2xl border overflow-hidden"
-                            style="background:var(--bg-card); border-color:var(--border);">
-                            <div class="px-3 py-2 border-b" style="border-color:var(--border-light);">
-                              <p class="text-[10px] font-semibold  tracking-wider" style="color:var(--text-3);">
-                                {{ $t("To'lov turini tanlang") }}
-                              </p>
-                            </div>
-                            <div class="py-1">
-                              <button v-for="opt in paymentOptions" :key="opt.value" type="button"
-                                @click.stop="paymentType = opt.value; showPaymentMenu = false; showPriceMenu = false"
-                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all text-left"
-                                :class="paymentType === opt.value
-                                  ? 'pill-selected'
-                                  : 'text-[var(--text-1)] hover:bg-[var(--border-light)]'">
-                                <span class="font-medium text-[13px]">{{ $t(opt.label) }}</span>
-                                <svg v-if="paymentType === opt.value" xmlns="http://www.w3.org/2000/svg"
-                                  class="w-3.5 h-3.5 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                  stroke-width="3">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        </Transition>
-                      </div>
-                    </div>
-                  </Transition>
-                </div>
-
-                <!-- Tanlangan narx va to'lov turi ko'rsatkich -->
-                <div v-if="price && paymentType && !showPriceMenu && !showPaymentMenu"
-                  class="mt-2 flex items-center gap-2 flex-wrap">
-                  <span
-                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
-                    style="background:var(--primary-light); color:var(--primary);" @click="showPriceMenu = true">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24"
-                      stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    {{ formatMoney(price) }} {{ $t("so'm") }}
-                  </span>
-                  <span
-                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
-                    style="background:var(--success-bg); color:var(--success);" @click="showPaymentMenu = true">
-                    {{ paymentType === 'NAQD' ? '💵' : paymentType === 'KARTA' ? '💳' : paymentType === 'ONLINE' ?
-                      '📱' : paymentType === 'NASIYA' ? '🤝' : '🏦' }}
-                    {{ paymentType === 'NAQD' ? $t('Naqd pul') : paymentType === 'KARTA' ? $t('Plastik karta') :
-                      paymentType === 'ONLINE' ? $t("Online to'lov") : paymentType === 'NASIYA' ? $t('Nasiya') :
-                        $t("Bank o'tkazmasi") }}
-                  </span>
+                  <!-- Tanlangan narx va to'lov turi ko'rsatkich -->
+                  <div v-if="price && paymentType && !showPriceMenu && !showPaymentMenu"
+                    class="mt-2 flex items-center gap-2 flex-wrap">
+                    <span
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
+                      style="background:var(--primary-light); color:var(--primary);" @click="showPriceMenu = true">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      {{ formatMoney(price) }} {{ $t("so'm") }}
+                    </span>
+                    <span
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium cursor-pointer"
+                      style="background:var(--success-bg); color:var(--success);" @click="showPaymentMenu = true">
+                      {{ paymentType === 'NAQD' ? '💵' : paymentType === 'KARTA' ? '💳' : paymentType === 'ONLINE' ?
+                        '📱' : paymentType === 'NASIYA' ? '🤝' : '🏦' }}
+                      {{ paymentType === 'NAQD' ? $t('Naqd pul') : paymentType === 'KARTA' ? $t('Plastik karta') :
+                        paymentType === 'ONLINE' ? $t("Online to'lov") : paymentType === 'NASIYA' ? $t('Nasiya') :
+                          $t("Bank o'tkazmasi") }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
+          <div v-if="!props.editing?.id" class="card p-5 space-y-4 h-[235px]">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                    :style="{ background: phoneVerified ? 'var(--success)' : 'var(--border)' }">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none"
+                      viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-[13px] font-semibold" style="color:var(--text-1);">
+                    {{ $t('Telefon raqami tekshirildi') }}</span>
+                </div>
+                <span class="text-[11px] font-semibold"
+                  :style="{ color: phoneVerified ? 'var(--success)' : 'var(--text-3)' }">
+                  {{ phoneVerified ? $t("To'g'ri") : $t("To'liq kiritilmagan") }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                    style="background:var(--success);">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none"
+                      viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Shaxs topildi')
+                  }}</span>
+                </div>
+                <span class="text-[11px] font-semibold" style="color:var(--text-2);">
+                  {{ duplicateInfo?.count > 0 ? $t('Mavjud mijoz') : $t('Yangi mijoz') }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                    style="background:var(--success);">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none"
+                      viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Oldingi murojaatlar')
+                  }}</span>
+                </div>
+                <span class="text-[11px] font-semibold" style="color:var(--text-2);">
+                  {{ duplicateInfo?.count > 0 ? `${duplicateInfo.count} ${$t('ta topildi')}` : $t('Topilmadi') }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                    :style="{ background: riskLevel === 'yuqori' ? 'var(--danger)' : 'var(--success)' }">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none"
+                      viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Risk darajasi')
+                  }}</span>
+                </div>
+                <span class="text-[11px] font-bold"
+                  :style="{ color: riskLevel === 'yuqori' ? 'var(--danger)' : 'var(--success)' }">
+                  {{ riskLevel === 'yuqori' ? $t('Yuqori') : $t('Past') }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- 4. Murojaat ma'lumotlari -->
         <div class="card p-5 space-y-3 flex-1 flex flex-col">
           <div class="flex items-center gap-2.5">
@@ -1689,73 +1759,7 @@ const copyTemplate = (tmpl) => {
                 :placeholder="$t('Murojaatning qisqacha mazmunini yozing...')"
                 class="w-full flex-1 min-h-[140px] px-3 py-2.5 bg-gray-50 dark:bg-white/5 border border-[var(--border)] rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20 resize-none"></textarea>
               <span class="absolute bottom-2 right-3 text-[10px]" style="color:var(--text-3);">{{ description.length
-                }}/500</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ AI Yordamchisi ustuni ══ -->
-      <div v-if="!props.editing?.id" class="space-y-5 flex flex-col">
-        <div class="card p-5 space-y-4">
-          <div class="flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-                  :style="{ background: phoneVerified ? 'var(--success)' : 'var(--border)' }">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Telefon raqami tekshirildi') }}</span>
-              </div>
-              <span class="text-[11px] font-semibold" :style="{ color: phoneVerified ? 'var(--success)' : 'var(--text-3)' }">
-                {{ phoneVerified ? $t("To'g'ri") : $t("To'liq kiritilmagan") }}
-              </span>
-            </div>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background:var(--success);">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Shaxs topildi') }}</span>
-              </div>
-              <span class="text-[11px] font-semibold" style="color:var(--text-2);">
-                {{ duplicateInfo?.count > 0 ? $t('Mavjud mijoz') : $t('Yangi mijoz') }}
-              </span>
-            </div>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background:var(--success);">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Oldingi murojaatlar') }}</span>
-              </div>
-              <span class="text-[11px] font-semibold" style="color:var(--text-2);">
-                {{ duplicateInfo?.count > 0 ? `${duplicateInfo.count} ${$t('ta topildi')}` : $t('Topilmadi') }}
-              </span>
-            </div>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-                  :style="{ background: riskLevel === 'yuqori' ? 'var(--danger)' : 'var(--success)' }">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Risk darajasi') }}</span>
-              </div>
-              <span class="text-[11px] font-bold" :style="{ color: riskLevel === 'yuqori' ? 'var(--danger)' : 'var(--success)' }">
-                {{ riskLevel === 'yuqori' ? $t('Yuqori') : $t('Past') }}
-              </span>
+              }}/500</span>
             </div>
           </div>
         </div>
@@ -1836,7 +1840,7 @@ const copyTemplate = (tmpl) => {
       </svg>
       <span class="text-[11px]" style="color:var(--text-2);">{{ $t('Yaratilgan sana:') }}</span>
       <span class="text-[11px] font-medium" style="color:var(--text-1);">{{ formatDate(props.editing?.createdAt)
-        }}</span>
+      }}</span>
     </div>
 
     <!-- Pastki tugmalar -->
