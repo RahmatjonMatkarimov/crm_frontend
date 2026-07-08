@@ -270,7 +270,7 @@ const trackedFieldsFilled = computed(() => [
   !!selectedDistrict.value,
   !!source.value,
   !!assignedToId.value,
-  !!price.value !== '',
+  price.value !== '',
   !!description.value,
 ])
 const filledFieldsCount = computed(() => trackedFieldsFilled.value.filter(Boolean).length)
@@ -294,10 +294,6 @@ const formSteps = computed(() => [
   { key: 'appeal', label: "Ichki izoh (faqat xodimlar uchun)", complete: section4Complete.value },
 ])
 
-// Forma bo'limlari joylashadigan grid maydonlari — tahrirlashda AI paneli ko'rinmaydi, shuning uchun "extra" 2 ustunga cho'ziladi
-const formGridAreas = computed(() => props.editing?.id
-  ? `"personal extra extra" "address appeal appeal"`
-  : `"personal extra ai" "address appeal appeal"`)
 
 import html2pdf from 'html2pdf.js'
 
@@ -1339,10 +1335,13 @@ const copyTemplate = (tmpl) => {
       style="background:var(--danger-bg); border:1px solid var(--danger-border); color:var(--danger);">
       {{ error }}</div>
 
-    <div class="grid gap-5" :style="{ gridTemplateAreas: formGridAreas, gridTemplateColumns: props.editing?.id ? 'repeat(3, 1fr)' : '1.2fr 1.2fr 0.8fr' }">
+    <div class="grid gap-5" :style="{ gridTemplateColumns: props.editing?.id ? '1fr 2fr' : '1.2fr 2fr' }">
+
+      <!-- Chap ustun: Shaxsiy va Manzil ma'lumotlari -->
+      <div class="flex flex-col gap-5">
 
       <!-- 1. Shaxsiy ma'lumotlar -->
-      <div class="card p-5 space-y-4" style="grid-area: personal;">
+      <div class="card p-5 space-y-4">
         <div class="flex items-center gap-2.5">
           <span
             class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
@@ -1432,8 +1431,8 @@ const copyTemplate = (tmpl) => {
                 <input v-model="phone" @input="handlePhone($event, 1)" type="tel" placeholder="+998 XX XXX XX XX"
                   :class="['w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-white/5 border rounded-lg text-[var(--text-1)] placeholder-[var(--text-3)] text-sm transition-all focus:outline-none focus:bg-[var(--bg-card)] focus:ring-1', submitted && !phone ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20' : 'border-[var(--border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/20']" />
               </div>
-              <div class="flex items-center mt-3 gap-3 text-sm">
-                <span class="text-[11px] min-w-[170px]" style="color:var(--text-2);">{{ $t('Bu raqamda Telegram bormi?')
+              <div class="flex items-center min-w-[260px] mt-3 gap-3 text-sm">
+                <span class="text-[11px] " style="color:var(--text-2);">{{ $t('Bu raqamda Telegram bormi?')
                   }}</span>
                 <label class="flex items-center gap-1 cursor-pointer">
                   <input type="radio" name="phoneIsTelegram" :checked="phoneIsTelegram === 'ha'"
@@ -1472,7 +1471,7 @@ const copyTemplate = (tmpl) => {
       </div>
 
       <!-- 2. Manzil ma'lumotlari -->
-      <div class="card p-5 space-y-4" style="grid-area: address;">
+      <div class="card p-5 space-y-4">
         <div class="flex items-center gap-2.5">
           <span
             class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
@@ -1553,9 +1552,14 @@ const copyTemplate = (tmpl) => {
             </div>
           </div>
       </div>
+      </div>
+
+      <!-- O'ng ustun: Qo'shimcha ma'lumotlar / AI tekshiruv va Ichki izoh -->
+      <div class="flex flex-col gap-5">
+        <div class="grid gap-5" :style="{ gridTemplateColumns: props.editing?.id ? '1fr' : '1.2fr 0.8fr' }">
 
       <!-- 3. Qo'shimcha ma'lumotlar -->
-      <div class="card p-5 space-y-4" style="grid-area: extra;">
+      <div class="card p-5 space-y-4">
         <div class="flex items-center gap-2.5">
           <span
             class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
@@ -1748,7 +1752,7 @@ const copyTemplate = (tmpl) => {
           </div>
       </div>
 
-      <div v-if="!props.editing?.id" class="card p-5 space-y-4 h-full" style="grid-area: ai;">
+      <div v-if="!props.editing?.id" class="card p-5 space-y-4">
         <div class="flex flex-col gap-3">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -1818,9 +1822,10 @@ const copyTemplate = (tmpl) => {
               </div>
           </div>
       </div>
+        </div>
 
       <!-- 4. Murojaat ma'lumotlari -->
-      <div class="card p-5 space-y-3 flex flex-col h-full" style="grid-area: appeal;">
+      <div class="card p-5 h-full space-y-3 flex flex-col">
           <div class="flex items-center gap-2.5">
             <span
               class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
@@ -1841,6 +1846,7 @@ const copyTemplate = (tmpl) => {
               }}/500</span>
             </div>
           </div>
+      </div>
       </div>
     </div>
 
