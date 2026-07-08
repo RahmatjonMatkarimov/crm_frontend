@@ -138,40 +138,101 @@ function selectLang(val) {
                 </router-link>
             </nav>
 
-            <!-- Yordam kerakmi? -->
-            <div v-if="!sidebarCollapsed" class="mx-3 mb-3 rounded-xl p-3.5 shrink-0"
-                style="background:var(--border-light); border:1px solid var(--border);">
-                <div class="flex items-center gap-2.5 mb-3">
-                    <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                        style="background:var(--primary); box-shadow:0 2px 8px -1px color-mix(in srgb, var(--primary) 60%, transparent);">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
-                            class="mt-1" :stroke="'var(--sidebar-active-text)'" style="width:20px;height:20px;">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M3 12.75v-1.5a9 9 0 1118 0v1.5m-18 0a2.25 2.25 0 002.25 2.25H6a1.5 1.5 0 001.5-1.5v-3A1.5 1.5 0 006 8.998H5.25A2.25 2.25 0 003 11.25v1.5zm18 0a2.25 2.25 0 01-2.25 2.25H18a1.5 1.5 0 01-1.5-1.5v-3a1.5 1.5 0 011.5-1.5h.75a2.25 2.25 0 012.25 2.25v1.5z" />
-                        </svg>
-                    </div>
-                    <div class="min-w-0">
-                        <p class="text-xs font-bold leading-tight truncate" style="color:var(--text-1);">
-                            {{ langStore.t('Yordam kerakmi?') }}
-                        </p>
-                        <p class="text-[11px] leading-tight truncate" style="color:var(--text-2);">
-                            {{ langStore.t("Biz bilan bog'laning") }}
-                        </p>
-                    </div>
-                </div>
-                <a href="tel:+998919999883"
-                    class="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
-                    style="background:var(--primary); color:var(--sidebar-active-text);"
-                    @mouseover="e => e.currentTarget.style.background = 'var(--primary-hover)'"
-                    @mouseleave="e => e.currentTarget.style.background = 'var(--primary)'">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" style="width:13px;height:13px;flex-shrink:0;">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
-                    </svg>
-                    +998 91 999 98 83
-                </a>
+<div
+    v-if="!sidebarCollapsed"
+    class="mx-3 mb-3 rounded-xl p-3 shrink-0"
+    style="background:var(--border-light); border:1px solid var(--border);"
+>
+    <!-- Yuqori qism -->
+    <div class="flex items-start gap-2.5 mb-3">
+        <div
+            class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+            style="background:var(--primary); box-shadow:0 2px 8px -1px color-mix(in srgb, var(--primary) 60%, transparent);"
+        >
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke-width="1.8"
+    :stroke="'var(--sidebar-active-text)'"
+    style="width:20px;height:20px;"
+>
+    <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M12 3.75a7.5 7.5 0 00-7.5 7.5v2.25A2.25 2.25 0 006.75 15.75h.75A1.5 1.5 0 009 14.25v-3A1.5 1.5 0 007.5 9.75h-.75a5.25 5.25 0 0110.5 0h-.75a1.5 1.5 0 00-1.5 1.5v3a1.5 1.5 0 001.5 1.5h.75A2.25 2.25 0 0019.5 13.5v-2.25A7.5 7.5 0 0012 3.75z"
+    />
+    <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M15.75 18.75h-2.25A1.5 1.5 0 0112 17.25v0"
+    />
+</svg>
+        </div>
+
+        <div class="min-w-0 flex-1">
+            <p class="text-xs font-bold leading-tight" style="color:var(--text-1);">
+                {{ langStore.t('Texnik nosozlik bormi?') }}
+            </p>
+
+            <p class="text-[11px] leading-snug mt-1" style="color:var(--text-2);">
+                {{ langStore.t('Sayt yoki server xatosi uchun mas’ulga murojaat qiling.') }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Mas’ul shaxs -->
+    <div
+        class="rounded-lg p-2.5 mb-3"
+        style="background:color-mix(in srgb, var(--bg) 70%, transparent); border:1px solid var(--border);"
+    >
+        <div class="flex items-center gap-2.5">
+
+            <div class="min-w-0 flex-1">
+                <p class="text-[10px] leading-tight mb-0.5" style="color:var(--text-2);">
+                    {{ langStore.t('Texnik mas’ul') }}
+                </p>
+
+                <p
+                    class="text-[12px] font-bold leading-tight whitespace-normal break-words"
+                    style="color:var(--text-1);"
+                >
+                    Rahmatjon Matkarimov
+                </p>
+
+                <p class="text-[10.5px] leading-tight mt-1" style="color:var(--text-2);">
+                    {{ langStore.t('Dasturchi') }}
+                </p>
             </div>
+        </div>
+    </div>
+
+    <!-- Telefon tugmasi -->
+    <a
+        href="tel:+998919999883"
+        class="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg text-[11.5px] font-bold transition-all cursor-pointer"
+        style="background:var(--primary); color:var(--sidebar-active-text);"
+        @mouseover="e => e.currentTarget.style.background = 'var(--primary-hover)'"
+        @mouseleave="e => e.currentTarget.style.background = 'var(--primary)'"
+    >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            style="width:13px;height:13px;flex-shrink:0;"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"
+            />
+        </svg>
+
+        +998 91 999 98 83
+    </a>
+</div>
             <div v-else class="flex justify-center mb-3 shrink-0">
                 <a href="tel:+998712000044" :title="`${langStore.t('Yordam kerakmi?')}: +998 71 200 00 44`"
                     class="w-9 h-9 rounded-lg flex items-center justify-center transition-all cursor-pointer"

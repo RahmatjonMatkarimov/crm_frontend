@@ -1339,7 +1339,7 @@ const copyTemplate = (tmpl) => {
       style="background:var(--danger-bg); border:1px solid var(--danger-border); color:var(--danger);">
       {{ error }}</div>
 
-    <div class="grid grid-cols-3 gap-5" :style="{ gridTemplateAreas: formGridAreas }">
+    <div class="grid gap-5" :style="{ gridTemplateAreas: formGridAreas, gridTemplateColumns: props.editing?.id ? 'repeat(3, 1fr)' : '1.2fr 1.2fr 0.8fr' }">
 
       <!-- 1. Shaxsiy ma'lumotlar -->
       <div class="card p-5 space-y-4" style="grid-area: personal;">
@@ -1759,12 +1759,12 @@ const copyTemplate = (tmpl) => {
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span class="text-[13px] font-semibold" style="color:var(--text-1);">
+                  <span class="text-[12px] font-semibold" style="color:var(--text-1);">
                     {{ $t('Telefon raqami tekshirildi') }}</span>
                 </div>
-                <span class="text-[11px] font-semibold"
+                <span class="text-[11px] text-center font-semibold"
                   :style="{ color: phoneVerified ? 'var(--success)' : 'var(--text-3)' }">
-                  {{ phoneVerified ? $t("To'g'ri") : $t("To'liq kiritilmagan") }}
+                  {{ phoneVerified ? $t("To'g'ri") : $t("To'liq kiritilmadi") }}
                 </span>
               </div>
               <div class="flex items-center justify-between">
@@ -1776,7 +1776,7 @@ const copyTemplate = (tmpl) => {
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Shaxs topildi')
+                  <span class="text-[12px] font-semibold" style="color:var(--text-1);">{{ $t('Shaxs topildi')
                   }}</span>
                 </div>
                 <span class="text-[11px] font-semibold" style="color:var(--text-2);">
@@ -1792,7 +1792,7 @@ const copyTemplate = (tmpl) => {
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Oldingi murojaatlar')
+                  <span class="text-[12px] font-semibold" style="color:var(--text-1);">{{ $t('Oldingi murojaatlar')
                   }}</span>
                 </div>
                 <span class="text-[11px] font-semibold" style="color:var(--text-2);">
@@ -1808,7 +1808,7 @@ const copyTemplate = (tmpl) => {
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span class="text-[13px] font-semibold" style="color:var(--text-1);">{{ $t('Risk darajasi')
+                  <span class="text-[12px] font-semibold" style="color:var(--text-1);">{{ $t('Risk darajasi')
                   }}</span>
                 </div>
                 <span class="text-[11px] font-bold"
@@ -1889,6 +1889,29 @@ const copyTemplate = (tmpl) => {
               <input ref="documentsInputRef" :key="documentsInputKey" type="file" multiple class="hidden"
                 @change="handleDocumentFiles" />
             </label>
+          </div>
+        </div>
+
+        <div
+          class="flex items-center justify-between gap-3 px-4 py-4 bg-gray-50 dark:bg-white/5 border border-dashed rounded-lg cursor-pointer"
+          style="border-color:var(--border);" @click="openCamera">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+              style="background:var(--info-bg); color:var(--info);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 7h3l2-2h8l2 2h3v12a1 1 0 01-1 1H4a1 1 0 01-1-1V7z" />
+                <circle cx="12" cy="13" r="3.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium truncate" style="color:var(--text-1);">
+                {{ $t("Kamera orqali hujjat suratga oling") }}</p>
+              <p class="text-[11px]" style="color:var(--text-3);">{{ $t('Qurilma kamerasidan foydalaning') }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
             <button type="button" class="btn btn-ghost btn-sm flex items-center gap-1.5 whitespace-nowrap"
               @click.stop="openCamera">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
@@ -1897,7 +1920,7 @@ const copyTemplate = (tmpl) => {
                   d="M3 7h3l2-2h8l2 2h3v12a1 1 0 01-1 1H4a1 1 0 01-1-1V7z" />
                 <circle cx="12" cy="13" r="3.5" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-              {{ $t('Kamera') }}
+              {{ $t('Kamerani ochish') }}
             </button>
           </div>
         </div>
