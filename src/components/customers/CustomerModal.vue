@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount, computed, nextTick, getCurrentInstance } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCustomersStore } from '@/stores/customers'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
@@ -18,6 +19,7 @@ const emit = defineEmits(['close', 'saved'])
 useHistoryBack(() => !props.pageMode, () => emit('close'))
 
 const { proxy } = getCurrentInstance()
+const router = useRouter()
 const store = useCustomersStore()
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
@@ -1092,6 +1094,12 @@ let duplicateCheckTimer = null
 const phoneVerified = computed(() => phone.value.replace(/\D/g, '').length >= 12)
 const riskLevel = computed(() => (blacklistedMatch.value ? 'yuqori' : 'past'))
 const aiPanelCollapsed = ref(false)
+const existingCustomerId = computed(() => blacklistedMatch.value?.id || duplicateInfo.value?.matches?.[0]?.id || null)
+
+const goToExistingCustomer = () => {
+  if (!existingCustomerId.value) return
+  router.push({ name: 'customer', params: { id: existingCustomerId.value } })
+}
 
 const runDuplicateCheck = () => {
   if (props.editing?.id) return
@@ -1820,6 +1828,8 @@ const copyTemplate = (tmpl) => {
                   {{ riskLevel === 'yuqori' ? $t('Yuqori') : $t('Past') }}
                 </span>
               </div>
+              <button v-if="existingCustomerId" type="button" @click="goToExistingCustomer"
+                class="btn bg-[var(--accent)] mt-2 text-white w-full">{{ $t('Mijoz haqida') }}</button>
           </div>
       </div>
         </div>
