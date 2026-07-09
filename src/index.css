@@ -96,6 +96,13 @@
   --info-bg:        #eff6ff;  /* Ko'k belgi foni */
   --info-border:    #bfdbfe;  /* Ko'k belgi chegarasi */
 
+  /* ── BINAFSHA (Purple) ──────────────────────────────────────────────
+     Qayerda: .gov-badge-purple (masalan "Xujjat tayyorlovchi" roli badge'i).
+  */
+  --purple:         #7e22ce;
+  --purple-bg:      #f3e8ff;
+  --purple-border:  #e9d5ff;
+
   /* ── QOPLAMA (Overlay) ────────────────────────────────────────────
      Qayerda: Modal oynalar ortidagi qorong'ilashtiruvchi fon (backdrop).
   */
@@ -174,6 +181,9 @@ html.dark {
   --info:           #60a5fa;   /* Dark: ko'k yorqinroq */
   --info-bg:        #0b1a2e;
   --info-border:    #1e3a5f;
+  --purple:         #c084fc;   /* Dark: binafsha yorqinroq */
+  --purple-bg:      #211129;
+  --purple-border:  #4c1d78;
   --overlay:        rgba(0, 0, 0, 0.7);
   --sidebar-active-text: #0a0a0b;  /* Dark: primary deyarli oq bo'lgani uchun matn qora */
   background-color: #0a0a0b;
@@ -358,6 +368,7 @@ body {
 .gov-badge-red    { background: var(--danger-bg);  color: var(--danger);  border: 1px solid var(--danger-border); }
 .gov-badge-yellow { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
 .gov-badge-blue   { background: var(--primary-light); color: var(--text-1); border: 1px solid var(--border); }
+.gov-badge-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
 
 /* ── Page title ── */
 .gov-page-title {

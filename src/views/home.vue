@@ -15,6 +15,15 @@ const langStore = useLangStore()
 
 const sidebarCollapsed = ref(false)
 
+const roleLabel = computed(() => ({
+    ADMIN: langStore.t('Administrator'),
+    YURIST: langStore.t('Yurist'),
+    KASSIR: langStore.t('Kassir'),
+    RAHBAR: langStore.t('Rahbar'),
+    IJROCHI: langStore.t('Ijrochi'),
+    XUJJAT_TAYYORLOVCHI: langStore.t('Xujjat tayyorlovchi'),
+}[authStore.userRole] || authStore.userRole))
+
 const routerList = computed(() => [
     {
         path: '/',
@@ -358,8 +367,13 @@ function selectLang(val) {
                                 class="w-full h-full object-cover" />
                             <img v-else src="/User-avatar.svg.png" class="w-full h-full object-cover" />
                         </div>
-                        <span class="text-xs font-semibold" style="color:var(--text-1);">
-                            {{ authStore.user?.name || authStore.user?.username }}
+                        <span class="flex flex-col leading-tight">
+                            <span class="text-xs font-semibold" style="color:var(--text-1);">
+                                {{ authStore.user?.name || authStore.user?.username }}
+                            </span>
+                            <span v-if="authStore.userRole" class="text-[10px]" style="color:var(--text-3);">
+                                {{ roleLabel }}
+                            </span>
                         </span>
                     </router-link>
                 </div>

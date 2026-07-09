@@ -66,6 +66,8 @@ const roleLabel = computed(() => ({
     YURIST: proxy.$t('Yurist'),
     KASSIR: proxy.$t('Kassir'),
     RAHBAR: proxy.$t('Rahbar'),
+    IJROCHI: proxy.$t('Ijrochi'),
+    XUJJAT_TAYYORLOVCHI: proxy.$t('Xujjat tayyorlovchi'),
 }[authStore.userRole] || authStore.userRole))
 
 const handleImgChange = (e) => {

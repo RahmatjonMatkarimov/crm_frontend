@@ -59,9 +59,22 @@ const groupedByStatus = computed(() =>
   }))
 )
 
+const activeCount = computed(() =>
+  store.customers.filter(c => c.status !== 'BEKOR_QILINDI').length
+)
+
+const debtorsCount = computed(() =>
+  store.customers.filter(c => {
+    const paid = c.payments?.reduce((a, b) => a + b.amount, 0) || 0
+    return (c.price || 0) - paid > 0
+  }).length
+)
+
 const openStatus = (key) => {
   router.push('/customers/status/' + getStatusCode(key))
 }
+
+const goToCreate = () => router.push('/customers/create')
 </script>
 
 <template>
@@ -69,13 +82,23 @@ const openStatus = (key) => {
 
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h1 class="gov-page-title">{{ $t('Mijozlar') }}</h1>
-        <p class="text-sm mt-1" style="color:var(--text-2);">
-          {{ $t('Faol mijozlar') }} — {{ $t('Jami') }}
-          <span class="font-bold" style="color:var(--text-1);">{{ store.customers.length }}</span>
-          {{ $t('ta') }}
-        </p>
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+          style="background:linear-gradient(135deg,var(--primary),var(--primary-hover));">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="1.6">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-wide" style="color:var(--text-1);">{{ $t('Mijozlar') }}</h1>
+          <p class="text-sm mt-0.5" style="color:var(--text-2);">
+            {{ $t('Faol mijozlar') }} — {{ $t('Jami') }}
+            <span class="font-bold" style="color:var(--text-1);">{{ store.customers.length }}</span>
+            {{ $t('ta') }}
+          </p>
+        </div>
       </div>
       <div class="flex items-center gap-2">
         <button @click="openPricesModal" v-if="authStore.permission.edit_prices" class="btn btn-ghost">
@@ -97,23 +120,32 @@ const openStatus = (key) => {
     </div>
 
     <!-- Status cards: ustiga bosilganda shu statusdagi mijozlar sahifasi ochiladi -->
-    <div v-else class="grid grid-cols-3 border-4 border-[var(--border)] rounded-2xl p-4 gap-4">
-      <div v-for="col in groupedByStatus" :key="col.key" @click="openStatus(col.key)"
-        class="card card-hover cursor-pointer p-6 transition-all flex items-center gap-4"
-        style="border:2px solid var(--border);">
-        <div class="w-20 h-20 rounded-2xl flex items-center justify-center shrink-0"
-          :style="{ background: col.colors.bg, color: col.colors.color }">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor" class="w-10 h-10">
-            <path v-for="(d, i) in statusIcons[col.key]" :key="i" stroke-linecap="round" stroke-linejoin="round"
-              :d="d" />
-          </svg>
-        </div>
-        <div class="flex-1 flex items-center justify-between gap-3 min-w-0">
-          <h3 class="font-bold w-full text-center uppercase" style="color:var(--text-1);">
-            {{ $t(col.label) }}
-          </h3>
-          <p class="text-2xl font-extrabold shrink-0" :style="{ color: col.colors.color }">{{ col.count }}</p>
+    <div v-else>
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div v-for="col in groupedByStatus" :key="col.key" @click="openStatus(col.key)"
+          class="card card-hover cursor-pointer p-5 transition-all flex items-center gap-4 group">
+          <div class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0"
+            :style="{ background: col.colors.bg, color: col.colors.color }">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
+              stroke="currentColor" class="w-7 h-7">
+              <path v-for="(d, i) in statusIcons[col.key]" :key="i" stroke-linecap="round" stroke-linejoin="round"
+                :d="d" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-semibold text-sm leading-snug" style="color:var(--text-1);">
+              {{ $t(col.label) }}
+            </h3>
+            <p class="text-xs mt-0.5" style="color:var(--text-3);">{{ col.count }} {{ $t('ta mijoz') }}</p>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <p class="text-2xl font-extrabold" :style="{ color: col.colors.color }">{{ col.count }}</p>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+              stroke="currentColor" class="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-60 group-hover:translate-x-0 transition-all"
+              style="color:var(--text-2);">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </div>
         </div>
       </div>
     </div>

@@ -54,6 +54,8 @@ const roles = computed(() => [
     { value: 'RAHBAR', label: proxy.$t('Rahbar') },
     { value: 'YURIST', label: proxy.$t('Yurist') },
     { value: 'KASSIR', label: proxy.$t('Kassir') },
+    { value: 'IJROCHI', label: proxy.$t('Ijrochi') },
+    { value: 'XUJJAT_TAYYORLOVCHI', label: proxy.$t('Xujjat tayyorlovchi') },
 ])
 
 const allChecked = computed(() =>
@@ -114,6 +116,8 @@ const roleLabel = (role) => ({
     RAHBAR: proxy.$t('Rahbar'),
     YURIST: proxy.$t('Yurist'),
     KASSIR: proxy.$t('Kassir'),
+    IJROCHI: proxy.$t('Ijrochi'),
+    XUJJAT_TAYYORLOVCHI: proxy.$t('Xujjat tayyorlovchi'),
 }[role] || role)
 
 const fields = computed(() => {
@@ -217,7 +221,9 @@ const fields = computed(() => {
                         'gov-badge-blue': user.role === 'ADMIN' || user.role === 'RAHBAR',
                         'gov-badge-green': user.role === 'YURIST',
                         'gov-badge-yellow': user.role === 'KASSIR',
-                    }">{{ $t(user.role === 'ADMIN' ? 'Administrator' : user.role === 'RAHBAR' ? 'Rahbar' : user.role === 'YURIST' ? 'Yurist' : 'Kassir') }}</span>
+                        'gov-badge-red': user.role === 'IJROCHI',
+                        'gov-badge-purple': user.role === 'XUJJAT_TAYYORLOVCHI',
+                    }">{{ roleLabel(user.role) }}</span>
                 </div>
 
                 <!-- Contact info -->

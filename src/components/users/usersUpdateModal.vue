@@ -24,6 +24,8 @@ const availableRoles = computed(() => {
         return [
             { value: 'KASSIR', label: proxy.$t('Kassir') },
             { value: 'YURIST', label: proxy.$t('Yurist') },
+            { value: 'IJROCHI', label: proxy.$t('Ijrochi') },
+            { value: 'XUJJAT_TAYYORLOVCHI', label: proxy.$t('Xujjat tayyorlovchi') },
             { value: 'RAHBAR', label: proxy.$t('Rahbar') },
             { value: 'ADMIN', label: proxy.$t('Administrator') },
         ]
@@ -31,6 +33,8 @@ const availableRoles = computed(() => {
     return [
         { value: 'KASSIR', label: proxy.$t('Kassir') },
         { value: 'YURIST', label: proxy.$t('Yurist') },
+        { value: 'IJROCHI', label: proxy.$t('Ijrochi') },
+        { value: 'XUJJAT_TAYYORLOVCHI', label: proxy.$t('Xujjat tayyorlovchi') },
     ]
 })
 const editingUser = ref(null)

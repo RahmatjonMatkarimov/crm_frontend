@@ -145,6 +145,8 @@ const roleLabel = (r) => ({
   RAHBAR: proxy.$t('Rahbar'),
   YURIST: proxy.$t('Yurist'),
   KASSIR: proxy.$t('Kassir'),
+  IJROCHI: proxy.$t('Ijrochi'),
+  XUJJAT_TAYYORLOVCHI: proxy.$t('Xujjat tayyorlovchi'),
 }[r] || r)
 
 const paymentTypeLabels = computed(() => ({
@@ -439,6 +441,8 @@ const formatMoney = (amount) => {
                             'gov-badge-blue': u.role === 'ADMIN' || u.role === 'RAHBAR',
                             'gov-badge-green': u.role === 'YURIST',
                             'gov-badge-yellow': u.role === 'KASSIR',
+                            'gov-badge-red': u.role === 'IJROCHI',
+                            'gov-badge-purple': u.role === 'XUJJAT_TAYYORLOVCHI',
                         }">
                             {{ roleLabel(u.role) }}
                         </span>

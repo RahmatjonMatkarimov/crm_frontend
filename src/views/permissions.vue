@@ -251,6 +251,13 @@ const roles = {
     edit_customers: true,
     add_customers: true,
   },
+  'IJROCHI': {
+    view_customers: true,
+    edit_customers: true,
+  },
+  'XUJJAT_TAYYORLOVCHI': {
+    view_customers: true,
+  },
   'RAHBAR': {
     view_customers: true,
     edit_customers: true,

@@ -1,6 +1,6 @@
 <template>
-    <div class="min-h-screen py-8 px-4">
-        <div class="max-w-5xl mx-auto">
+    <div>
+        <div class="max-w-7xl mx-auto">
 
             <!-- Loading -->
             <div v-if="loading" class="flex flex-col items-center justify-center py-32 gap-3">
@@ -21,7 +21,7 @@
                 <div class="overflow-hidden card">
                     <div class="px-6 py-5 flex items-center justify-between gap-4">
                         <div class="flex items-center gap-5">
-                            <div class="w-16 h-16 rounded-lg flex items-center justify-center shrink-0 text-2xl font-bold text-white"
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 text-2xl font-bold text-white"
                                 style="background:linear-gradient(135deg,var(--primary),var(--primary-hover));">
                                 {{ (customer.surname || customer.name || '?').charAt(0).toUpperCase() }}
                             </div>
@@ -68,14 +68,16 @@
                     <div class="lg:col-span-2 flex flex-col gap-5">
 
                         <!-- Main Info Card -->
-                        <div class="rounded-xl border shadow-sm overflow-hidden"
-                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
-                            <div class="px-6 py-4 border-b" :class="'border-[var(--border)] bg-[var(--border-light)]'">
-                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
-                                    {{ $t('Mijoz haqida') }}
-                                </p>
+                        <div class="card p-6 space-y-4">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background:var(--primary); color:#fff;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                    </svg>
+                                </span>
+                                <h3 class="text-sm font-bold" style="color:var(--text-1);">{{ $t('Mijoz haqida') }}</h3>
                             </div>
-                            <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <InfoRow :label="$t('F.I.Sh')"
                                     :value="`${$t(customer.surname || '')} ${$t(customer.name || '')} ${$t(customer.father_name || '')}`"
                                     icon="user" />
@@ -98,7 +100,7 @@
                             </div>
 
                             <!-- Description -->
-                            <div v-if="authStore.userRole === 'YURIST'" class="px-6 pb-6">
+                            <div v-if="authStore.userRole === 'YURIST'">
                                 <div class="rounded-lg p-4"
                                     :class="'bg-[var(--border-light)] border border-[var(--border)]'">
                                     <p
@@ -114,13 +116,18 @@
                         </div>
 
                         <!-- Payment History -->
-                        <div class="rounded-xl border shadow-sm overflow-hidden"
-                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
-                            <div class="px-6 py-4 border-b flex items-center justify-between"
-                                :class="'border-[var(--border)] bg-[var(--border-light)]'">
-                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
-                                    {{ $t("To'lov Tarixi") }}
-                                </p>
+                        <div class="card overflow-hidden">
+                            <div class="px-6 pt-6 pb-4 flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background:var(--success); color:#fff;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-3.5 h-3.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3M3.75 6h16.5a1.5 1.5 0 011.5 1.5v9a1.5 1.5 0 01-1.5 1.5H3.75a1.5 1.5 0 01-1.5-1.5v-9a1.5 1.5 0 011.5-1.5z" />
+                                        </svg>
+                                    </span>
+                                    <h3 class="text-sm font-bold" style="color:var(--text-1);">
+                                        {{ $t("To'lov Tarixi") }}
+                                    </h3>
+                                </div>
                                 <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
                                     :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
                                     {{ payments.length }} {{ $t('ta') }}
@@ -182,14 +189,99 @@
                                 </table>
                             </div>
                         </div>
+                        <!-- Status History -->
+                        <div class="card overflow-hidden">
+                            <div class="px-6 pt-6 pb-4 flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background:var(--info); color:#fff;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-3.5 h-3.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                    </span>
+                                    <h3 class="text-sm font-bold" style="color:var(--text-1);">
+                                        {{ $t('Ish Tarixi') }}
+                                    </h3>
+                                </div>
+                                <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
+                                    :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
+                                    {{ statusHistory.length }} {{ $t('ta') }}
+                                </span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr :class="'border-b border-[var(--border)]'">
+                                            <th
+                                                class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--text-2)]">
+                                                {{ $t('Sana') }}
+                                            </th>
+                                            <th
+                                                class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--text-2)]">
+                                                {{ $t('ISH holati') }}
+                                            </th>
+                                            <th
+                                                class="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--text-2)]">
+                                                {{ $t("O'zgartirgan") }}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y" :class="'divide-[var(--border)]'">
+                                        <tr v-for="entry in statusHistory" :key="entry.id" class="transition-colors"
+                                            :class="'hover:bg-[var(--border-light)]'">
+                                            <td class="px-6 py-4 text-sm"
+                                                :class="themeStore.isDark ? 'text-[var(--text-2)]' : 'text-[var(--text-3)]'">
+                                                {{ formatDate(entry.changedAt) }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg"
+                                                    :style="`background:${(statusInlineColors[entry.toStatus] || statusInlineColors.NAVBATDA).bg}; color:${(statusInlineColors[entry.toStatus] || statusInlineColors.NAVBATDA).color};`">
+                                                    {{ entry.note || statusLabels[entry.toStatus] || entry.toStatus }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 text-sm"
+                                                :class="themeStore.isDark ? 'text-[var(--text-2)]' : 'text-[var(--text-3)]'">
+                                                <template v-if="entry.changedByUser">
+                                                    {{ $t(entry.changedByUser.name) }} {{ $t(entry.changedByUser.surname) }}
+                                                </template>
+                                                <template v-else>—</template>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="statusHistory.length === 0">
+                                            <td colspan="3" class="px-6 py-16 text-center">
+                                                <div class="flex flex-col items-center gap-3">
+                                                    <div class="w-12 h-12 rounded-lg flex items-center justify-center"
+                                                        :class="'bg-[var(--border-light)]'">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                            class="w-6 h-6 text-[var(--text-2)]">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text-sm text-[var(--text-2)]">
+                                                        {{ $t("Hali status tarixi yo'q") }}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                         <!-- Checks -->
-                        <div class="rounded-xl border shadow-sm overflow-hidden"
-                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
-                            <div class="px-6 py-4 border-b flex items-center justify-between"
-                                :class="'border-[var(--border)] bg-[var(--border-light)]'">
-                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
-                                    {{ $t('Cheklar') }}
-                                </p>
+                        <div class="card overflow-hidden">
+                            <div class="px-6 pt-6 pb-4 flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background:var(--warning); color:#fff;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-3.5 h-3.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                        </svg>
+                                    </span>
+                                    <h3 class="text-sm font-bold" style="color:var(--text-1);">
+                                        {{ $t('Cheklar') }}
+                                    </h3>
+                                </div>
                                 <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
                                     :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
                                     {{ checks.length }} {{ $t('ta') }}
@@ -197,7 +289,7 @@
                             </div>
 
                             <div v-if="checks.length > 0"
-                                class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                class="px-6 pb-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                 <div v-for="check in checks" :key="check.id" @click="openCheck(check)"
                                     class="group cursor-pointer rounded-lg overflow-hidden border transition-all hover:shadow-lg hover:-translate-y-0.5"
                                     style="background:var(--border-light); border-color:var(--border);">
@@ -250,13 +342,18 @@
                         </div>
 
                         <!-- Hujjatlar -->
-                        <div class="rounded-xl border shadow-sm overflow-hidden"
-                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
-                            <div class="px-6 py-4 border-b flex items-center justify-between"
-                                :class="'border-[var(--border)] bg-[var(--border-light)]'">
-                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
-                                    {{ $t('Hujjatlar') }}
-                                </p>
+                        <div class="card overflow-hidden">
+                            <div class="px-6 pt-6 pb-4 flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background:var(--info); color:#fff;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-3.5 h-3.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                        </svg>
+                                    </span>
+                                    <h3 class="text-sm font-bold" style="color:var(--text-1);">
+                                        {{ $t('Hujjatlar') }}
+                                    </h3>
+                                </div>
                                 <span class="text-xs font-medium px-2.5 py-1 rounded-lg"
                                     :class="'bg-[var(--border-light)] text-[var(--text-2)]'">
                                     {{ documents.length }} {{ $t('ta') }}
@@ -264,7 +361,7 @@
                             </div>
 
                             <div v-if="documents.length > 0"
-                                class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                class="px-6 pb-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                 <div v-for="doc in documents" :key="doc.id" @click="openDocument(doc)"
                                     class="group cursor-pointer rounded-lg overflow-hidden border transition-all hover:shadow-lg hover:-translate-y-0.5"
                                     style="background:var(--border-light); border-color:var(--border);">
@@ -312,17 +409,21 @@
                     </div>
 
                     <!-- Right column: Qo'shimcha + Qo'shimcha amallar -->
-                    <div class="flex flex-col gap-5">
+                    <div class="flex flex-col gap-5 lg:sticky lg:top-6 lg:self-start">
 
                         <!-- Meta Card -->
-                        <div class="rounded-xl border shadow-sm overflow-hidden"
-                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
-                            <div class="px-6 py-4 border-b" :class="'border-[var(--border)] bg-[var(--border-light)]'">
-                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
+                        <div class="card p-6 space-y-5">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background:var(--gold); color:#fff;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                                    </svg>
+                                </span>
+                                <h3 class="text-sm font-bold" style="color:var(--text-1);">
                                     {{ $t("Qo'shimcha") }}
-                                </p>
+                                </h3>
                             </div>
-                            <div class="p-6 space-y-5">
+                            <div class="space-y-5">
                                 <!-- Status -->
                                 <div>
                                     <p
@@ -331,7 +432,7 @@
                                     </p>
                                     <div class="relative">
                                         <select :value="customer.status || 'NAVBATDA'"
-                                            @change="changeStatus($event.target.value)" :disabled="statusSaving"
+                                            @change="onStatusSelect($event.target.value)" :disabled="statusSaving"
                                             class="w-full pl-3 pr-8 py-2 rounded-xl text-sm font-semibold transition-all focus:outline-none appearance-none cursor-pointer disabled:opacity-60"
                                             :style="`background:${statusInlineColors[customer.status || 'NAVBATDA']?.bg}; color:${statusInlineColors[customer.status || 'NAVBATDA']?.color}; border:1.5px solid ${statusInlineColors[customer.status || 'NAVBATDA']?.color}40;`">
                                             <option v-for="(label, key) in statusLabels" :key="key" :value="key">{{
@@ -351,7 +452,52 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                    <button v-if="customer.status !== 'BEKOR_QILINDI' && (authStore.user.role === 'ADMIN' || authStore.user.role === 'RAHBAR'||authStore.user.role==='YURIST')" @click="onStatusSelect('BEKOR_QILINDI')"
+                                        class="w-full text-xs font-semibold py-2 rounded-lg transition-all"
+                                        style="background:var(--danger-bg); color:var(--danger); border:1px solid var(--danger-border);">
+                                        {{ $t("Rad etish") }}
+                                    </button>
+                                    <Transition name="slide-fade">
+                                        <div v-if="showRejectModal" class="mt-2 rounded-lg pl-3 pr-2.5 py-2.5 space-y-2"
+                                            style="background:var(--bg-card); border:1px solid var(--danger-border); border-left:3px solid var(--danger);">
+                                            <div class="flex items-center justify-between gap-2">
+                                                <label class="text-[11px] font-bold uppercase tracking-wider"
+                                                    style="color:var(--danger);">
+                                                    {{ $t('Rad etilish sababi') }}
+                                                </label>
+                                                <button @click="closeRejectModal"
+                                                    class="w-5 h-5 rounded flex items-center justify-center shrink-0"
+                                                    style="color:var(--text-2);">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <div v-if="rejectError" class="text-[11px]" style="color:var(--danger);">{{
+                                                rejectError }}</div>
+                                            <textarea v-model="rejectReason" rows="3"
+                                                :placeholder="$t('Rad etilish sababini kiriting')"
+                                                class="w-full px-2.5 py-2 rounded-lg border text-xs transition-all focus:outline-none focus:ring-1 focus:ring-[var(--danger)]/20"
+                                                style="background:var(--border-light); border-color:var(--border); color:var(--text-1);"></textarea>
+                                            <div class="flex justify-end gap-2 pt-0.5">
+                                                <button @click="closeRejectModal"
+                                                    class="px-3 py-1.5 rounded-lg text-[11px] font-semibold"
+                                                    style="color:var(--text-2);">
+                                                    {{ $t('Bekor qilish') }}
+                                                </button>
+                                                <button @click="submitReject" :disabled="rejectSaving"
+                                                    class="px-3.5 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
+                                                    style="background:var(--danger); color:white;">
+                                                    <div v-if="rejectSaving"
+                                                        class="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70">
+                                                    </div>
+                                                    {{ $t('Rad etish') }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </Transition>
                                 <!-- Qora ro'yxat -->
                                 <div
                                     v-if="authStore.user.role === 'YURIST' || authStore.user.role === 'ADMIN' || authStore.user.role === 'RAHBAR'">
@@ -376,6 +522,59 @@
                                         style="background:var(--danger-bg); color:var(--danger); border:1px solid var(--danger-border);">
                                         {{ $t("Qora ro'yxatga qo'shish") }}
                                     </button>
+                                    <Transition name="slide-fade">
+                                        <div v-if="showBlacklistModal" class="mt-2 rounded-lg pl-3 pr-2.5 py-2.5 space-y-2"
+                                            style="background:var(--bg-card); border:1px solid var(--danger-border); border-left:3px solid var(--danger);">
+                                            <div class="flex items-center justify-between gap-2">
+                                                <label class="text-[11px] font-bold uppercase tracking-wider"
+                                                    style="color:var(--danger);">
+                                                    {{ $t("Qora ro'yxatga qo'shish sababi") }}
+                                                </label>
+                                                <button @click="closeBlacklistModal"
+                                                    class="w-5 h-5 rounded flex items-center justify-center shrink-0"
+                                                    style="color:var(--text-2);">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <div v-if="blacklistError" class="text-[11px]" style="color:var(--danger);">{{
+                                                blacklistError }}</div>
+                                            <textarea v-model="blacklistReason" rows="3"
+                                                :placeholder="$t('Qora ro\'yxatga qo\'shish sababini kiriting')"
+                                                class="w-full px-2.5 py-2 rounded-lg border text-xs transition-all focus:outline-none focus:ring-1 focus:ring-[var(--danger)]/20"
+                                                style="background:var(--border-light); border-color:var(--border); color:var(--text-1);"></textarea>
+                                            <div class="flex justify-end gap-2 pt-0.5">
+                                                <button @click="closeBlacklistModal"
+                                                    class="px-3 py-1.5 rounded-lg text-[11px] font-semibold"
+                                                    style="color:var(--text-2);">
+                                                    {{ $t('Bekor qilish') }}
+                                                </button>
+                                                <button @click="submitBlacklist" :disabled="blacklistSaving"
+                                                    class="px-3.5 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5"
+                                                    style="background:var(--danger); color:white;">
+                                                    <div v-if="blacklistSaving"
+                                                        class="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70">
+                                                    </div>
+                                                    {{ $t("Qo'shish") }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </Transition>
+                                </div>
+
+                                <!-- Rad etish sababi -->
+                                <div v-if="customer.status === 'BEKOR_QILINDI' && customer.rejectReason"
+                                    class="rounded-lg p-3 space-y-1"
+                                    style="background:var(--danger-bg); border:1px solid var(--danger-border);">
+                                    <p class="text-xs font-bold" style="color:var(--danger);">
+                                        {{ $t('Rad etilish sababi') }}
+                                    </p>
+                                    <p class="text-xs" style="color:var(--danger);">{{ customer.rejectReason }}</p>
+                                    <p class="text-[11px]" style="color:var(--danger);">{{
+                                        formatDate(customer.rejectedAt) }}</p>
                                 </div>
 
                                 <!-- Konsultatsiya vaqti (faqat YURIST va RAHBAR) -->
@@ -463,80 +662,91 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="rounded-xl border shadow-sm overflow-hidden"
-                            :class="'bg-[var(--bg-card)] border-[var(--border)]'">
-                            <div class="px-6 py-4 border-b" :class="'border-[var(--border)] bg-[var(--border-light)]'">
-                                <p class="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-2)]">
+                        <div class="card p-6 space-y-4">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style="background:var(--text-1); color:var(--bg-card);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5M3.75 3h16.5M21.75 3v11.25A2.25 2.25 0 0119.5 16.5H12M12 16.5v3.75m-6 0h12M12 16.5H9" />
+                                    </svg>
+                                </span>
+                                <h3 class="text-sm font-bold" style="color:var(--text-1);">
                                     {{ $t("Qo'shimcha amallar") }}
-                                </p>
+                                </h3>
                             </div>
-                            <div class="p-[22px] grid gap-3">
-                                <button @click="printQabulxat" class="btn"
-                                    style="background:var(--primary-light); color:var(--primary);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M6.72 13.83A2.25 2.25 0 004.5 16.08v3.42a.75.75 0 00.75.75h13.5a.75.75 0 00.75-.75v-3.42a2.25 2.25 0 00-2.22-2.25M6.72 13.83V8.25a.75.75 0 01.75-.75h9.06a.75.75 0 01.75.75v5.58M6.72 13.83h10.56" />
-                                    </svg>
-                                    {{ $t('Qabul xatini chop etish') }}
+                            <div class="grid grid-cols-2 gap-2">
+                                <button @click="printQabulxat" class="action-btn">
+                                    <span class="action-icon" style="background:var(--primary-light); color:var(--primary);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M6.72 13.83A2.25 2.25 0 004.5 16.08v3.42a.75.75 0 00.75.75h13.5a.75.75 0 00.75-.75v-3.42a2.25 2.25 0 00-2.22-2.25M6.72 13.83V8.25a.75.75 0 01.75-.75h9.06a.75.75 0 01.75.75v5.58M6.72 13.83h10.56" />
+                                        </svg>
+                                    </span>
+                                    <span class="action-label">{{ $t('Qabul xatini chop etish') }}</span>
                                 </button>
-                                <button @click="printChek" class="btn"
-                                    style="background:var(--success-bg); color:var(--success); border:1px solid var(--success-border);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                    </svg>
-                                    {{ $t('Chekni chop etish') }}
+                                <button @click="printChek" class="action-btn">
+                                    <span class="action-icon" style="background:var(--success-bg); color:var(--success);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                        </svg>
+                                    </span>
+                                    <span class="action-label">{{ $t('Chekni chop etish') }}</span>
                                 </button>
-                                <button class="btn"
-                                    style="background:var(--warning-bg); color:var(--warning); border:1px solid var(--warning);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                                    </svg>
-                                    {{ $t('SMS yuborish') }}
+                                <button class="action-btn">
+                                    <span class="action-icon" style="background:var(--warning-bg); color:var(--warning);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                        </svg>
+                                    </span>
+                                    <span class="action-label">{{ $t('SMS yuborish') }}</span>
                                 </button>
-                                <button @click="openAppointmentModal" class="btn"
-                                    style="background:var(--info-bg); color:var(--info); border:1px solid var(--info);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008z" />
-                                    </svg>
-                                    {{ $t('Qabul vaqtini belgilash') }}
+                                <button @click="openAppointmentModal" class="action-btn">
+                                    <span class="action-icon" style="background:var(--info-bg); color:var(--info);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008z" />
+                                        </svg>
+                                    </span>
+                                    <span class="action-label">{{ $t('Qabul vaqtini belgilash') }}</span>
                                 </button>
-                                <button @click="openPaymentLinkModal" class="btn"
-                                    style="background:var(--warning-bg); color:var(--warning); border:1px solid var(--warning-border);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
-                                    </svg>
-                                    {{ $t("To'lov havolasini yuborish") }}
+                                <button @click="openPaymentLinkModal" class="action-btn">
+                                    <span class="action-icon" style="background:var(--warning-bg); color:var(--warning);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                        </svg>
+                                    </span>
+                                    <span class="action-label">{{ $t("To'lov havolasini yuborish") }}</span>
                                 </button>
-                                <button @click="openTelegramModal" class="btn"
-                                    style="background:var(--primary-light); color:var(--primary); border:1px solid var(--border);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                        viewBox="0 0 24 24" stroke-width="1.8">
-                                        <path d="M0 0h24v24H0z" fill="none" />
-                                        <path fill="#000" fill-rule="evenodd" d="M5.788 14.02a1 1 0 0 0 .132.031a456 456 0 0 1 .844 2.002c.503 1.202 1.01 2.44 1.121 2.796c.139.438.285.736.445.94c.083.104.178.196.29.266a1 1 0 0 0 .186.088c.32.12.612.07.795.009a1.3 1.3 0 0 0 .304-.15L9.91 20l2.826-1.762l3.265 2.502q.072.055.156.093c.392.17.772.23 1.13.182c.356-.05.639-.199.85-.368a2 2 0 0 0 .564-.728l.009-.022l.003-.008l.002-.004v-.002l.001-.001a1 1 0 0 0 .04-.133l2.98-15.025a1 1 0 0 0 .014-.146c0-.44-.166-.859-.555-1.112c-.334-.217-.705-.227-.94-.209c-.252.02-.486.082-.643.132a4 4 0 0 0-.26.094l-.011.005l-16.714 6.556l-.002.001a2 2 0 0 0-.167.069a2.5 2.5 0 0 0-.38.212c-.227.155-.75.581-.661 1.285c.07.56.454.905.689 1.071c.128.091.25.156.34.199c.04.02.126.054.163.07l.01.003zm14.138-9.152h-.002l-.026.011l-16.734 6.565l-.026.01l-.01.003a1 1 0 0 0-.09.04a1 1 0 0 0 .086.043l3.142 1.058a1 1 0 0 1 .16.076l10.377-6.075l.01-.005a2 2 0 0 1 .124-.068c.072-.037.187-.091.317-.131c.09-.028.357-.107.645-.014a.85.85 0 0 1 .588.689a.84.84 0 0 1 .003.424c-.07.275-.262.489-.437.653c-.15.14-2.096 2.016-4.015 3.868l-2.613 2.52l-.465.45l5.872 4.502a.54.54 0 0 0 .251.04a.23.23 0 0 0 .117-.052a.5.5 0 0 0 .103-.12l.002-.001l2.89-14.573a2 2 0 0 0-.267.086zm-8.461 12.394l-1.172-.898l-.284 1.805zm-2.247-2.68l1.165-1.125l2.613-2.522l.973-.938l-6.52 3.817l.035.082a339 339 0 0 1 1.22 2.92l.283-1.8a.75.75 0 0 1 .231-.435" clip-rule="evenodd" />
-                                    </svg>
-                                    {{ $t('Telegram orqali xabar/fayl yuborish') }}
+                                <button @click="openTelegramModal" class="action-btn">
+                                    <span class="action-icon" style="background:var(--primary-light); color:var(--primary);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="1.8">
+                                            <path d="M0 0h24v24H0z" fill="none" />
+                                            <path fill="currentColor" fill-rule="evenodd" d="M5.788 14.02a1 1 0 0 0 .132.031a456 456 0 0 1 .844 2.002c.503 1.202 1.01 2.44 1.121 2.796c.139.438.285.736.445.94c.083.104.178.196.29.266a1 1 0 0 0 .186.088c.32.12.612.07.795.009a1.3 1.3 0 0 0 .304-.15L9.91 20l2.826-1.762l3.265 2.502q.072.055.156.093c.392.17.772.23 1.13.182c.356-.05.639-.199.85-.368a2 2 0 0 0 .564-.728l.009-.022l.003-.008l.002-.004v-.002l.001-.001a1 1 0 0 0 .04-.133l2.98-15.025a1 1 0 0 0 .014-.146c0-.44-.166-.859-.555-1.112c-.334-.217-.705-.227-.94-.209c-.252.02-.486.082-.643.132a4 4 0 0 0-.26.094l-.011.005l-16.714 6.556l-.002.001a2 2 0 0 0-.167.069a2.5 2.5 0 0 0-.38.212c-.227.155-.75.581-.661 1.285c.07.56.454.905.689 1.071c.128.091.25.156.34.199c.04.02.126.054.163.07l.01.003zm14.138-9.152h-.002l-.026.011l-16.734 6.565l-.026.01l-.01.003a1 1 0 0 0-.09.04a1 1 0 0 0 .086.043l3.142 1.058a1 1 0 0 1 .16.076l10.377-6.075l.01-.005a2 2 0 0 1 .124-.068c.072-.037.187-.091.317-.131c.09-.028.357-.107.645-.014a.85.85 0 0 1 .588.689a.84.84 0 0 1 .003.424c-.07.275-.262.489-.437.653c-.15.14-2.096 2.016-4.015 3.868l-2.613 2.52l-.465.45l5.872 4.502a.54.54 0 0 0 .251.04a.23.23 0 0 0 .117-.052a.5.5 0 0 0 .103-.12l.002-.001l2.89-14.573a2 2 0 0 0-.267.086zm-8.461 12.394l-1.172-.898l-.284 1.805zm-2.247-2.68l1.165-1.125l2.613-2.522l.973-.938l-6.52 3.817l.035.082a339 339 0 0 1 1.22 2.92l.283-1.8a.75.75 0 0 1 .231-.435" clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                    <span class="action-label">{{ $t('Telegram orqali xabar/fayl yuborish') }}</span>
                                 </button>
-                                <label class="btn cursor-pointer"
-                                    style="background:var(--border-light); color:var(--text-1); border:1px solid var(--border);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
-                                    </svg>
-                                    {{ $t('Fayl yuklash') }}
+                                <label class="action-btn col-span-2 cursor-pointer">
+                                    <span class="action-icon" style="background:var(--border-light); color:var(--text-1); border:1px solid var(--border);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
+                                        </svg>
+                                    </span>
+                                    <span class="action-label">{{ $t('Fayl yuklash') }}</span>
                                     <input type="file" multiple class="hidden" @change="handleUploadDocuments" />
                                 </label>
                             </div>
-                            <p v-if="documentUploadError" class="px-6 pb-4 text-xs" style="color:var(--danger);">
+                            <p v-if="documentUploadError" class="text-xs" style="color:var(--danger);">
                                 {{ documentUploadError }}
                             </p>
                         </div>
@@ -620,57 +830,6 @@
                                 class="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70">
                             </div>
                             {{ $t("To'lash") }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </Transition>
-    </Teleport>
-
-    <!-- Qora ro'yxatga qo'shish modal -->
-    <Teleport to="body">
-        <Transition name="modal-fade">
-            <div v-if="showBlacklistModal" class="fixed inset-0 z-50 flex items-center justify-center p-4"
-                style="background:var(--overlay);" @click.self="closeBlacklistModal">
-                <div class="w-full max-w-sm rounded-lg shadow-2xl overflow-hidden" :class="'bg-[var(--bg-card)]'">
-                    <div class="px-6 py-4 flex items-center justify-between border-b"
-                        style="border-color:var(--border);">
-                        <h3 class="font-bold text-base" style="color:var(--text-1);">{{ $t("Qora ro'yxatga qo'shish") }}
-                        </h3>
-                        <button @click="closeBlacklistModal" class="w-7 h-7 rounded-lg flex items-center justify-center"
-                            style="background:var(--border-light); color:var(--text-2);">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                                stroke="currentColor" class="w-4 h-4">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="p-6 space-y-4">
-                        <div v-if="blacklistError" class="text-xs text-[var(--danger)] px-1">{{ blacklistError }}</div>
-                        <div class="space-y-1">
-                            <label class="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-2)]">
-                                {{ $t('Sababi') }} <span class="text-[var(--danger)] text-[16px]">*</span>
-                            </label>
-                            <textarea v-model="blacklistReason" rows="4"
-                                :placeholder="$t('Qora ro\'yxatga qo\'shish sababini kiriting')"
-                                class="w-full px-3 py-2.5 bg-[var(--border-light)] rounded-lg border text-sm transition-all focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]/20"
-                                style="border-color:var(--border); color:var(--text-1);"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="px-6 py-4 flex justify-end gap-3 border-t"
-                        style="border-color:var(--border); background:var(--border-light);">
-                        <button @click="closeBlacklistModal" class="px-5 py-2 rounded-lg text-sm font-medium"
-                            :class="'text-[var(--text-2)]'">
-                            {{ $t('Bekor qilish') }}
-                        </button>
-                        <button @click="submitBlacklist" :disabled="blacklistSaving" class="btn"
-                            style="background:var(--danger); color:white;">
-                            <div v-if="blacklistSaving"
-                                class="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70">
-                            </div>
-                            {{ $t("Qo'shish") }}
                         </button>
                     </div>
                 </div>
@@ -919,6 +1078,7 @@ const customer = ref(null)
 const payments = ref([])
 const checks = ref([])
 const documents = ref([])
+const statusHistory = computed(() => customer.value?.statusHistory || [])
 const loading = ref(false)
 const statusSaving = ref(false)
 
@@ -1245,6 +1405,49 @@ const changeStatus = async (newStatus) => {
     }
 }
 
+const onStatusSelect = (newStatus) => {
+    if (newStatus === 'BEKOR_QILINDI') {
+        openRejectModal()
+        return
+    }
+    changeStatus(newStatus)
+}
+
+const showRejectModal = ref(false)
+const rejectReason = ref('')
+const rejectSaving = ref(false)
+const rejectError = ref('')
+
+const openRejectModal = () => {
+    rejectReason.value = ''
+    rejectError.value = ''
+    showRejectModal.value = true
+}
+
+const closeRejectModal = () => {
+    showRejectModal.value = false
+    rejectReason.value = ''
+    rejectError.value = ''
+}
+
+const submitReject = async () => {
+    rejectError.value = ''
+    if (!rejectReason.value.trim()) {
+        rejectError.value = 'Sababni kiriting'
+        return
+    }
+    rejectSaving.value = true
+    try {
+        const { data } = await api.put(ENDPOINTS.CUSTOMER_REJECT(customer.value.id), { reason: rejectReason.value.trim() })
+        customer.value = { ...customer.value, ...data }
+        closeRejectModal()
+    } catch (e) {
+        rejectError.value = e?.response?.data?.message || 'Xatolik yuz berdi'
+    } finally {
+        rejectSaving.value = false
+    }
+}
+
 const totalPaid = computed(() =>
     payments.value.reduce((sum, p) => sum + Number(p.amount || 0), 0)
 )
@@ -1422,5 +1625,49 @@ export default defineComponent({
 .modal-fade-enter-from,
 .modal-fade-leave-to {
     opacity: 0;
+}
+
+.slide-fade-enter-active {
+    transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+}
+.slide-fade-leave-active {
+    transition: opacity 0.12s ease-in, transform 0.12s ease-in;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 150ms ease, background 150ms ease;
+}
+.action-btn:hover {
+    border-color: var(--text-3);
+    background: var(--border-light);
+}
+.action-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.action-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-1);
+    line-height: 1.25;
 }
 </style>

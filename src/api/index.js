@@ -60,6 +60,7 @@ export const ENDPOINTS = {
   CUSTOMER_CHECK_DUPLICATE: '/api/customers/check-duplicate',
   CUSTOMER_BLACKLIST:       (id) => `/api/customers/${id}/blacklist`,
   CUSTOMER_UNBLACKLIST:     (id) => `/api/customers/${id}/unblacklist`,
+  CUSTOMER_REJECT:          (id) => `/api/customers/${id}/reject`,
   PRICES:             '/api/customers/settings/prices',
 
   // Queue / Waiting room

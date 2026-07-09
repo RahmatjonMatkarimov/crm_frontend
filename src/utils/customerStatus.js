@@ -4,7 +4,7 @@ export const KANBAN_STATUS_ORDER = ['NAVBATDA', 'KORIB_CHIQILDI', 'YAKUNLANDI', 
 
 export const kanbanStatusLabels = {
   NAVBATDA: 'Maslahat olish uchun navbatda turgan fuqarolar',
-  KORIB_CHIQILDI: 'Qabuldagi mijozlar',
+  KORIB_CHIQILDI: 'Yurist qabulida kirgan fuqarolar',
   YAKUNLANDI: 'Maslahat berilgan mijozlar',
   YURISTDA: 'Shartnoma tuzilgan mijozlar',
   BEKOR_QILINDI: 'Rad etilgan murojaatlar',
